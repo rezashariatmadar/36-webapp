@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}خانه - ۳۶{% endblock %}
+
+{% block content %}
+<div class="hero bg-base-200 rounded-box p-10">
+    <div class="hero-content text-center">
+        <div class="max-w-md">
+            <h1 class="text-5xl font-bold italic text-primary">۳۶</h1>
+            <p class="py-6 font-medium">به سامانه مدیریت ۳۶ خوش آمدید.</p>
+            {% if user.is_authenticated %}
+                <p class="mb-4">شما با شماره <span class="badge badge-outline">{{ user.phone_number }}</span> وارد شده‌اید.</p>
+                <div class="grid grid-cols-1 gap-2">
+                    <a href="{% url 'logout' %}" class="btn btn-outline btn-sm">خروج از حساب</a>
+                </div>
+            {% else %}
+                <div class="flex gap-2 justify-center">
+                    <a href="{% url 'login' %}" class="btn btn-primary">ورود به سیستم</a>
+                    <a href="{% url 'register' %}" class="btn btn-ghost">عضویت جدید</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Login" %} - ۳۶{% endblock %}
+
+{% block content %}
+<div class="flex justify-center items-center">
+    <div class="card w-full max-w-md bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-2xl font-bold mb-6 text-center block">{% trans "Login" %}</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error mb-4">
+                        <span>{{ form.non_field_errors|striptags }}</span>
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="form-control w-full mb-4">
+                        <label class="label">
+                            <span class="label-text">{{ field.label }}</span>
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="label">
+                                <span class="label-text-alt text-error">{{ field.errors|striptags }}</span>
+                            </label>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="card-actions justify-end mt-6">
+                    <button type="submit" class="btn btn-primary w-full">{% trans "Login" %}</button>
+                </div>
+            </form>
+            
+            <div class="mt-4 text-center">
+                <p class="text-sm opacity-70">
+                    {% trans "Don't have an account?" %} 
+                    <a href="{% url 'register' %}" class="link link-primary">{% trans "Register" %}</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styling for Django form fields to match daisyUI inputs */
+    input[type="text"], input[type="password"] {
+        @apply input input-bordered w-full;
+    }
+</style>
+{% endblock %}

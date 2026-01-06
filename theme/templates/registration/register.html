@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Register" %} - ۳۶{% endblock %}
+
+{% block content %}
+<div class="flex justify-center items-center">
+    <div class="card w-full max-w-md bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-2xl font-bold mb-6 text-center block">{% trans "Create an Account" %}</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="form-control w-full mb-4">
+                        <label class="label">
+                            <span class="label-text">{{ field.label }}</span>
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="label">
+                                <span class="label-text-alt text-error">{{ field.errors|striptags }}</span>
+                            </label>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <label class="label">
+                                <span class="label-text-alt opacity-50">{{ field.help_text }}</span>
+                            </label>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="card-actions justify-end mt-6">
+                    <button type="submit" class="btn btn-primary w-full">{% trans "Register" %}</button>
+                </div>
+            </form>
+            
+            <div class="mt-4 text-center">
+                <p class="text-sm opacity-70">
+                    {% trans "Already have an account?" %} 
+                    <a href="{% url 'login' %}" class="link link-primary">{% trans "Login" %}</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styling for Django form fields to match daisyUI inputs */
+    input[type="text"], input[type="password"], input[type="email"], select, textarea {
+        @apply input input-bordered w-full;
+    }
+    input.is-invalid {
+        @apply input-error;
+    }
+</style>
+{% endblock %}

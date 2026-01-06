@@ -21,23 +21,23 @@
     -   Add regex validator to the `phone_number` field on the model.
 
 ## Phase 3: Authentication Views & Forms
-- [ ] Task: Create Registration Form
+- [x] Task: Create Registration Form
     -   Create a `UserRegistrationForm` (ModelForm).
     -   Override `clean()` to run the National ID validator.
     -   Ensure labels are in Persian.
-- [ ] Task: Implement Registration View
+- [x] Task: Implement Registration View
     -   Create a view to handle registration.
     -   On success: Create user (set password = national_id), assign to 'Customer' group, and redirect to login.
-- [ ] Task: Implement Login View
+- [x] Task: Implement Login View
     -   Use or extend Django's `LoginView`.
     -   Create a custom `AuthenticationForm` if needed for Persian labels.
-- [ ] Task: Create Templates (RTL)
+- [x] Task: Create Templates (RTL)
     -   `registration/login.html`: Tailwind styled, dark theme, RTL.
     -   `registration/register.html`: Tailwind styled, dark theme, RTL.
     -   Ensure `dir="rtl"` is set on the `<html>` or container.
 
 ## Phase 4: Roles & Permissions
-- [ ] Task: Initialize Groups
+- [x] Task: Initialize Groups
     -   Create a management command `init_roles` to create 'Admin', 'Barista', and 'Customer' groups.
     -   Run the command.
 
