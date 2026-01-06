@@ -4,7 +4,7 @@
 {% block title %}{% trans "Menu" %} - ۳۶{% endblock %}
 
 {% block content %}
-<div class="pb-20"> <!-- Padding for bottom spacing -->
+<div class="pb-32"> <!-- Increased padding for bottom cart bar -->
     
     <!-- Hero Section -->
     <div class="text-center mb-4 py-8 bg-gradient-to-b from-primary/5 to-transparent rounded-b-3xl -mx-4 md:-mx-8 md:rounded-b-[3rem]">
@@ -13,12 +13,11 @@
     </div>
 
     <!-- Sticky Category Nav -->
-    <!-- Added top-[-1px] to ensure it sticks firmly, and z-50 -->
     <div class="sticky top-0 z-50 bg-base-100/95 backdrop-blur-md border-b border-base-200 -mx-4 md:-mx-8 px-4 md:px-8 py-3 mb-8 overflow-x-auto no-scrollbar flex gap-2 snap-x shadow-sm" id="category-nav">
         {% for category in categories %}
             {% if category.items.all %}
                 <a href="#category-{{ category.id }}" 
-                   class="btn btn-sm btn-ghost rounded-full whitespace-nowrap snap-start font-bold opacity-60 hover:opacity-100 transition-all border border-transparent hover:border-base-300 data-[active=true]:bg-primary data-[active=true]:text-primary-content data-[active=true]:opacity-100 data-[active=true]:shadow-md"
+                   class="btn btn-sm btn-ghost rounded-full whitespace-nowrap snap-start font-bold opacity-60 hover:opacity-100 transition-all border border-transparent hover:border-base-300 data-[active=true]:bg-primary data-[active=true]:text-primary-content data-[active=true]:opacity-100"
                    data-target="category-{{ category.id }}">
                     {{ category.name }}
                 </a>
@@ -30,7 +29,6 @@
     <div class="space-y-20 max-w-4xl mx-auto px-1">
         {% for category in categories %}
             {% if category.items.all %}
-                <!-- Increased scroll margin to clear the sticky header (approx 80px) -->
                 <section id="category-{{ category.id }}" class="scroll-mt-28 section-category">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="h-8 w-1 bg-secondary rounded-full shadow-sm"></div>
@@ -39,15 +37,15 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         {% for item in category.items.all %}
-                            <div class="card card-side bg-base-100 shadow-sm border border-base-200 hover:shadow-md hover:border-primary/20 transition-all duration-300 p-3 items-center group cursor-default">
+                            <div class="card card-side bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-all duration-300 p-3 items-center group">
                                 {% if item.image %}
-                                    <figure class="w-24 h-24 shrink-0 rounded-xl overflow-hidden ml-4 bg-base-200 relative">
+                                    <figure class="w-24 h-24 shrink-0 rounded-xl overflow-hidden ml-4 bg-base-200">
                                         <img src="{{ item.image.url }}" loading="lazy" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                     </figure>
                                 {% else %}
                                     <div class="w-24 h-24 shrink-0 rounded-xl bg-base-200/50 flex items-center justify-center ml-4 text-base-content/20 group-hover:text-primary/40 transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                         </svg>
                                     </div>
                                 {% endif %}
@@ -59,11 +57,17 @@
                                     {% if item.description %}
                                         <p class="text-xs text-base-content/60 line-clamp-2 mb-3 leading-relaxed">{{ item.description }}</p>
                                     {% endif %}
-                                    <div class="flex items-center justify-end">
-                                        <div class="badge badge-lg badge-ghost font-bold text-primary border-primary/10 bg-primary/5 group-hover:bg-primary group-hover:text-primary-content transition-colors">
+                                    
+                                    <div class="flex items-center justify-between mt-auto">
+                                        <div class="font-bold text-sm text-primary">
                                             {{ item.price }} 
                                             <span class="text-[10px] mr-1 opacity-80 font-normal">تومان</span>
                                         </div>
+                                        <a href="{% url 'cafe:add_to_cart' item.id %}" class="btn btn-xs btn-circle btn-primary shadow-sm hover:scale-110 active:scale-95 transition-all">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -74,6 +78,21 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Floating Cart Bar -->
+{% if cart_count %}
+    <div class="fixed bottom-6 left-0 right-0 z-50 px-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <a href="{% url 'cafe:cart_detail' %}" class="max-w-md mx-auto btn btn-primary w-full h-16 rounded-2xl shadow-2xl flex justify-between items-center px-6 border-none">
+            <div class="flex items-center gap-3">
+                <div class="badge badge-secondary font-black h-8 w-8 text-lg">{{ cart_count }}</div>
+                <span class="font-bold text-lg tracking-tight">مشاهده سفارش</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 17l-4 4m0 0l-4-4m4 4V3" />
+            </svg>
+        </a>
+    </div>
+{% endif %}
 
 <style>
     .no-scrollbar::-webkit-scrollbar {
@@ -86,27 +105,22 @@
 </style>
 
 <script>
+    // Intersection Observer logic remains the same as before
     document.addEventListener('DOMContentLoaded', () => {
         const navLinks = document.querySelectorAll('#category-nav a');
         const sections = document.querySelectorAll('.section-category');
-        const nav = document.getElementById('category-nav');
         
         let isClickScrolling = false;
         let scrollTimeout;
 
-        // Optimized Intersection Observer
         const observerOptions = {
             root: null,
-            // Check intersection primarily in the top 20% of the screen
-            // This prevents highlighting sections at the bottom before they are "read"
             rootMargin: '-10% 0px -85% 0px', 
             threshold: 0
         };
 
         const observer = new IntersectionObserver((entries) => {
-            // If we are scrolling via click, don't update nav to avoid jumping
             if (isClickScrolling) return;
-
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const id = entry.target.id;
@@ -121,38 +135,20 @@
             navLinks.forEach(link => {
                 if (link.getAttribute('href') === `#${targetId}`) {
                     link.setAttribute('data-active', 'true');
-                    
-                    // Smoothly scroll the nav itself to keep active item visible
-                    link.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'nearest',
-                        inline: 'center'
-                    });
+                    link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
                 } else {
                     link.setAttribute('data-active', 'false');
                 }
             });
         }
 
-        // Handle click manually to set flag
         navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                // We let the default anchor behavior happen (for CSS smooth scroll)
-                // But we set a flag to pause the observer
-                
+            link.addEventListener('click', () => {
                 isClickScrolling = true;
                 const targetId = link.getAttribute('href').substring(1);
-                
-                // Immediately update UI for responsiveness
                 updateActiveLink(targetId);
-
-                // Clear any existing timeout
                 clearTimeout(scrollTimeout);
-                
-                // Reset flag after scroll is likely done (1s is usually enough for smooth scroll)
-                scrollTimeout = setTimeout(() => {
-                    isClickScrolling = false;
-                }, 1000);
+                scrollTimeout = setTimeout(() => { isClickScrolling = false; }, 1000);
             });
         });
     });

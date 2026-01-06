@@ -14,10 +14,10 @@
     -   Design minimalist, responsive template.
     -   Add link to main navbar.
 
-## Phase 3: Order Management (Upcoming)
-- [ ] Task: Create Order Models
+## Phase 3: Order Management
+- [x] Task: Create Order Models
     -   `CafeOrder`, `OrderItem`.
-- [ ] Task: Implement Barista Dashboard
+- [x] Task: Implement Barista Dashboard
     -   Real-time (polling) order queue.
-- [ ] Task: Customer Ordering Flow
+- [x] Task: Customer Ordering Flow
     -   Shopping cart / checkout logic.

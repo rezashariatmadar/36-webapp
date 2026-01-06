@@ -1,0 +1,19 @@
+from django.contrib import admin
+from .models import PricingPlan, Space, Booking
+
+@admin.register(PricingPlan)
+class PricingPlanAdmin(admin.ModelAdmin):
+    list_display = ('name', 'daily_rate', 'hourly_rate', 'monthly_rate')
+
+@admin.register(Space)
+class SpaceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'zone', 'capacity', 'pricing_plan', 'is_active')
+    list_filter = ('zone', 'is_active')
+    search_fields = ('name',)
+
+@admin.register(Booking)
+class BookingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'space', 'booking_type', 'start_time', 'end_time', 'status')
+    list_filter = ('status', 'booking_type', 'space__zone')
+    search_fields = ('user__phone_number', 'user__full_name')
+    date_hierarchy = 'start_time'

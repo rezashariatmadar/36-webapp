@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'accounts',
     'theme',
     'cafe',
+    'cowork',
 ]
 
 MIDDLEWARE = [

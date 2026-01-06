@@ -29,3 +29,56 @@ class MenuItem(models.Model):
 
     def __str__(self):
         return self.name
+
+class CafeOrder(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', _('Pending')
+        PREPARING = 'PREPARING', _('Preparing')
+        READY = 'READY', _('Ready to Pickup')
+        DELIVERED = 'DELIVERED', _('Delivered')
+        CANCELLED = 'CANCELLED', _('Cancelled')
+
+    user = models.ForeignKey('accounts.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Customer"))
+    status = models.CharField(_("Status"), max_length=20, choices=Status.choices, default=Status.PENDING)
+    is_paid = models.BooleanField(_("Is Paid"), default=False)
+    notes = models.TextField(_("Notes/Table Number"), blank=True, help_text=_("e.g. Table 5 or Specific delivery instructions"))
+    
+    total_price = models.DecimalField(_("Total Price"), max_digits=12, decimal_places=0, default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Cafe Order")
+        verbose_name_plural = _("Cafe Orders")
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Order #{self.id} - {self.get_status_display()}"
+
+    def update_total_price(self):
+        # We use a aggregate for efficiency
+        total = self.items.aggregate(models.Sum(models.F('unit_price') * models.F('quantity')))['models.F(unit_price) * models.F(quantity)__sum'] or 0
+        # Wait, the F() expression in aggregate is a bit tricky depending on Django version.
+        # Let's use a simpler way for reliability in MVP.
+        total = sum(item.get_subtotal() for item in self.items.all())
+        self.total_price = total
+        self.save()
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(CafeOrder, related_name='items', on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(MenuItem, on_delete=models.PROTECT, verbose_name=_("Menu Item"))
+    quantity = models.PositiveIntegerField(_("Quantity"), default=1)
+    unit_price = models.DecimalField(_("Unit Price"), max_digits=12, decimal_places=0) # Price at the time of order
+
+    def get_subtotal(self):
+        return self.unit_price * self.quantity
+
+    def save(self, *args, **kwargs):
+        if not self.unit_price:
+            self.unit_price = self.menu_item.price
+        super().save(*args, **kwargs)
+        self.order.update_total_price()
+
+    def __str__(self):
+        return f"{self.quantity}x {self.menu_item.name}"

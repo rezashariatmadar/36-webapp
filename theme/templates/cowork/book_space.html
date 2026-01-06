@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}تکمیل رزرو - ۳۶{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <div class="mb-8 text-center">
+        <span class="badge badge-primary font-bold mb-4">{{ space.get_zone_display }}</span>
+        <h1 class="text-3xl font-black text-base-content">{{ space.name }}</h1>
+        <p class="text-sm opacity-60 mt-2">لطفا جزئیات رزرو خود را مشخص کنید</p>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card-body p-6 md:p-8">
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error text-sm py-2 rounded-lg">
+                        <span>{{ form.non_field_errors|striptags }}</span>
+                    </div>
+                {% endif %}
+
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-bold">نوع رزرو</span>
+                    </label>
+                    <select name="{{ form.booking_type.name }}" class="select select-bordered w-full">
+                        {% for value, text in form.booking_type.field.choices %}
+                            <option value="{{ value }}" {% if form.booking_type.value == value %}selected{% endif %}>{{ text }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-bold">زمان شروع</span>
+                    </label>
+                    <input type="datetime-local" name="{{ form.start_time.name }}" 
+                           class="input input-bordered w-full text-left ltr" 
+                           required value="{{ form.start_time.value|default:'' }}">
+                    {% if form.start_time.errors %}
+                        <span class="text-error text-xs mt-1">{{ form.start_time.errors|striptags }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-bold">زمان پایان</span>
+                    </label>
+                    <input type="datetime-local" name="{{ form.end_time.name }}" 
+                           class="input input-bordered w-full text-left ltr" 
+                           required value="{{ form.end_time.value|default:'' }}">
+                    {% if form.end_time.errors %}
+                        <span class="text-error text-xs mt-1">{{ form.end_time.errors|striptags }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="bg-base-200/50 rounded-xl p-4 text-xs space-y-2 mt-4">
+                    <div class="flex justify-between">
+                        <span class="opacity-70">تعرفه روزانه:</span>
+                        <span class="font-bold">{{ space.pricing_plan.daily_rate }} تومان</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="opacity-70">تعرفه ساعتی:</span>
+                        <span class="font-bold">{{ space.pricing_plan.hourly_rate }} تومان</span>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="btn btn-primary btn-lg w-full font-black shadow-lg shadow-primary/20">
+                        تایید و رزرو
+                    </button>
+                    <a href="{% url 'cowork:space_list' %}" class="btn btn-ghost w-full mt-2">انصراف</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

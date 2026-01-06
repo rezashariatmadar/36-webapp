@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}آنالیز و آمار - ۳۶{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto pb-20">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
+        <div>
+            <h1 class="text-4xl font-black text-primary">گزارش عملکرد</h1>
+            <p class="text-base-content/60 font-medium">نگاهی کلی به وضعیت کافه و فضای کار</p>
+        </div>
+        <div class="flex gap-2">
+            <div class="badge badge-lg badge-outline p-4 font-bold ltr">{{ now|date:"Y/m/d" }}</div>
+            <button onclick="location.reload()" class="btn btn-sm btn-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 1. Top Level Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <div class="stats shadow-sm border border-base-200 bg-base-100">
+            <div class="stat">
+                <div class="stat-title text-xs font-bold opacity-50">درآمد کل کافه</div>
+                <div class="stat-value text-primary text-2xl">{{ cafe_total }}</div>
+                <div class="stat-desc font-bold text-success">امروز: {{ cafe_today }}</div>
+            </div>
+        </div>
+        <div class="stats shadow-sm border border-base-200 bg-base-100">
+            <div class="stat">
+                <div class="stat-title text-xs font-bold opacity-50">درآمد فضای کار</div>
+                <div class="stat-value text-secondary text-2xl">{{ cowork_total }}</div>
+                <div class="stat-desc font-medium opacity-40">مجموع تراکنش‌ها</div>
+            </div>
+        </div>
+        <div class="stats shadow-sm border border-base-200 bg-base-100">
+            <div class="stat">
+                <div class="stat-title text-xs font-bold opacity-50">نرخ اشغال فضا</div>
+                <div class="stat-value text-2xl">{{ occupancy_rate }}%</div>
+                <div class="stat-desc w-full mt-2">
+                    <progress class="progress progress-primary w-full" value="{{ occupancy_rate }}" max="100"></progress>
+                </div>
+            </div>
+        </div>
+        <div class="stats shadow-sm border border-base-200 bg-base-100">
+            <div class="stat">
+                <div class="stat-title text-xs font-bold opacity-50">رزروهای فعال</div>
+                <div class="stat-value text-2xl">{{ active_bookings }}</div>
+                <div class="stat-desc font-medium opacity-40">از مجموع {{ total_spaces }} فضا</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- 2. Cafe Detailed Stats -->
+        <div class="card bg-base-100 shadow-sm border border-base-200">
+            <div class="card-body p-0">
+                <div class="p-6 border-b border-base-200 flex justify-between items-center">
+                    <h2 class="card-title font-black text-primary">پرفروش‌ترین‌های کافه</h2>
+                    <span class="badge badge-ghost">Top 5 Items</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra w-full">
+                        <thead>
+                            <tr class="opacity-50">
+                                <th>نام آیتم</th>
+                                <th class="text-center">تعداد</th>
+                                <th class="text-left">درآمد حاصله</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in top_items %}
+                                <tr>
+                                    <td class="font-bold">{{ item.menu_item__name }}</td>
+                                    <td class="text-center">
+                                        <div class="badge badge-neutral font-black">{{ item.total_qty }}</div>
+                                    </td>
+                                    <td class="text-left font-medium text-xs">{{ item.total_rev }} <span class="opacity-40">تومان</span></td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="text-center opacity-30 py-8">داده‌ای یافت نشد</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Cowork Detailed Stats -->
+        <div class="card bg-base-100 shadow-sm border border-base-200">
+            <div class="card-body p-0">
+                <div class="p-6 border-b border-base-200 flex justify-between items-center">
+                    <h2 class="card-title font-black text-secondary">مشتریان برتر (فضای کار)</h2>
+                    <span class="badge badge-ghost">Loyal Members</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra w-full">
+                        <thead>
+                            <tr class="opacity-50">
+                                <th>کاربر</th>
+                                <th class="text-center">تعداد رزرو</th>
+                                <th class="text-left">مجموع پرداختی</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in top_cowork_members %}
+                                <tr>
+                                    <td>
+                                        <div class="font-bold">{{ member.user__full_name|default:"کاربر بدون نام" }}</div>
+                                        <div class="text-[10px] opacity-50 ltr text-right">{{ member.user__phone_number }}</div>
+                                    </td>
+                                    <td class="text-center font-black">{{ member.total_bookings }}</td>
+                                    <td class="text-left font-medium text-xs text-secondary">{{ member.total_spent }} <span class="opacity-40">تومان</span></td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="text-center opacity-30 py-8">داده‌ای یافت نشد</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Top Cafe Buyers -->
+        <div class="card bg-base-100 shadow-sm border border-base-200 lg:col-span-2">
+            <div class="card-body p-0">
+                <div class="p-6 border-b border-base-200">
+                    <h2 class="card-title font-black text-primary">مشتریان وفادار کافه</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra w-full">
+                        <thead>
+                            <tr class="opacity-50">
+                                <th>نام مشتری / شماره تماس</th>
+                                <th class="text-left">مجموع خرید</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for buyer in top_cafe_buyers %}
+                                <tr>
+                                    <td class="flex items-center gap-3">
+                                        <div class="avatar placeholder">
+                                            <div class="bg-primary/10 text-primary rounded-full w-8">
+                                                <span class="text-xs font-black">{{ buyer.user__full_name|slice:":1" }}</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold">{{ buyer.user__full_name|default:"مشتری حضوری" }}</div>
+                                            <div class="text-[10px] opacity-50 ltr text-right">{{ buyer.user__phone_number }}</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-left font-black text-primary">{{ buyer.total_spent }} <span class="text-[10px] font-normal opacity-40">تومان</span></td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="2" class="text-center opacity-30 py-8">داده‌ای یافت نشد</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

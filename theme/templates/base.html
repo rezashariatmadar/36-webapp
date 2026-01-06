@@ -25,7 +25,13 @@
             <nav>
                 <ul class="flex gap-4 items-center">
                     <li><a href="{% url 'cafe:menu' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">منو</a></li>
+                    <li><a href="{% url 'cowork:space_list' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">رزرو فضا</a></li>
                     {% if user.is_authenticated %}
+                        <li><a href="{% url 'cafe:order_list' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">سفارش‌های من</a></li>
+                        <li><a href="{% url 'cowork:my_bookings' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">رزروهای من</a></li>
+                        {% if user.is_staff or user.groups.all %} <!-- Simplified check for staff/barista -->
+                            <li><a href="{% url 'cafe:barista_dashboard' %}" class="btn btn-sm btn-accent text-accent-content font-bold">پنل باریستا</a></li>
+                        {% endif %}
                         <li class="hidden md:block"><span class="text-sm font-medium opacity-90">{{ user.full_name|default:user.phone_number }}</span></li>
                         <li>
                             <form action="{% url 'logout' %}" method="post" class="inline">
