@@ -24,6 +24,7 @@
             
             <nav>
                 <ul class="flex gap-4 items-center">
+                    <li><a href="{% url 'cafe:menu' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">منو</a></li>
                     {% if user.is_authenticated %}
                         <li class="hidden md:block"><span class="text-sm font-medium opacity-90">{{ user.full_name|default:user.phone_number }}</span></li>
                         <li>

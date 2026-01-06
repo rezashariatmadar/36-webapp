@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Menu" %} - ۳۶{% endblock %}
+
+{% block content %}
+<div class="pb-20"> <!-- Padding for bottom spacing -->
+    
+    <!-- Hero Section -->
+    <div class="text-center mb-8 py-8 bg-gradient-to-b from-primary/5 to-transparent rounded-b-3xl -mx-4 md:-mx-8 md:rounded-b-[3rem]">
+        <h1 class="text-4xl font-black text-primary mb-2 tracking-tight">منوی ۳۶</h1>
+        <p class="text-base-content/60 font-medium">تجربه‌ای متفاوت از طعم‌ها</p>
+    </div>
+
+    <!-- Sticky Category Nav -->
+    <div class="sticky top-0 z-40 bg-base-100/95 backdrop-blur-md border-b border-base-200 -mx-4 md:-mx-8 px-4 md:px-8 py-2 mb-6 overflow-x-auto no-scrollbar flex gap-2 snap-x" id="category-nav">
+        {% for category in categories %}
+            {% if category.items.all %}
+                <a href="#category-{{ category.id }}" 
+                   class="btn btn-sm btn-ghost rounded-full whitespace-nowrap snap-start font-bold opacity-60 hover:opacity-100 transition-all border border-transparent hover:border-base-300 data-[active=true]:bg-primary data-[active=true]:text-primary-content data-[active=true]:opacity-100"
+                   data-target="category-{{ category.id }}">
+                    {{ category.name }}
+                </a>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Menu Items -->
+    <div class="space-y-16 max-w-4xl mx-auto">
+        {% for category in categories %}
+            {% if category.items.all %}
+                <section id="category-{{ category.id }}" class="scroll-mt-32 section-category">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="h-8 w-1 bg-secondary rounded-full"></div>
+                        <h2 class="text-2xl font-black text-base-content">{{ category.name }}</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                        {% for item in category.items.all %}
+                            <div class="card card-side bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-all p-3 items-center group">
+                                {% if item.image %}
+                                    <figure class="w-24 h-24 shrink-0 rounded-xl overflow-hidden ml-4">
+                                        <img src="{{ item.image.url }}" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    </figure>
+                                {% else %}
+                                    <div class="w-24 h-24 shrink-0 rounded-xl bg-base-200 flex items-center justify-center ml-4 text-base-content/10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="flex-grow min-w-0">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <h3 class="font-bold text-lg text-base-content leading-tight">{{ item.name }}</h3>
+                                    </div>
+                                    {% if item.description %}
+                                        <p class="text-xs text-base-content/60 line-clamp-2 mb-2">{{ item.description }}</p>
+                                    {% endif %}
+                                    <div class="flex items-center justify-end">
+                                        <div class="badge badge-ghost font-bold text-primary">{{ item.price }} <span class="text-[10px] mr-1 opacity-70">تومان</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const navLinks = document.querySelectorAll('#category-nav a');
+        const sections = document.querySelectorAll('.section-category');
+        const nav = document.getElementById('category-nav');
+
+        // Scroll Spy
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -60% 0px', // Active when element is in top part of screen
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Remove active from all
+                    navLinks.forEach(link => link.setAttribute('data-active', 'false'));
+                    
+                    // Add active to current
+                    const activeLink = document.querySelector(`#category-nav a[data-target="${entry.target.id}"]`);
+                    if (activeLink) {
+                        activeLink.setAttribute('data-active', 'true');
+                        
+                        // Scroll nav to center active item
+                        activeLink.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest',
+                            inline: 'center'
+                        });
+                    }
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => observer.observe(section));
+
+        // Smooth scroll on click
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                
+                // Offset for sticky header
+                const headerOffset = 140; 
+                const elementPosition = targetSection.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

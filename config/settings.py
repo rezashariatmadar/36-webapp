@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # Local apps
     'accounts',
     'theme',
+    'cafe',
 ]
 
 MIDDLEWARE = [
@@ -131,4 +132,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TAILWIND_APP_NAME = 'theme'
 AUTH_USER_MODEL = 'accounts.CustomUser'
 LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = 'home'
