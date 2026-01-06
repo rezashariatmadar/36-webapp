@@ -45,9 +45,9 @@
     -   Verify redirect to login for unauthenticated users.
 - [x] Task: Conductor - User Manual Verification 'RBAC & Permission Testing' (Protocol in workflow.md) 12321ed
 
-## Phase 5: API Testing & Coverage Finalization
+## Phase 5: API Testing & Coverage Finalization [checkpoint: 099cf1a]
 - [x] Task: Implement Tests for REST Endpoints 12321ed
     -   Use `rest_framework.test` to verify User and Menu API responses.
-- [~] Task: Final Coverage Report & Cleanup
+- [x] Task: Final Coverage Report & Cleanup 099cf1a
     -   Run full suite and ensure >80% coverage on all apps.
-- [ ] Task: Conductor - User Manual Verification 'API & Coverage Finalization' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'API & Coverage Finalization' (Protocol in workflow.md) 099cf1a
