@@ -4,55 +4,96 @@
 {% block title %}{% trans "Register" %} - ۳۶{% endblock %}
 
 {% block content %}
-<div class="flex justify-center items-center">
-    <div class="card w-full max-w-md bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title text-2xl font-bold mb-6 text-center block">{% trans "Create an Account" %}</h2>
-            
-            <form method="post">
+<div class="flex flex-col items-center justify-center min-h-[80vh]">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-black text-secondary mb-2">۳۶</h1>
+            <h2 class="text-xl font-bold">{% trans "Create Account" %}</h2>
+        </div>
+        
+        <div class="bg-base-100 shadow-sm border border-base-300 rounded-lg p-6 md:p-8">
+            <form method="post" class="space-y-4">
                 {% csrf_token %}
                 
-                {% for field in form %}
-                    <div class="form-control w-full mb-4">
-                        <label class="label">
-                            <span class="label-text">{{ field.label }}</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Phone Number -->
+                    <div class="form-control w-full md:col-span-2">
+                        <label class="label pb-1">
+                            <span class="label-text font-bold text-sm">{{ form.phone_number.label }}</span>
                         </label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <label class="label">
-                                <span class="label-text-alt text-error">{{ field.errors|striptags }}</span>
-                            </label>
-                        {% endif %}
-                        {% if field.help_text %}
-                            <label class="label">
-                                <span class="label-text-alt opacity-50">{{ field.help_text }}</span>
-                            </label>
+                        <input type="text" name="{{ form.phone_number.name }}" 
+                               class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-secondary transition-colors" 
+                               placeholder="۰۹xxxxxxxxx" required value="{{ form.phone_number.value|default:'' }}">
+                        {% if form.phone_number.errors %}
+                            <span class="text-error text-xs mt-1">{{ form.phone_number.errors|striptags }}</span>
                         {% endif %}
                     </div>
-                {% endfor %}
 
-                <div class="card-actions justify-end mt-6">
-                    <button type="submit" class="btn btn-primary w-full">{% trans "Register" %}</button>
+                    <!-- National ID -->
+                    <div class="form-control w-full">
+                        <label class="label pb-1">
+                            <span class="label-text font-bold text-sm">{{ form.national_id.label }}</span>
+                        </label>
+                        <input type="text" name="{{ form.national_id.name }}" 
+                               class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-secondary transition-colors" 
+                               placeholder="۰۰xxxxxxx" required value="{{ form.national_id.value|default:'' }}">
+                        {% if form.national_id.errors %}
+                            <span class="text-error text-xs mt-1">{{ form.national_id.errors|striptags }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="form-control w-full">
+                        <label class="label pb-1">
+                            <span class="label-text font-bold text-sm">{{ form.full_name.label }}</span>
+                        </label>
+                        <input type="text" name="{{ form.full_name.name }}" 
+                               class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-secondary transition-colors" 
+                               placeholder="{% trans 'Full Name' %}" required value="{{ form.full_name.value|default:'' }}">
+                        {% if form.full_name.errors %}
+                            <span class="text-error text-xs mt-1">{{ form.full_name.errors|striptags }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-control w-full">
+                        <label class="label pb-1">
+                            <span class="label-text font-bold text-sm">{{ form.password.label }}</span>
+                        </label>
+                        <input type="password" name="{{ form.password.name }}" 
+                               class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-secondary transition-colors" 
+                               placeholder="******" required>
+                        <label class="label pt-1"><span class="label-text-alt opacity-60 text-[10px]">{% trans "Use National ID for initial login" %}</span></label>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-control w-full">
+                        <label class="label pb-1">
+                            <span class="label-text font-bold text-sm">{{ form.confirm_password.label }}</span>
+                        </label>
+                        <input type="password" name="{{ form.confirm_password.name }}" 
+                               class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-secondary transition-colors" 
+                               placeholder="******" required>
+                        {% if form.confirm_password.errors %}
+                            <span class="text-error text-xs mt-1">{{ form.confirm_password.errors|striptags }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="btn btn-secondary btn-sm w-full font-bold">
+                        {% trans "Register" %}
+                    </button>
                 </div>
             </form>
             
-            <div class="mt-4 text-center">
-                <p class="text-sm opacity-70">
+            <div class="mt-6 text-center border-t border-base-200 pt-4">
+                <p class="text-xs text-base-content/70">
                     {% trans "Already have an account?" %} 
-                    <a href="{% url 'login' %}" class="link link-primary">{% trans "Login" %}</a>
+                    <a href="{% url 'login' %}" class="link link-secondary font-bold no-underline hover:underline">{% trans "Login" %}</a>
                 </p>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    /* Styling for Django form fields to match daisyUI inputs */
-    input[type="text"], input[type="password"], input[type="email"], select, textarea {
-        @apply input input-bordered w-full;
-    }
-    input.is-invalid {
-        @apply input-error;
-    }
-</style>
 {% endblock %}

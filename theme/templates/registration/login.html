@@ -4,53 +4,61 @@
 {% block title %}{% trans "Login" %} - ۳۶{% endblock %}
 
 {% block content %}
-<div class="flex justify-center items-center">
-    <div class="card w-full max-w-md bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title text-2xl font-bold mb-6 text-center block">{% trans "Login" %}</h2>
-            
-            <form method="post">
+<div class="flex flex-col items-center justify-center min-h-[70vh]">
+    <div class="w-full max-w-sm">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-black text-primary mb-2">۳۶</h1>
+            <h2 class="text-xl font-bold">{% trans "Welcome Back" %}</h2>
+        </div>
+        
+        <div class="bg-base-100 shadow-sm border border-base-300 rounded-lg p-6 md:p-8">
+            <form method="post" class="space-y-4">
                 {% csrf_token %}
                 
                 {% if form.non_field_errors %}
-                    <div class="alert alert-error mb-4">
+                    <div class="alert alert-error rounded-md text-sm py-2">
                         <span>{{ form.non_field_errors|striptags }}</span>
                     </div>
                 {% endif %}
 
-                {% for field in form %}
-                    <div class="form-control w-full mb-4">
-                        <label class="label">
-                            <span class="label-text">{{ field.label }}</span>
-                        </label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <label class="label">
-                                <span class="label-text-alt text-error">{{ field.errors|striptags }}</span>
-                            </label>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                <div class="form-control w-full">
+                    <label class="label pb-1">
+                        <span class="label-text font-bold text-sm">{{ form.username.label }}</span>
+                    </label>
+                    <input type="text" name="{{ form.username.name }}" 
+                           class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-primary transition-colors" 
+                           placeholder="۰۹xxxxxxxxx" required autofocus>
+                    {% if form.username.errors %}
+                        <span class="text-error text-xs mt-1">{{ form.username.errors|striptags }}</span>
+                    {% endif %}
+                </div>
 
-                <div class="card-actions justify-end mt-6">
-                    <button type="submit" class="btn btn-primary w-full">{% trans "Login" %}</button>
+                <div class="form-control w-full">
+                    <label class="label pb-1">
+                        <span class="label-text font-bold text-sm">{{ form.password.label }}</span>
+                    </label>
+                    <input type="password" name="{{ form.password.name }}" 
+                           class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-primary transition-colors" 
+                           placeholder="******" required>
+                    {% if form.password.errors %}
+                        <span class="text-error text-xs mt-1">{{ form.password.errors|striptags }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="btn btn-primary btn-sm w-full font-bold">
+                        {% trans "Login" %}
+                    </button>
                 </div>
             </form>
             
-            <div class="mt-4 text-center">
-                <p class="text-sm opacity-70">
+            <div class="mt-6 text-center border-t border-base-200 pt-4">
+                <p class="text-xs text-base-content/70">
                     {% trans "Don't have an account?" %} 
-                    <a href="{% url 'register' %}" class="link link-primary">{% trans "Register" %}</a>
+                    <a href="{% url 'register' %}" class="link link-primary font-bold no-underline hover:underline">{% trans "Register now" %}</a>
                 </p>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    /* Styling for Django form fields to match daisyUI inputs */
-    input[type="text"], input[type="password"] {
-        @apply input input-bordered w-full;
-    }
-</style>
 {% endblock %}
