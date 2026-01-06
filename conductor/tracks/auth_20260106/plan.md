@@ -1,7 +1,7 @@
 # Track Plan: Core Authentication System
 
 ## Phase 1: Project & App Initialization
-- [ ] Task: Initialize Django Project & Auth App
+- [~] Task: Initialize Django Project & Auth App
     -   Create a new Django app named `accounts` (or `users`).
     -   Configure `settings.py` for RTL, Timezone (Tehran), and add `accounts` to `INSTALLED_APPS`.
     -   Setup TailwindCSS integration (if not already done globally).
