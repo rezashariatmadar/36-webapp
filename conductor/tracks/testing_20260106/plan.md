@@ -19,20 +19,24 @@
     -   Verify no `NoReverseMatch` during test runs.
 - [x] Task: Conductor - User Manual Verification 'URL Namespacing & Fixes' (Protocol in workflow.md) 8982cea
 
-## Phase 3: Unit Tests (Models & Validation)
-- [x] Task: Create `factory_boy` Factories
+## Phase 3: Unit Tests (Models & Validation) [checkpoint: 12321ed]
+- [x] Task: Create `factory_boy` Factories 07a2366
     -   UserFactory
     -   MenuItemFactory
     -   SpaceFactory
     -   BookingFactory
-- [~] Task: Unit Tests for National ID & Phone Validation
+- [x] Task: Unit Tests for National ID & Phone Validation 07a2366
     -   Implement comprehensive tests for `validate_iranian_national_id`.
     -   Test `CustomUser` phone number validation.
-- [ ] Task: Implement Tests for User Registration & Groups
-    -   Test form submission and default group assignment.
-- [ ] Task: Implement Tests for RBAC Decorators
-    -   Verify that `@admin_required` and `@barista_required` restrict access correctly.
-- [ ] Task: Conductor - User Manual Verification 'Accounts Module Testing' (Protocol in workflow.md)
+- [x] Task: Unit Tests for Cafe Logic (Cart & Orders) 8982cea
+    -   Test cart session logic (add/remove/total).
+    -   Test order status transitions.
+    -   Verify menu category ordering.
+- [x] Task: Unit Tests for Coworking Logic (Spaces & Bookings) 12321ed
+    -   Test space availability checks & conflict prevention.
+    -   Validate pricing calculations for all plans.
+    -   Enforce 08:00-20:00 operating hour constraints.
+- [x] Task: Conductor - User Manual Verification 'Models & Validation' (Protocol in workflow.md) 12321ed
 
 ## Phase 4: Cafe Module Testing (Menu & Orders)
 - [ ] Task: Create Factories for Cafe
