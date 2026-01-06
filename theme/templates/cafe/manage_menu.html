@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}مدیریت موجودی منو - ۳۶{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-10">
+        <h1 class="text-3xl font-black text-primary">مدیریت موجودی</h1>
+        <a href="{% url 'cafe:barista_dashboard' %}" class="btn btn-ghost btn-sm">بازگشت به داشبورد</a>
+    </div>
+
+    <div class="card bg-base-100 shadow-sm border border-base-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr class="opacity-50">
+                        <th>آیتم</th>
+                        <th>دسته‌بندی</th>
+                        <th class="text-left">وضعیت موجودی</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td><span class="font-bold">{{ item.name }}</span></td>
+                            <td><span class="badge badge-sm badge-ghost">{{ item.category.name }}</span></td>
+                            <td class="text-left">
+                                <form method="post" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <button type="submit" class="btn {% if item.is_available %}btn-success{% else %}btn-error{% endif %} btn-xs w-24 text-white">
+                                        {% if item.is_available %}موجود{% else %}ناموجود{% endif %}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

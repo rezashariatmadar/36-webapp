@@ -21,3 +21,12 @@
     -   Real-time (polling) order queue.
 - [x] Task: Customer Ordering Flow
     -   Shopping cart / checkout logic.
+- [x] Task: Manual Order Entry (Walk-ins)
+    -   Dedicated UI for staff to record offline orders.
+- [x] Task: Menu Item Management
+    -   Barista-level stock toggle (Available/Unavailable).
+
+## Phase 4: Payments (v3 - Deferred)
+- [ ] Task: Zibal Gateway Integration
+    -   Handshake, Verification, and Refund API.
+

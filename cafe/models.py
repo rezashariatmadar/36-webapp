@@ -45,6 +45,10 @@ class CafeOrder(models.Model):
     
     total_price = models.DecimalField(_("Total Price"), max_digits=12, decimal_places=0, default=0)
     
+    # Payment Tracking
+    payment_token = models.CharField(_("Payment Token"), max_length=100, blank=True, null=True)
+    transaction_id = models.CharField(_("Transaction ID"), max_length=100, blank=True, null=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

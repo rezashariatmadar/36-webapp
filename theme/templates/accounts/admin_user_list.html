@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}مدیریت کاربران - ۳۶{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-10">
+        <h1 class="text-3xl font-black text-primary">مدیریت کاربران</h1>
+        <div class="badge badge-lg badge-outline font-bold">{{ users.count }} کاربر ثبت شده</div>
+    </div>
+
+    <div class="card bg-base-100 shadow-sm border border-base-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr class="opacity-50">
+                        <th>کاربر</th>
+                        <th>نقش‌ها</th>
+                        <th>وضعیت</th>
+                        <th class="text-left">عملیات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                        <tr>
+                            <td>
+                                <div class="font-bold">{{ u.full_name|default:"بدون نام" }}</div>
+                                <div class="text-xs opacity-50 ltr text-right">{{ u.phone_number }}</div>
+                            </td>
+                            <td>
+                                <div class="flex flex-wrap gap-1">
+                                    {% if u.is_admin %}<span class="badge badge-primary badge-xs">Admin</span>{% endif %}
+                                    {% if u.is_barista %}<span class="badge badge-accent badge-xs">Barista</span>{% endif %}
+                                    {% if u.is_customer %}<span class="badge badge-ghost badge-xs">Customer</span>{% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if u.is_active %}
+                                    <span class="badge badge-success badge-sm text-white">فعال</span>
+                                {% else %}
+                                    <span class="badge badge-error badge-sm text-white">غیرفعال</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-left">
+                                <a href="{% url 'accounts:toggle_user_status' u.id %}" class="btn btn-ghost btn-xs">
+                                    {% if u.is_active %}تعلیق{% else %}فعال‌سازی{% endif %}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

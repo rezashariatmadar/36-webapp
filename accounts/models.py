@@ -3,7 +3,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .utils import validate_iranian_national_id
 from django.core.exceptions import ValidationError
-
 from django.core.validators import RegexValidator
 
 class CustomUserManager(BaseUserManager):
@@ -44,8 +43,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     
-    # Custom fields or profile data could go here
-
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'phone_number'
@@ -53,3 +50,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.phone_number
+
+    @property
+    def is_admin(self):
+        return self.is_superuser or self.groups.filter(name='Admin').exists()
+
+    @property
+    def is_barista(self):
+        return self.groups.filter(name='Barista').exists()
+
+    @property
+    def is_customer(self):
+        return self.groups.filter(name='Customer').exists()

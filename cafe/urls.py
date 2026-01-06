@@ -1,11 +1,16 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .views import (
     menu_view, add_to_cart, remove_from_cart, cart_detail, 
     checkout, order_list, barista_dashboard, update_order_status, 
-    toggle_order_payment, admin_dashboard
+    toggle_order_payment, admin_dashboard, manual_order_entry, 
+    manage_menu_stock, MenuItemViewSet, customer_lookup
 )
 
 app_name = 'cafe'
+
+router = DefaultRouter()
+router.register(r'menu-items', MenuItemViewSet)
 
 urlpatterns = [
     path('menu/', menu_view, name='menu'),
@@ -14,8 +19,20 @@ urlpatterns = [
     path('cart/remove/<int:item_id>/', remove_from_cart, name='remove_from_cart'),
     path('checkout/', checkout, name='checkout'),
     path('orders/', order_list, name='order_list'),
+    
+    # Barista Views
     path('dashboard/', barista_dashboard, name='barista_dashboard'),
+    path('manual-order/', manual_order_entry, name='manual_order'),
+    path('manage-menu/', manage_menu_stock, name='manage_menu'),
+    path('lookup/', customer_lookup, name='customer_lookup'),
+    
+    # Analytics
     path('analytics/', admin_dashboard, name='admin_dashboard'),
+    
+    # Logic
     path('order/<int:order_id>/status/<str:new_status>/', update_order_status, name='update_order_status'),
     path('order/<int:order_id>/toggle-payment/', toggle_order_payment, name='toggle_order_payment'),
+    
+    # API
+    path('api/', include(router.urls)),
 ]

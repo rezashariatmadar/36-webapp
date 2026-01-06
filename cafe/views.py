@@ -137,6 +137,77 @@ def order_list(request):
 
 # --- Staff/Barista Views ---
 
+from accounts.utils import admin_required, barista_required, customer_required
+from rest_framework import serializers, viewsets
+
+# --- API Serializers ---
+
+class MenuItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MenuItem
+        fields = '__all__'
+
+class MenuItemViewSet(viewsets.ModelViewSet):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+
+# --- Barista Views ---
+
+@barista_required
+def manual_order_entry(request):
+    """View for Baristas to enter orders for walk-in customers."""
+    if request.method == 'POST':
+        customer_phone = request.POST.get('phone_number')
+        item_ids = request.POST.getlist('items')
+        notes = request.POST.get('notes', 'Walk-in Guest')
+        
+        user = None
+        if customer_phone:
+            user = CustomUser.objects.filter(phone_number=customer_phone).first()
+            
+        with transaction.atomic():
+            order = CafeOrder.objects.create(
+                user=user,
+                notes=notes,
+                is_paid=True # Assume paid for walk-ins usually
+            )
+            for item_id in item_ids:
+                item = MenuItem.objects.get(id=item_id)
+                OrderItem.objects.create(order=order, menu_item=item, unit_price=item.price)
+        
+        messages.success(request, "Manual order recorded.")
+        return redirect('cafe:barista_dashboard')
+        
+    menu_items = MenuItem.objects.filter(is_available=True)
+    initial_phone = request.GET.get('phone_number', '')
+    return render(request, 'cafe/manual_order.html', {
+        'menu_items': menu_items,
+        'initial_phone': initial_phone
+    })
+
+@barista_required
+def manage_menu_stock(request):
+    """View for Baristas to toggle item availability."""
+    items = MenuItem.objects.all().order_by('category', 'name')
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        item = get_object_or_404(MenuItem, id=item_id)
+        item.is_available = not item.is_available
+        item.save()
+        return redirect('cafe:manage_menu')
+    return render(request, 'cafe/manage_menu.html', {'items': items})
+
+@barista_required
+def customer_lookup(request):
+    """Simple search for Baristas to find customer profiles."""
+    query = request.GET.get('q', '')
+    customers = []
+    if query:
+        customers = CustomUser.objects.filter(
+            Q(phone_number__icontains=query) | Q(full_name__icontains=query)
+        ).filter(groups__name='Customer')[:10]
+    return render(request, 'cafe/customer_lookup.html', {'customers': customers, 'query': query})
+
 @user_passes_test(is_staff_member)
 def barista_dashboard(request):
     active_orders = CafeOrder.objects.filter(~Q(status__in=[CafeOrder.Status.DELIVERED, CafeOrder.Status.CANCELLED])).prefetch_related('items__menu_item').order_by('created_at')

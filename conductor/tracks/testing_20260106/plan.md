@@ -19,11 +19,15 @@
     -   Verify no `NoReverseMatch` during test runs.
 - [x] Task: Conductor - User Manual Verification 'URL Namespacing & Fixes' (Protocol in workflow.md) 8982cea
 
-## Phase 3: Accounts Module Testing (RBAC & Auth)
-- [ ] Task: Create Factories for Accounts
-    -   `UserFactory` with support for different groups (Admin, Barista, Customer).
-- [ ] Task: Implement Tests for National ID & Phone Validators
-    -   Comprehensive unit tests for logic in `accounts/utils.py`.
+## Phase 3: Unit Tests (Models & Validation)
+- [x] Task: Create `factory_boy` Factories
+    -   UserFactory
+    -   MenuItemFactory
+    -   SpaceFactory
+    -   BookingFactory
+- [~] Task: Unit Tests for National ID & Phone Validation
+    -   Implement comprehensive tests for `validate_iranian_national_id`.
+    -   Test `CustomUser` phone number validation.
 - [ ] Task: Implement Tests for User Registration & Groups
     -   Test form submission and default group assignment.
 - [ ] Task: Implement Tests for RBAC Decorators
