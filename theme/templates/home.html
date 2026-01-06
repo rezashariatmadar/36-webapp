@@ -11,12 +11,15 @@
             {% if user.is_authenticated %}
                 <p class="mb-4">شما با شماره <span class="badge badge-outline">{{ user.phone_number }}</span> وارد شده‌اید.</p>
                 <div class="grid grid-cols-1 gap-2">
-                    <a href="{% url 'logout' %}" class="btn btn-outline btn-sm">خروج از حساب</a>
+                    <form action="{% url 'accounts:logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline btn-sm w-full">خروج از حساب</button>
+                    </form>
                 </div>
             {% else %}
                 <div class="flex gap-2 justify-center">
-                    <a href="{% url 'login' %}" class="btn btn-primary">ورود به سیستم</a>
-                    <a href="{% url 'register' %}" class="btn btn-ghost">عضویت جدید</a>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-primary">ورود به سیستم</a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-ghost">عضویت جدید</a>
                 </div>
             {% endif %}
         </div>
