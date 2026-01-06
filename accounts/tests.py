@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from .utils import validate_iranian_national_id
-from .models import CustomUser
+from .models import CustomUser, validate_iranian_national_id
 from .factories import UserFactory
 
 class NationalIDValidatorTests(TestCase):

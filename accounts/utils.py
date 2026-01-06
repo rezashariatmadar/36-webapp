@@ -1,20 +1,5 @@
 import re
-from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
-
-def validate_iranian_national_id(national_id: str) -> bool:
-    """Validates an Iranian National ID (Code Melli)."""
-    if not re.match(r'^\d{10}$', national_id):
-        return False
-    check_digit = int(national_id[9])
-    if len(set(national_id)) == 1:
-        return False
-    sum_digits = sum(int(national_id[i]) * (10 - i) for i in range(9))
-    remainder = sum_digits % 11
-    if remainder < 2:
-        return check_digit == remainder
-    else:
-        return check_digit == (11 - remainder)
 
 def admin_required(view_func):
     def wrap(request, *args, **kwargs):

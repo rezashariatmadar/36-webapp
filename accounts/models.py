@@ -1,9 +1,23 @@
+import re
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .utils import validate_iranian_national_id
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+
+def validate_iranian_national_id(national_id: str) -> bool:
+    """Validates an Iranian National ID (Code Melli)."""
+    if not re.match(r'^\d{10}$', national_id):
+        return False
+    check_digit = int(national_id[9])
+    if len(set(national_id)) == 1:
+        return False
+    sum_digits = sum(int(national_id[i]) * (10 - i) for i in range(9))
+    remainder = sum_digits % 11
+    if remainder < 2:
+        return check_digit == remainder
+    else:
+        return check_digit == (11 - remainder)
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, phone_number, password=None, **extra_fields):
