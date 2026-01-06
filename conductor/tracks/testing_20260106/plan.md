@@ -9,14 +9,15 @@
     -   Add configuration for coverage reporting.
 - [x] Task: Conductor - User Manual Verification 'Environment & Tooling' (Protocol in workflow.md) b81f264
 
-## Phase 2: URL Namespacing & Fixes
-- [ ] Task: Audit & Fix URL Namespacing
+## Phase 2: URL Namespacing & Fixes [checkpoint: 8982cea]
+- [x] Task: Audit & Fix URL Namespacing 8982cea
     -   Fix `NoReverseMatch` for 'logout'.
     -   Audit all templates for non-namespaced URLs.
     -   Audit all `redirect()` and `reverse()` calls in views.
-- [ ] Task: Write Regression Tests for URLs
-    -   Create a test to ensure all core pages load without `NoReverseMatch`.
-- [ ] Task: Conductor - User Manual Verification 'URL Namespacing & Fixes' (Protocol in workflow.md)
+- [x] Task: Regression Tests for URL Safety 8982cea
+    -   Write tests to ensure core pages load.
+    -   Verify no `NoReverseMatch` during test runs.
+- [x] Task: Conductor - User Manual Verification 'URL Namespacing & Fixes' (Protocol in workflow.md) 8982cea
 
 ## Phase 3: Accounts Module Testing (RBAC & Auth)
 - [ ] Task: Create Factories for Accounts
