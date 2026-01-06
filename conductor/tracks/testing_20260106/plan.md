@@ -1,13 +1,13 @@
 # Track Plan: Stability & Testing (v1.1)
 
-## Phase 1: Environment & Tooling
+## Phase 1: Environment & Tooling [checkpoint: b81f264]
 - [x] Task: Install and Configure `factory_boy` e99b44e
     -   Install `factory_boy` using `uv`.
     -   Update `requirements.txt`.
 - [x] Task: Setup Coverage Tooling e99b44e
     -   Install `coverage` or `pytest-cov`.
     -   Add configuration for coverage reporting.
-- [ ] Task: Conductor - User Manual Verification 'Environment & Tooling' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Environment & Tooling' (Protocol in workflow.md) b81f264
 
 ## Phase 2: URL Namespacing & Fixes
 - [ ] Task: Audit & Fix URL Namespacing
