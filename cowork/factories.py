@@ -10,7 +10,6 @@ class PricingPlanFactory(DjangoModelFactory):
         model = PricingPlan
 
     name = factory.Sequence(lambda n: f'Plan {n}')
-    base_price = 100000
     hourly_rate = 20000
     daily_rate = 150000
     monthly_rate = 3000000
@@ -20,7 +19,7 @@ class SpaceFactory(DjangoModelFactory):
         model = Space
 
     name = factory.Sequence(lambda n: f'Space {n}')
-    zone = Space.Zone.CLASSROOM
+    zone = Space.ZoneType.DESK
     pricing_plan = factory.SubFactory(PricingPlanFactory)
     capacity = 1
     is_active = True

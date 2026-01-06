@@ -62,10 +62,9 @@ class CafeOrder(models.Model):
 
     def update_total_price(self):
         # We use a aggregate for efficiency
-        total = self.items.aggregate(models.Sum(models.F('unit_price') * models.F('quantity')))['models.F(unit_price) * models.F(quantity)__sum'] or 0
-        # Wait, the F() expression in aggregate is a bit tricky depending on Django version.
-        # Let's use a simpler way for reliability in MVP.
-        total = sum(item.get_subtotal() for item in self.items.all())
+        total = self.items.aggregate(
+            total=models.Sum(models.F('unit_price') * models.F('quantity'))
+        )['total'] or 0
         self.total_price = total
         self.save()
 

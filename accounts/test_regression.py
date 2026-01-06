@@ -76,3 +76,8 @@ class CorePagesRegressionTests(TestCase):
         response = self.client.get(reverse('cafe:manual_order'))
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse('accounts:login'), response.url)
+
+    def test_admin_dashboard_redirects_for_anonymous(self):
+        response = self.client.get(reverse('cafe:admin_dashboard'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('accounts:login'), response.url)

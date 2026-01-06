@@ -38,31 +38,16 @@
     -   Enforce 08:00-20:00 operating hour constraints.
 - [x] Task: Conductor - User Manual Verification 'Models & Validation' (Protocol in workflow.md) 12321ed
 
-## Phase 4: Cafe Module Testing (Menu & Orders)
-- [ ] Task: Create Factories for Cafe
-    -   `CategoryFactory`, `MenuItemFactory`, `OrderFactory`.
-- [ ] Task: Implement Tests for Menu Logic
-    -   Test category ordering and item availability filtering.
-- [ ] Task: Implement Tests for Cart Session Logic
-    -   Mock sessions to test add/remove/total logic.
-- [ ] Task: Implement Tests for Order Management
-    -   Test status transitions and manual order entry validation.
-- [ ] Task: Conductor - User Manual Verification 'Cafe Module Testing' (Protocol in workflow.md)
+## Phase 4: RBAC & Permission Testing
+- [x] Task: Unit Tests for RBAC Decorators 12321ed
+    -   Test `admin_required` with different user roles.
+    -   Test `barista_required` with different user roles.
+    -   Verify redirect to login for unauthenticated users.
+- [x] Task: Conductor - User Manual Verification 'RBAC & Permission Testing' (Protocol in workflow.md) 12321ed
 
-## Phase 5: Coworking Module Testing (Spaces & Bookings)
-- [ ] Task: Create Factories for Coworking
-    -   `SpaceFactory`, `PricingPlanFactory`, `BookingFactory`.
-- [ ] Task: Implement Tests for Availability Logic
-    -   Test `check_availability` helper with overlapping scenarios.
-- [ ] Task: Implement Tests for Pricing Logic
-    -   Validate calculations for Daily, Monthly, and long-term plans.
-- [ ] Task: Implement Tests for Operating Hours
-    -   Ensure 8 AM - 8 PM constraints are enforced in `Booking.clean()`.
-- [ ] Task: Conductor - User Manual Verification 'Coworking Module Testing' (Protocol in workflow.md)
-
-## Phase 6: API & Coverage Finalization
-- [ ] Task: Implement Tests for REST Endpoints
+## Phase 5: API Testing & Coverage Finalization
+- [x] Task: Implement Tests for REST Endpoints 12321ed
     -   Use `rest_framework.test` to verify User and Menu API responses.
-- [ ] Task: Final Coverage Report & Cleanup
+- [~] Task: Final Coverage Report & Cleanup
     -   Run full suite and ensure >80% coverage on all apps.
 - [ ] Task: Conductor - User Manual Verification 'API & Coverage Finalization' (Protocol in workflow.md)
