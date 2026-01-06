@@ -218,86 +218,32 @@ Bringing it together, different roles will interact with different parts of the 
     The front-end for customers should be user-friendly and mobile-first (since many will use their phone). We saw in the design notes the plan for a **mobile-first, RTL interface for the cafe**[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/GEMINI.md#L50-L53), meaning the UI will support Persian language and right-to-left layout (as seen in CSS `direction: rtl` in the body)[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/static/css/style.css#L14-L22). We should indeed ensure the Persian localization: use Persian labels for the cafe form (as already in code)[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/cafe/forms.py#L5-L13), and possibly support Farsi translations of the UI text via `gettext`. This will make the system usable for local staff and customers (who likely prefer Persian). The admin might use English or Persian depending on preference – we can make the UI bilingual if needed.
     
 
-## Development Phases & Timeline
+## Development Phases & Timeline (Status: Jan 6, 2026)
 
-Given an estimated timeline of **1-2 months**, we will break the project into phases with specific deliverables. This ensures we have a working core early and can progressively add features:
+**Phase 1: Core Setup** – **COMPLETED**
+- Project foundation, custom User model, and Persian (RTL) configuration.
 
-**Phase 1: Core Setup (Week 1)** – *Goal: project foundation and auth*
+**Phase 2: Menu & Inventory Module** – **COMPLETED**
+- Models, administration, and menu display logic implemented and tested.
 
-- Initialize the Django project (if not already done). Configure settings for SQLite (dev) and set up switching to PostgreSQL for production via environment variables[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/GEMINI.md#L10-L15). Install necessary packages (ensure we have pillow for images, etc.).
-- Set up the **User model** modifications: either use a custom user model with phone, or create a `UserProfile` extending `auth.User`. Given simplicity, a `UserProfile` model might be fine to add phone and national_id fields[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/GEMINI.md#L30-L34). Alternatively, since using phone as username is critical, it might be cleaner to implement a custom user model now (since changing later is hard). We’ll decide early and implement it.
-- Implement **registration and login** views/forms that use phone & national ID. Include the national ID validation function here. Test that a user can create an account and log in.
-- Implement group creation for **Admin** and **Barista** (possibly via a script or in code)[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/cafe/management/commands/setup_groups.py#L10-L17). Assign any initial test users to these groups.
-- Basic templates for login/register, and maybe a base layout with navbar or sidebar to use later. No heavy front-end yet, just ensure we can navigate after login.
+**Phase 3: Order Management Module** – **COMPLETED**
+- Ordering workflow, Barista dashboard, and manual entry system implemented and tested.
 
-*Deliverable:* Working auth system where a user can sign up and log in with phone/ID. Admin user can log into Django admin.
+**Phase 4: Analytics Dashboard** – **COMPLETED**
+- Data-driven dashboard for staff and admins implemented and tested.
 
-**Phase 2: Menu & Inventory Module (Week 2)** – *Goal: manage cafe menu*
+**Phase 5: Space & Reservation Backend** – **COMPLETED**
+- Pricing plans, space seeding, and availability logic implemented and tested.
 
-- Create models for **MenuCategory** and **MenuItem** as described[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/cafe/models.py#L5-L13)[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/cafe/models.py#L16-L24). Apply migrations.
-- Set up Django admin for these models so items can be added easily for now. Load initial menu data (either via admin or a script from the ODS file if possible).
-- Create views/templates for customers to **view the menu** (public or after login). This could simply list categories and items, showing name, price, description, and whether available. This page helps customers know what’s offered and maybe plan orders.
-- (Optional late Phase2 or Phase3) Provide admin/barista interface to add/edit menu items outside of Django admin – not critical if admin is acceptable, so this can be postponed. A quick use of Django admin might suffice for the short term.
+**Phase 6: Reservation Frontend & Real-Time Map** – **COMPLETED**
+- Interactive floor plan and booking system implemented and tested.
 
-*Deliverable:* Menu items can be managed (at least via admin) and displayed on the site. Inventory availability toggle works.
+**Phase 7: Stability & Testing** – **COMPLETED**
+- Full test suite (49 tests), 83% coverage, and namespacing audit.
 
-**Phase 3: Order Management Module (Weeks 3-4)** – *Goal: ordering system functional*
+**Phase 8: Final Touches and Deployment** – **IN PROGRESS**
+- Final polishing, production database configuration, and deployment.
 
-- Create models for **CafeOrder** and **OrderItem** with relations to User, MenuItem, etc[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/cafe/models.py#L42-L50)[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/cafe/models.py#L62-L70). Include fields and choices for status. Migrate and test creating orders.
-- Implement the **customer ordering workflow**: menu page with an “Add to order” or direct “Order” functionality. This likely involves creating a cart session or immediate order creation. For simplicity, we might implement a quick order form: the user selects a quantity and item, submits, and we create an order with that single item (for multiple items, user repeats or we make a small cart). However, better is a cart: allow adding multiple items then finalizing one order. We can do this with session storage or a temporary Order record.
-- Create the **Barista order queue page**: use Django views to query all pending orders and display them. Use some AJAX or auto-refresh to update it frequently. Include buttons or links to update status (which trigger a small view or use Django admin actions). We can make each order row clickable to see details and change status. Ensure that when status changes, both barista view and user view reflect it (maybe via page refresh or AJAX).
-- Implement the **manual order form** for barista: a page where barista can create an order. Use a ModelForm for CafeOrder (with optional user field as in code) and inline formset or a custom UI for adding items (could also just provide a multi-select or repeated item add). Since this can be complex, an easier approach: barista selects an item and quantity and clicks “Add” repeatedly, which behind the scenes creates OrderItems attached to a new CafeOrder (like building the order). Or use a small JavaScript to allow adding item rows before submitting. We’ll try to make it user-friendly but keep it within our time (could also leverage Django admin’s inlines as a quick solution for barista, but admin UI might be too technical for daily use).
-- Testing: simulate an order by a customer, ensure barista sees it and can mark it delivered. Simulate a barista creating an order for a guest.
-- Internationalization: ensure the barista interface is in Persian (labels, directions RTL) for ease of use (the code already shows Persian labels on forms, we will use that)[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/cafe/forms.py#L5-L13).
-
-*Deliverable:* Customers can place orders from the menu, and baristas can view and fulfill those orders. Orders update status and are stored with correct relations. Basic payment status toggling in place.
-
-**Phase 4: Analytics Dashboard (Week 4)** – *Goal: admin insights*
-
-- Create a view for admin dashboard that aggregates data from orders (and later bookings). Focus on implementing queries for **top sellers** and **top buyers** as specified. Use Django’s ORM annotate/Count to get top 5 items sold and top 5 users by total spent. Render these in a template (initially as lists or tables).
-- Add summary stats like total orders today, total revenue today, etc. and maybe a list of today’s orders or recent orders.
-- If time permits, integrate a chart library (or use a simple Google Charts or Chart.js via CDN) to plot something like sales over the last week.
-- Also include some reservation stats if Phase 5 is done (if not, we’ll integrate later).
-- Ensure this page is only accessible to admin (use @login_required and check group or staff status).
-- Test with some dummy data (create orders manually or via script to see that counts work).
-
-*Deliverable:* Admin can view a dashboard page with key metrics (top items, top customers, sales stats). This helps track performance.
-
-**Phase 5: Space & Reservation Backend (Week 5)** – *Goal: coworking space data model ready*
-
-- Define models for **PricingPlan**, **Space**, and **Booking** as discussed[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/GEMINI.md#L28-L34). Add choices for space zone (e.g., an enum in Django model for zone types). Fields for coordinates and allowed booking types. Migrate the models.
-- Create initial entries for PricingPlan (for example Standard Desk, Private Office, Meeting Room with appropriate rates)[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/management/management/commands/seed_spaces.py#L10-L19).
-- Create entries for Space for each seat/room according to the floor plan. We can write a **management command or migration script** to seed the Space table with all the seats using provided layout (the repository already has a `seed_spaces.py` which we can adapt)[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/management/management/commands/seed_spaces.py#L26-L35)[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/management/management/commands/seed_spaces.py#L86-L95). This includes setting the zone and pricing plan for each, and coordinates.
-- Implement the Booking model logic:
-    - Perhaps override `clean()` or use a custom method to validate no overlapping booking when saving. Or more straightforward, handle it in the view when a booking is made.
-    - Write the `check_availability(space, start, end)` helper[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/GEMINI.md#L42-L45). This function queries existing bookings for the space to see if any conflict with the desired time.
-    - We will also incorporate zone rules: e.g., if booking_type is monthly but space.zone == LONG_TABLE (daily-only zone), then treat as not available (or not allowed).
-- No user interface yet in this phase, just backend. Test by manually creating some Booking objects in the shell or admin to ensure constraints logic works (e.g., try two overlapping bookings, see that our code prevents it).
-
-*Deliverable:* Data structures for reservations are in place and seeded with actual space data. The system “knows” about all seats and rooms and their booking rules.
-
-**Phase 6: Reservation Frontend & Real-Time Map (Week 6)** – *Goal: users can book via interactive floor plan*
-
-- Develop the **Floor Plan page** for customers. This involves:
-    - An HTML template that renders the grid of Spaces. We iterate over all Space objects, and for each, output a div or button at the proper grid position (using inline CSS or classes based on `grid_row` etc.)[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/GEMINI.md#L34-L40). Use the background image of the floor in the container for visual reference[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/static/css/style.css#L200-L208).
-    - Color-code or indicate availability. We can do this by adding a class like `reserved` or `available` on each element depending on `space.is_available` (which we determine in view context by checking current bookings)[GitHub](https://github.com/rezashariatmadar/36-cowork-website/blob/4458ace7e395eb33f2657d9706e16daba9a916e6/static/css/style.css#L176-L184). Maybe also show the name or number of the seat on the element (tiny text or on hover).
-    - Make these elements interactive: wrap them in a form or link. For an available space, clicking could direct to a booking form for that specific space. For a reserved space, clicking might do nothing or show info (if admin logged in, maybe show who reserved).
-    - Implement the **Booking form** view. When user chooses a space, present a form where they select date/time and booking type. This form needs to enforce allowed type (e.g., if space.allow_monthly is false, hide that option). Use a calendar/date picker for daily or monthly start, and a time picker for hourly if applicable.
-    - When form is submitted, in the view: validate again with `check_availability` then save the Booking and redirect to a confirmation or the map with success message. If unavailable (race condition), show an error.
-    - If booking requires payment, for now either mark it as unpaid and let them pay on-site, or simply assume they'll pay and mark as paid. We might include a note like "Please see the receptionist to complete payment."
-    - Update the floor plan view to reflect the new booking (if we redirect back there, the seat should now show reserved). *Real-time:* we can add a small AJAX that periodically fetches an endpoint giving current reserved spaces (maybe just a JSON of available ids) and updates the classes. This can be done if time permits to give a near-real-time feel.
-- **Reservations List:** Create a page for the user to see their bookings. List active (upcoming or ongoing) and maybe past bookings. Allow them to cancel if the booking is for the future (and within cancellation period if any policy). Cancellation would delete the Booking (or mark it cancelled) and free the space.
-- **Admin/Staff View of Reservations:** We might add a view for staff to see today's bookings (who is expected today, etc.), and all active monthly members. This could be a simple table: Space – booked by – type – dates. Useful for reception to know who’s sitting where. If receptionist role is used, they would rely on this.
-- **Testing:** We must test various scenarios:
-    - Book a daily seat, then ensure it’s unavailable for that day.
-    - Book an hourly meeting room, ensure overlapping not allowed.
-    - Try booking a monthly seat and then a daily on the same seat next day – should conflict if within that month.
-    - Cancel a booking and see it frees up.
-    - Ensure the pricing logic charges correct amount (if we display price).
-
-*Deliverable:* Customers can view seat availability on a map and create reservations. The system enforces booking rules. Staff can view the reservations.
-
-**Phase 7: Final Touches and Deployment (Week 7-8)** – *Goal: polish and go-live*
 
 - **Integration and UX:** At this point, all major features are in place. We will refine the UI: ensure navigation links are set (e.g., link from dashboard to relevant sections, add menu links for Orders, Reservations, etc.). Add appropriate success/error messages in forms. Ensure forms have Persian labels where needed and validation messages are user-friendly.
 - **Access Control:** Double-check that pages are protected by login and by role. For example, barista pages shouldn’t be accessible by customers (we can use @user_passes_test or custom middleware). Admin pages only by admin group.
