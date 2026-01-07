@@ -1,0 +1,60 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-top-4 duration-500">
+    {% for space in spaces %}
+        <div class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-xl hover:border-primary/20 transition-all group overflow-hidden">
+            <div class="h-2 bg-primary/10 group-hover:bg-primary transition-colors"></div>
+            <div class="card-body p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="card-title text-xl font-black mb-1">{{ space.name }}</h2>
+                        <span class="badge badge-sm badge-ghost opacity-70">{{ space.get_zone_display }}</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-xs font-bold opacity-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        {{ space.capacity }} نفره
+                    </div>
+                </div>
+                
+                <div class="space-y-3 mb-8 bg-base-200/30 p-4 rounded-2xl border border-base-200">
+                    {% if space.pricing_plan.is_contact_for_price %}
+                        <div class="text-center py-2">
+                            <span class="text-primary font-black">برای قیمت تماس بگیرید</span>
+                        </div>
+                    {% else %}
+                        {% if space.pricing_plan.daily_rate > 0 %}
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="opacity-60">روزانه</span>
+                                <span class="font-bold">{{ space.pricing_plan.daily_rate }} <span class="text-[10px] font-normal">تومان</span></span>
+                            </div>
+                        {% endif %}
+                        {% if space.pricing_plan.monthly_rate > 0 %}
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="opacity-60">ماهانه</span>
+                                <span class="font-bold text-secondary">{{ space.pricing_plan.monthly_rate }} <span class="text-[10px] font-normal">تومان</span></span>
+                            </div>
+                        {% endif %}
+                        {% if space.pricing_plan.yearly_rate > 0 %}
+                            <div class="flex justify-between items-center text-sm border-t border-base-200 pt-2 mt-2">
+                                <span class="opacity-60">سالانه</span>
+                                <span class="font-black text-primary">{{ space.pricing_plan.yearly_rate }} <span class="text-[10px] font-normal">تومان</span></span>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="card-actions">
+                    {% if space.pricing_plan.is_contact_for_price %}
+                        <a href="tel:02112345678" class="btn btn-outline btn-primary w-full font-bold">تماس با پذیرش</a>
+                    {% else %}
+                        <a href="{% url 'cowork:book_space' space.id %}" class="btn btn-primary w-full font-bold shadow-lg shadow-primary/20">
+                            رزرو آنلاین
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-span-full text-center py-10 bg-base-200/50 rounded-box border border-dashed border-base-300">
+            <h3 class="text-xl font-bold opacity-40">فضایی در این بخش موجود نیست</h3>
+        </div>
+    {% endfor %}
+</div>

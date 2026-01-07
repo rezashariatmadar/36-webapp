@@ -10,9 +10,17 @@ from decimal import Decimal
 def space_list(request):
     spaces = Space.objects.filter(is_active=True).select_related('pricing_plan')
     zone = request.GET.get('zone')
+    
     if zone:
         spaces = spaces.filter(zone=zone)
-    return render(request, 'cowork/space_list.html', {'spaces': spaces})
+    
+    if request.htmx:
+        return render(request, 'cowork/partials/space_items.html', {'spaces': spaces})
+        
+    return render(request, 'cowork/space_list.html', {
+        'spaces': spaces,
+        'zones': Space.ZoneType.choices
+    })
 
 @login_required
 def book_space(request, space_id):
