@@ -17,7 +17,7 @@
 - **Real-Time & Interactivity:**
     - **Polling:** Use HTMX `hx-trigger="every 5s"` (or 5-10s) for updating seat availability and the barista order queue.
     - **HTMX Patterns:**
-        - `hx-get` for fetching availability fragments.
+        - `hx-get` for fetching availability fragments and lazy-loading hierarchical content (e.g., coworking zones).
         - `hx-post` for all booking and order actions.
 - **Features & Status:**
     - **Seat Status:** 

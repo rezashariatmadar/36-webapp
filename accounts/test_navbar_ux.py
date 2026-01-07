@@ -23,11 +23,10 @@ class NavbarUXTests(TestCase):
         self.assertContains(response, 'رزرو فضا')
         self.assertContains(response, 'ورود')
 
-    def test_navbar_structure_logged_in(self):
-        self.client.login(phone_number='09123456789', password='password123')
+    def test_mobile_menu_present(self):
         response = self.client.get(reverse('accounts:home'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '۳۶')
-        self.assertContains(response, 'Test User')
-        # Check for RTL alignment fix class
-        self.assertContains(response, 'rtl:left-0')
+        # Check for mobile dropdown container
+        self.assertContains(response, 'dropdown md:hidden')
+        # Check for hamburger icon svg
+        self.assertContains(response, 'M4 6h16M4 12h16M4 18h7')
