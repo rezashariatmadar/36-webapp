@@ -41,7 +41,39 @@ class UserListAPI(APIView):
 @admin_required
 def admin_user_list(request):
     users = CustomUser.objects.all().prefetch_related('groups')
-    return render(request, 'accounts/admin_user_list.html', {'users': users})
+    
+    # Group users by roles for hierarchical model
+    roles_with_users = [
+        {
+            'name': 'Admin',
+            'label': 'مدیران سیستم',
+            'users': [u for u in users if u.is_admin],
+            'class': 'badge-primary'
+        },
+        {
+            'name': 'Barista',
+            'label': 'باریستاها',
+            'users': [u for u in users if u.is_barista and not u.is_admin],
+            'class': 'badge-accent'
+        },
+        {
+            'name': 'Customer',
+            'label': 'مشتریان',
+            'users': [u for u in users if u.is_customer and not u.is_admin and not u.is_barista],
+            'class': 'badge-ghost'
+        },
+        {
+            'name': 'Unassigned',
+            'label': 'بدون نقش',
+            'users': [u for u in users if not u.groups.exists() and not u.is_superuser],
+            'class': 'badge-neutral'
+        }
+    ]
+    
+    return render(request, 'accounts/admin_user_list.html', {
+        'roles_with_users': roles_with_users,
+        'total_count': users.count()
+    })
 
 @admin_required
 def toggle_user_status(request, user_id):
@@ -49,6 +81,37 @@ def toggle_user_status(request, user_id):
     user.is_active = not user.is_active
     user.save()
     messages.success(request, f"User {user.phone_number} status updated.")
+    return redirect('accounts:user_list')
+
+@admin_required
+def change_user_role(request, user_id, new_role):
+    user = get_object_or_404(CustomUser, id=user_id)
+    
+    # Define valid roles
+    valid_roles = ['Admin', 'Barista', 'Customer']
+    if new_role not in valid_roles:
+        messages.error(request, "Invalid role selected.")
+        return redirect('accounts:user_list')
+        
+    try:
+        # Clear existing functional groups
+        user.groups.clear()
+        
+        # Add new group
+        group, _ = Group.objects.get_or_create(name=new_role)
+        user.groups.add(group)
+        
+        # Update is_staff flag if needed
+        if new_role in ['Admin', 'Barista']:
+            user.is_staff = True
+        else:
+            user.is_staff = False
+        user.save()
+        
+        messages.success(request, f"User {user.phone_number} promoted to {new_role}.")
+    except Exception as e:
+        messages.error(request, f"Error updating role: {e}")
+        
     return redirect('accounts:user_list')
 
 class RegisterView(CreateView):

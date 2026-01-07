@@ -15,56 +15,9 @@
         <h1 class="text-3xl font-black text-primary mt-4">سفارش شما</h1>
     </div>
 
-    {% if items %}
-        <div class="bg-base-100 rounded-3xl shadow-sm border border-base-200 overflow-hidden mb-8">
-            <div class="divide-y divide-base-200">
-                {% for item in items %}
-                    <div class="p-6 flex items-center justify-between gap-4">
-                        <div class="flex-grow">
-                            <h3 class="font-bold text-lg">{{ item.item.name }}</h3>
-                            <p class="text-xs opacity-60">{{ item.item.price }} تومان</p>
-                        </div>
-                        
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center bg-base-200 rounded-xl p-1">
-                                <a href="{% url 'cafe:remove_from_cart' item.item.id %}" class="btn btn-ghost btn-xs btn-square">-</a>
-                                <span class="w-8 text-center font-black">{{ item.quantity }}</span>
-                                <a href="{% url 'cafe:add_to_cart' item.item.id %}" class="btn btn-ghost btn-xs btn-square">+</a>
-                            </div>
-                            <div class="text-right w-24">
-                                <span class="font-black text-primary">{{ item.subtotal }}</span>
-                                <span class="text-[10px] opacity-60 block">تومان</span>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-            
-            <div class="bg-base-200/50 p-6 flex justify-between items-center border-t border-base-200">
-                <span class="text-lg font-bold opacity-60">جمع کل</span>
-                <div class="text-right">
-                    <span class="text-2xl font-black text-primary">{{ total }}</span>
-                    <span class="text-xs opacity-60">تومان</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-4">
-            <a href="{% url 'cafe:checkout' %}" class="btn btn-primary btn-lg rounded-2xl font-black shadow-xl shadow-primary/20">
-                تایید نهایی و ثبت سفارش
-            </a>
-        </div>
-    {% else %}
-        <div class="text-center py-20">
-            <div class="bg-base-200 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-base-content/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-            </div>
-            <h2 class="text-xl font-bold mb-2">سبد شما خالی است</h2>
-            <p class="text-sm opacity-60 mb-8">هنوز موردی را انتخاب نکرده‌اید.</p>
-            <a href="{% url 'cafe:menu' %}" class="btn btn-primary rounded-xl px-8">مشاهده منو</a>
-        </div>
-    {% endif %}
+    <!-- Dynamic Cart List Container -->
+    <div id="cart-list-container">
+        {% include "cafe/partials/cart_list.html" %}
+    </div>
 </div>
 {% endblock %}

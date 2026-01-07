@@ -4,57 +4,122 @@
 {% block title %}ثبت سفارش حضوری - ۳۶{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <div class="mb-10">
-        <h1 class="text-3xl font-black text-primary">ثبت سفارش حضوری</h1>
-        <p class="text-sm opacity-60">ویژه مشتریان گذری و ثبت دستی</p>
+<div class="max-w-5xl mx-auto">
+    <div class="mb-10 flex justify-between items-end">
+        <div>
+            <h1 class="text-3xl font-black text-primary">ثبت سفارش حضوری</h1>
+            <p class="text-sm opacity-60">ویژه مشتریان گذری و ثبت دستی</p>
+        </div>
+        <a href="{% url 'cafe:barista_dashboard' %}" class="btn btn-ghost btn-sm">بازگشت به داشبورد</a>
     </div>
 
     <form method="post" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {% csrf_token %}
         
-        <!-- Left: Item Selection -->
-        <div class="lg:col-span-2 space-y-6">
-            <div class="card bg-base-100 shadow-sm border border-base-200">
-                <div class="card-body p-6">
-                    <h2 class="card-title text-sm font-bold mb-4 opacity-50">انتخاب آیتم‌ها</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {% for item in menu_items %}
-                            <label class="flex items-center gap-3 p-3 rounded-xl border border-base-200 hover:bg-base-200 cursor-pointer transition-colors group">
-                                <input type="checkbox" name="items" value="{{ item.id }}" class="checkbox checkbox-primary">
-                                <div class="flex-grow">
-                                    <div class="font-bold text-sm">{{ item.name }}</div>
-                                    <div class="text-[10px] opacity-50">{{ item.price }} تومان</div>
-                                </div>
-                            </label>
-                        {% endfor %}
+        <!-- Left: Categorized Item Selection -->
+        <div class="lg:col-span-2 space-y-4">
+            <div class="join join-vertical w-full bg-base-100 shadow-sm border border-base-200">
+                {% for category in categories %}
+                    {% if category.items.all %}
+                    <div class="collapse collapse-arrow join-item border-b border-base-200">
+                        <input type="checkbox" name="cat-accordion" {% if forloop.first %}checked{% endif %} /> 
+                        <div class="collapse-title text-lg font-bold flex items-center gap-3">
+                            <span class="w-2 h-6 bg-secondary rounded-full"></span>
+                            {{ category.name }}
+                        </div>
+                        <div class="collapse-content bg-base-200/20"> 
+                            <div class="grid grid-cols-1 gap-3 py-4">
+                                {% for item in category.items.all %}
+                                    {% if item.is_available %}
+                                    <div class="flex items-center justify-between p-4 bg-base-100 rounded-2xl border border-base-200 group hover:border-primary/30 transition-all">
+                                        <div>
+                                            <div class="font-black text-sm">{{ item.name }}</div>
+                                            <div class="text-[10px] opacity-50">{{ item.price }} تومان</div>
+                                        </div>
+                                        
+                                        <!-- Quantity Control -->
+                                        <div class="flex items-center gap-3 bg-base-200 p-1 rounded-xl">
+                                            <button type="button" 
+                                                    onclick="changeQty('qty_{{ item.id }}', -1)"
+                                                    class="btn btn-xs btn-circle btn-ghost">-</button>
+                                            <input type="number" 
+                                                   name="qty_{{ item.id }}" 
+                                                   id="qty_{{ item.id }}" 
+                                                   value="0" 
+                                                   min="0"
+                                                   class="w-10 text-center bg-transparent border-none font-bold text-sm focus:ring-0 appearance-none pointer-events-none">
+                                            <button type="button" 
+                                                    onclick="changeQty('qty_{{ item.id }}', 1)"
+                                                    class="btn btn-xs btn-circle btn-ghost">+</button>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
-                </div>
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
 
         <!-- Right: Customer Info & Submit -->
         <div class="space-y-6">
-            <div class="card bg-base-100 shadow-xl border border-primary/20 sticky top-24">
+            <div class="card bg-base-100 shadow-xl border border-primary/20 sticky top-24 rounded-3xl overflow-hidden">
                 <div class="card-body p-6">
+                    <h2 class="card-title text-primary font-black mb-4">جزئیات سفارش</h2>
+                    
                     <div class="form-control w-full mb-4">
                         <label class="label"><span class="label-text font-bold">شماره تماس (اختیاری)</span></label>
-                        <input type="text" name="phone_number" value="{{ initial_phone }}" class="input input-bordered w-full ltr" placeholder="09xxxxxxxxx">
-                        <label class="label"><span class="label-text-alt opacity-50">جهت اتصال به حساب کاربری</span></label>
+                        <input type="text" name="phone_number" value="{{ initial_phone }}" 
+                               class="input input-bordered w-full ltr bg-base-200 rounded-2xl" placeholder="09xxxxxxxxx">
                     </div>
 
                     <div class="form-control w-full mb-6">
-                        <label class="label"><span class="label-text font-bold">یادداشت</span></label>
-                        <textarea name="notes" class="textarea textarea-bordered h-24" placeholder="مثال: بیرون‌بر یا شماره میز"></textarea>
+                        <label class="label"><span class="label-text font-bold">یادداشت / میز</span></label>
+                        <textarea name="notes" class="textarea textarea-bordered h-24 bg-base-200 rounded-2xl" 
+                                  placeholder="مثال: بیرون‌بر یا میز شماره ۴"></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-full font-black text-lg shadow-lg shadow-primary/20">
-                        ثبت و نهایی‌سازی
+                    <div class="divider opacity-10"></div>
+
+                    <button type="submit" class="btn btn-primary w-full font-black text-lg h-16 shadow-xl shadow-primary/20 rounded-2xl">
+                        ثبت نهایی سفارش
                     </button>
-                    <a href="{% url 'cafe:barista_dashboard' %}" class="btn btn-ghost btn-sm w-full mt-2">بازگشت</a>
                 </div>
             </div>
         </div>
     </form>
 </div>
+
+<script>
+    function changeQty(id, delta) {
+        const input = document.getElementById(id);
+        let val = parseInt(input.value) + delta;
+        if (val < 0) val = 0;
+        input.value = val;
+        
+        // Visual feedback
+        const parent = input.closest('.flex');
+        if (val > 0) {
+            parent.classList.add('bg-primary/10');
+            parent.classList.remove('bg-base-200');
+        } else {
+            parent.classList.remove('bg-primary/10');
+            parent.classList.add('bg-base-200');
+        }
+    }
+</script>
+
+<style>
+    /* Hide arrows from number input */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
 {% endblock %}

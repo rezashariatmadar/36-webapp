@@ -20,16 +20,16 @@ module.exports = {
       {
         minimalist: {
           // Dark Theme Configuration
-          "primary": "#100370",      // Company Blue (Keep for branding headers/accents)
+          "primary": "#100370",      // Company Blue (Headers/Branding)
           "primary-content": "#ffffff",
           
           "secondary": "#63021f",    // Company Red
           "secondary-content": "#ffffff",
           
-          "accent": "#00b5ff",       // Cyan - CRITICAL for buttons on dark backgrounds
+          "accent": "#00b5ff",       // Cyan (High visibility actions)
           "accent-content": "#000000",
           
-          "neutral": "#0f0f0f",      // Very dark gray for footers
+          "neutral": "#0f0f0f",      // Very dark gray (Footer)
           "neutral-content": "#ffffff",
           
           "base-100": "#1c1917",     // Dark Grey (Main Background)

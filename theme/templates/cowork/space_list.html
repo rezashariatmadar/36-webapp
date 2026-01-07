@@ -4,35 +4,29 @@
 {% block title %}رزرو فضا - ۳۶{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto">
-    <div class="text-center mb-10">
-        <h1 class="text-4xl font-black text-primary mb-2">فضای کار اشتراکی</h1>
-        <p class="text-base-content/60">انتخاب محیط ایده‌آل برای کار و تمرکز</p>
+<div class="max-w-6xl mx-auto pb-20">
+    <div class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-4xl font-black text-primary mb-2">فضای کار اشتراکی</h1>
+            <p class="text-base-content/60 font-medium">انتخاب محیط ایده‌آل برای کار و تمرکز</p>
+        </div>
+        <div class="flex gap-2">
+            <div class="badge badge-outline gap-2 p-4">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                بروزرسانی زنده
+            </div>
+        </div>
     </div>
 
-    <!-- Zone Hierarchical View -->
-    <div class="join join-vertical w-full bg-base-100 shadow-xl rounded-2xl border border-base-200">
-        {% for code, label in zones %}
-            <div class="collapse collapse-arrow join-item border-base-300 group">
-                <input type="radio" name="cowork-accordion" 
-                       hx-get="{% url 'cowork:space_list' %}?zone={{ code }}" 
-                       hx-target="#zone-content-{{ code }}" 
-                       hx-trigger="change"
-                       hx-indicator="#loading-{{ code }}" /> 
-                <div class="collapse-title text-xl font-black flex items-center gap-4 py-6">
-                    <div class="w-2 h-8 bg-primary rounded-full group-hover:h-12 transition-all duration-300"></div>
-                    {{ label }}
-                </div>
-                <div class="collapse-content"> 
-                    <div id="loading-{{ code }}" class="htmx-indicator justify-center py-10">
-                        <span class="loading loading-spinner loading-lg text-primary"></span>
-                    </div>
-                    <div id="zone-content-{{ code }}" class="py-6">
-                        <!-- Content loaded via HTMX -->
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
+    <!-- HTMX Polling Container -->
+    <div id="zone-list-container" 
+         hx-get="{% url 'cowork:space_list' %}" 
+         hx-trigger="every 10s"
+         hx-swap="innerHTML">
+        {% include "cowork/partials/zone_list.html" %}
     </div>
 </div>
 {% endblock %}

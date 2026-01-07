@@ -1,0 +1,39 @@
+<div id="item-control-{{ item.id }}" class="flex items-center justify-end gap-3 transition-all duration-300">
+    {# Signal the NAVBAR cart badge to update its count #}
+    {% if request.htmx %}
+    <span hx-swap-oob="true" id="cart-badge" class="badge badge-secondary badge-sm font-black {% if not cart_count %}hidden{% endif %}">
+        {{ cart_count|default:0 }}
+    </span>
+    {% endif %}
+
+    {% if quantity > 0 %}
+        <div class="flex items-center bg-base-200 rounded-xl p-1 shadow-inner">
+            <button hx-post="{% url 'cafe:remove_from_cart' item.id %}" 
+                    hx-target="#item-control-{{ item.id }}" 
+                    hx-swap="outerHTML"
+                    class="btn btn-ghost btn-xs btn-square font-black">-</button>
+            <span class="w-8 text-center font-black text-sm">{{ quantity }}</span>
+            <button hx-post="{% url 'cafe:add_to_cart' item.id %}" 
+                    hx-target="#item-control-{{ item.id }}" 
+                    hx-swap="outerHTML"
+                    class="btn btn-ghost btn-xs btn-square font-black">+</button>
+        </div>
+        <div class="text-right w-20">
+            <span class="font-black text-primary text-sm">{{ item.price }}</span>
+            <span class="text-[10px] opacity-60 block">تومان</span>
+        </div>
+    {% else %}
+        <div class="font-bold text-sm text-primary">
+            {{ item.price }} 
+            <span class="text-[10px] mr-1 opacity-80 font-normal">تومان</span>
+        </div>
+        <button hx-post="{% url 'cafe:add_to_cart' item.id %}" 
+                hx-target="#item-control-{{ item.id }}" 
+                hx-swap="outerHTML"
+                class="btn btn-sm btn-circle btn-accent shadow-lg hover:scale-110 active:scale-95 transition-all text-accent-content">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+        </button>
+    {% endif %}
+</div>

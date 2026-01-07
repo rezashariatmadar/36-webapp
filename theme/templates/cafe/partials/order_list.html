@@ -1,0 +1,72 @@
+{% if orders %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+        {% for order in orders %}
+            <div class="card bg-base-100 shadow-xl border-t-4 
+                {% if order.status == 'PENDING' %}border-warning
+                {% elif order.status == 'PREPARING' %}border-info
+                {% elif order.status == 'READY' %}border-success
+                {% else %}border-base-300{% endif %}">
+                
+                <div class="card-body p-5">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h2 class="card-title text-2xl font-black">#{{ order.id }}</h2>
+                            <span class="text-xs opacity-50">{{ order.created_at|time:"H:i" }} ({{ order.created_at|timesince }} پیش)</span>
+                        </div>
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="badge badge-sm font-bold">{{ order.get_status_display }}</span>
+                            {% if order.is_paid %}
+                                <span class="badge badge-success badge-sm text-[10px] text-white">پرداخت شده</span>
+                            {% else %}
+                                <span class="badge badge-error badge-sm text-[10px] text-white">تسویه نشده</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 mb-6 min-h-[100px]">
+                        {% for item in order.items.all %}
+                            <div class="flex justify-between items-center bg-base-200/50 p-2 rounded-lg">
+                                <span class="font-bold text-sm">{{ item.menu_item.name }}</span>
+                                <span class="badge badge-neutral font-black">× {{ item.quantity }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if order.notes %}
+                        <div class="bg-primary/5 p-3 rounded-xl text-xs mb-6 border border-primary/10">
+                            <span class="font-black text-primary block mb-1">یادداشت:</span>
+                            {{ order.notes }}
+                        </div>
+                    {% endif %}
+
+                    <div class="card-actions flex-col gap-2 mt-auto">
+                        <div class="grid grid-cols-2 gap-2 w-full">
+                            {% if order.status == 'PENDING' %}
+                                <button hx-post="{% url 'cafe:update_order_status' order.id 'PREPARING' %}" hx-target="#order-list-container" class="btn btn-info btn-sm font-bold">شروع تهیه</button>
+                            {% elif order.status == 'PREPARING' %}
+                                <button hx-post="{% url 'cafe:update_order_status' order.id 'READY' %}" hx-target="#order-list-container" class="btn btn-success btn-sm font-bold text-white">آماده شد</button>
+                            {% elif order.status == 'READY' %}
+                                <button hx-post="{% url 'cafe:update_order_status' order.id 'DELIVERED' %}" hx-target="#order-list-container" class="btn btn-primary btn-sm font-bold">تحویل داده شد</button>
+                            {% endif %}
+                            
+                            <button hx-post="{% url 'cafe:toggle_order_payment' order.id %}" hx-target="#order-list-container" class="btn btn-outline btn-sm font-bold">
+                                {% if order.is_paid %}لغو پرداخت{% else %}تایید پرداخت{% endif %}
+                            </button>
+                        </div>
+                        
+                        {% if order.status == 'PENDING' %}
+                            <button hx-post="{% url 'cafe:update_order_status' order.id 'CANCELLED' %}" hx-target="#order-list-container" class="btn btn-ghost btn-xs text-error w-full mt-2">لغو سفارش</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-32 bg-base-100 rounded-3xl border-2 border-dashed border-base-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 opacity-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <h2 class="text-2xl font-bold opacity-30">هیچ سفارش فعالی وجود ندارد</h2>
+    </div>
+{% endif %}

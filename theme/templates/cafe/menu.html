@@ -1,23 +1,21 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n cafe_extras %}
 
 {% block title %}{% trans "Menu" %} - ۳۶{% endblock %}
 
 {% block content %}
-<div class="pb-32"> <!-- Increased padding for bottom cart bar -->
+<div class="pb-32">
     
-    <!-- Hero Section -->
-    <div class="text-center mb-4 py-8 bg-gradient-to-b from-primary/5 to-transparent rounded-b-3xl -mx-4 md:-mx-8 md:rounded-b-[3rem]">
+    <div class="text-center mb-4 py-8 bg-gradient-to-b from-primary/20 to-transparent rounded-b-3xl -mx-4 md:-mx-8 md:rounded-b-[3rem]">
         <h1 class="text-4xl font-black text-primary mb-2 tracking-tight">منوی ۳۶</h1>
         <p class="text-base-content/60 font-medium">تجربه‌ای متفاوت از طعم‌ها</p>
     </div>
 
-    <!-- Sticky Category Nav -->
-    <div class="sticky top-0 z-50 bg-base-100/95 backdrop-blur-md border-b border-base-200 -mx-4 md:-mx-8 px-4 md:px-8 py-3 mb-8 overflow-x-auto no-scrollbar flex gap-2 snap-x shadow-sm" id="category-nav">
+    <div class="sticky top-0 z-50 bg-base-100/95 backdrop-blur-md border-b border-white/5 -mx-4 md:-mx-8 px-4 md:px-8 py-3 mb-8 overflow-x-auto no-scrollbar flex gap-2 snap-x shadow-sm" id="category-nav">
         {% for category in categories %}
             {% if category.items.all %}
                 <a href="#category-{{ category.id }}" 
-                   class="btn btn-sm btn-ghost rounded-full whitespace-nowrap snap-start font-bold opacity-60 hover:opacity-100 transition-all border border-transparent hover:border-base-300 data-[active=true]:bg-primary data-[active=true]:text-primary-content data-[active=true]:opacity-100"
+                   class="btn btn-sm btn-ghost rounded-full whitespace-nowrap snap-start font-bold opacity-60 hover:opacity-100 transition-all border border-transparent hover:border-white/10 data-[active=true]:bg-primary data-[active=true]:text-primary-content data-[active=true]:opacity-100"
                    data-target="category-{{ category.id }}">
                     {{ category.name }}
                 </a>
@@ -25,7 +23,6 @@
         {% endfor %}
     </div>
 
-    <!-- Menu Items -->
     <div class="space-y-20 max-w-4xl mx-auto px-1">
         {% for category in categories %}
             {% if category.items.all %}
@@ -37,13 +34,13 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         {% for item in category.items.all %}
-                            <div class="card card-side bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-all duration-300 p-3 items-center group">
+                            <div class="card card-side bg-base-200 shadow-sm border border-white/5 hover:shadow-md transition-all duration-300 p-3 items-center group">
                                 {% if item.image %}
-                                    <figure class="w-24 h-24 shrink-0 rounded-xl overflow-hidden ml-4 bg-base-200">
+                                    <figure class="w-24 h-24 shrink-0 rounded-xl overflow-hidden ml-4 bg-base-300">
                                         <img src="{{ item.image.url }}" loading="lazy" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                     </figure>
                                 {% else %}
-                                    <div class="w-24 h-24 shrink-0 rounded-xl bg-base-200/50 flex items-center justify-center ml-4 text-base-content/20 group-hover:text-primary/40 transition-colors">
+                                    <div class="w-24 h-24 shrink-0 rounded-xl bg-base-300 flex items-center justify-center ml-4 text-base-content/20 group-hover:text-primary/40 transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                         </svg>
@@ -58,16 +55,10 @@
                                         <p class="text-xs text-base-content/60 line-clamp-2 mb-3 leading-relaxed">{{ item.description }}</p>
                                     {% endif %}
                                     
-                                    <div class="flex items-center justify-between mt-auto">
-                                        <div class="font-bold text-sm text-primary">
-                                            {{ item.price }} 
-                                            <span class="text-[10px] mr-1 opacity-80 font-normal">تومان</span>
-                                        </div>
-                                        <a href="{% url 'cafe:add_to_cart' item.id %}" class="btn btn-sm btn-circle btn-accent shadow-lg hover:scale-110 active:scale-95 transition-all text-accent-content">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                            </svg>
-                                        </a>
+                                    <div id="item-control-container-{{ item.id }}" class="mt-auto">
+                                        {% with quantity=cart_data|get_item:item.id %}
+                                            {% include "cafe/partials/item_quantity_control.html" with item=item quantity=quantity|default:0 %}
+                                        {% endwith %}
                                     </div>
                                 </div>
                             </div>
@@ -90,7 +81,6 @@
 </style>
 
 <script>
-    // Intersection Observer logic remains the same as before
     document.addEventListener('DOMContentLoaded', () => {
         const navLinks = document.querySelectorAll('#category-nav a');
         const sections = document.querySelectorAll('.section-category');

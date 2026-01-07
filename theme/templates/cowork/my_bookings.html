@@ -27,18 +27,20 @@
                                 {% if booking.status == 'CONFIRMED' %}badge-success text-white
                                 {% elif booking.status == 'CANCELLED' %}badge-error text-white
                                 {% else %}badge-neutral{% endif %}">
-                                {{ booking.get_status_display }}
+                                {% if booking.status == 'PENDING' %}در انتظار تایید
+                                {% elif booking.status == 'CONFIRMED' %}تایید شده
+                                {% else %}{{ booking.get_status_display }}{% endif %}
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4 text-sm">
                             <div class="flex items-center gap-2">
                                 <span class="opacity-50">شروع:</span>
-                                <span class="font-bold ltr">{{ booking.start_time|date:"Y/m/d H:i" }}</span>
+                                <span class="font-bold ltr">{{ booking.start_time_jalali }}</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="opacity-50">پایان:</span>
-                                <span class="font-bold ltr">{{ booking.end_time|date:"Y/m/d H:i" }}</span>
+                                <span class="font-bold ltr">{{ booking.end_time_jalali }}</span>
                             </div>
                         </div>
 

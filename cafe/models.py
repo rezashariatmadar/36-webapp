@@ -1,4 +1,5 @@
 from django.db import models
+from django_jalali.db import models as jmodels
 from django.utils.translation import gettext_lazy as _
 
 class MenuCategory(models.Model):
@@ -20,8 +21,8 @@ class MenuItem(models.Model):
     price = models.DecimalField(_("Price (Toman)"), max_digits=12, decimal_places=0)
     image = models.ImageField(_("Image"), upload_to='menu_items/', blank=True, null=True)
     is_available = models.BooleanField(_("Is Available"), default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = jmodels.jDateTimeField(auto_now_add=True)
+    updated_at = jmodels.jDateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _("Menu Item")
@@ -41,6 +42,7 @@ class CafeOrder(models.Model):
     user = models.ForeignKey('accounts.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Customer"))
     status = models.CharField(_("Status"), max_length=20, choices=Status.choices, default=Status.PENDING)
     is_paid = models.BooleanField(_("Is Paid"), default=False)
+    settled_at = jmodels.jDateTimeField(_("Settled At"), null=True, blank=True)
     notes = models.TextField(_("Notes/Table Number"), blank=True, help_text=_("e.g. Table 5 or Specific delivery instructions"))
     
     total_price = models.DecimalField(_("Total Price"), max_digits=12, decimal_places=0, default=0)
@@ -49,8 +51,8 @@ class CafeOrder(models.Model):
     payment_token = models.CharField(_("Payment Token"), max_length=100, blank=True, null=True)
     transaction_id = models.CharField(_("Transaction ID"), max_length=100, blank=True, null=True)
     
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = jmodels.jDateTimeField(auto_now_add=True)
+    updated_at = jmodels.jDateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _("Cafe Order")

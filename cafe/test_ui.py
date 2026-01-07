@@ -15,22 +15,23 @@ class CafeUITests(TestCase):
     def test_menu_add_button_style(self):
         response = self.client.get(reverse('cafe:menu'))
         self.assertEqual(response.status_code, 200)
-        # Check for new button class 'btn-secondary'
-        self.assertContains(response, 'btn-secondary')
+        # Check for new button class 'btn-accent'
+        self.assertContains(response, 'btn-accent')
         # Check for new size 'btn-sm'
         self.assertContains(response, 'btn-sm')
 
     def test_floating_cart_appears(self):
-        # Initially no cart, so no FAB
+        # Initially cart is hidden
         response = self.client.get(reverse('accounts:home'))
-        self.assertNotContains(response, 'fixed bottom-6 left-6')
+        self.assertContains(response, 'id="floating-cart"')
+        self.assertContains(response, 'hidden')
         
         # Add item to cart
         session = self.client.session
         session['cart'] = {str(self.item.id): 1}
         session.save()
         
-        # Now FAB should appear
+        # Now FAB should NOT have 'hidden' class
         response = self.client.get(reverse('accounts:home'))
-        self.assertContains(response, 'fixed bottom-6 left-6')
-        self.assertContains(response, 'badge-secondary')
+        self.assertContains(response, 'id="floating-cart"')
+        self.assertNotContains(response, 'id="floating-cart" class="fixed bottom-6 right-6 z-[150] animate-bounce hidden"')

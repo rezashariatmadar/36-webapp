@@ -6,14 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}۳۶ - کافی‌شاپ{% endblock %}</title>
     {% tailwind_css %}
-    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfzto96nqE92lsyoZlSreW7tBpn9S1OfQLWPJYPpgWAVknkr9Sua6UXjsJs5TvM" crossorigin="anonymous"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/dist/font-face.css" rel="stylesheet" type="text/css" />
+    
     <style>
-        @font-face {
-            font-family: 'Vazir';
-            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir.woff2') format('woff2');
-        }
         body {
-            font-family: 'Vazir', system-ui, -apple-system, sans-serif;
+            font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
         }
         .htmx-indicator {
             display: none !important;
@@ -25,8 +29,69 @@
             display: flex !important;
         }
     </style>
+
+    <script>
+        $(document).ready(function() {
+            function formatPrices() {
+                $('.format-price').each(function() {
+                    const $el = $(this);
+                    const val = $el.text().replace(/[^0-9]/g, '');
+                    if (val) {
+                        $el.text(new Intl.NumberFormat('fa-IR').format(val) + ' تومان');
+                    }
+                });
+            }
+            
+            function initDatePicker() {
+                $('.jalali-date').each(function() {
+                    const $input = $(this);
+                    if ($input.data('datepicker-initialized')) return;
+                    
+                    $input.persianDatepicker({
+                        format: 'YYYY-MM-DD',
+                        autoClose: true,
+                        initialValue: false,
+                        observer: true,
+                        altField: $input,
+                        altFormat: 'YYYY-MM-DD',
+                        persianDigit: false,
+                        calendar: {
+                            persian: {
+                                leapYearMode: 'astronomical'
+                            }
+                        },
+                        onSelect: function(unix) {
+                            const formattedDate = new persianDate(unix).format('YYYY-MM-DD');
+                            $input.val(formattedDate);
+                            if (window.htmx) {
+                                htmx.trigger($input[0], 'change');
+                            }
+                        }
+                    });
+                    $input.data('datepicker-initialized', true);
+                });
+            }
+
+            initDatePicker();
+            formatPrices();
+
+            document.addEventListener('htmx:afterSwap', function() {
+                initDatePicker();
+                formatPrices();
+            });
+        });
+
+        document.addEventListener('htmx:responseError', function(event) {
+            console.error('HTMX Response Error:', event.detail.xhr.status, event.detail.xhr.responseText);
+        });
+
+        document.addEventListener('htmx:sendError', function(event) {
+            console.error('HTMX Send Error:', event.detail.xhr);
+        });
+    </script>
 </head>
-<body class="min-h-screen bg-base-100 text-base-content flex flex-col">
+<body class="min-h-screen bg-base-100 text-base-content flex flex-col" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <div class="hidden">{% csrf_token %}</div>
     
     <header class="bg-primary text-primary-content shadow-lg sticky top-0 z-[100] border-b border-white/10">
         <div class="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -39,7 +104,17 @@
                 </ul>
             </nav>
 
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center gap-[10px] shrink-0">
+                <!-- Cart Icon in Navbar -->
+                <a href="{% url 'cafe:cart_detail' %}" class="btn btn-sm btn-ghost hover:bg-white/10 flex items-center gap-[10px] px-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span id="cart-badge" class="badge badge-secondary badge-sm font-black {% if not cart_count %}hidden{% endif %}">
+                        {{ cart_count|default:0 }}
+                    </span>
+                </a>
+
                 <div class="dropdown md:hidden dropdown-end">
                     <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
@@ -132,16 +207,18 @@
         </div>
     {% endif %}
 
-    {% if cart_count %}
-    <div class="fixed bottom-6 right-6 z-[150] animate-bounce">
-        <a href="{% url 'cafe:cart_detail' %}" class="btn btn-circle btn-lg btn-accent shadow-2xl shadow-accent/40 border-4 border-base-100 relative group transition-all hover:scale-110">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent-content" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span class="badge badge-secondary badge-lg absolute -top-2 -right-2 font-black shadow-sm scale-110 group-hover:scale-125 transition-transform text-white border-base-100">{{ cart_count }}</span>
-        </a>
-    </div>
-    {% endif %}
+    <script>
+        document.addEventListener('htmx:afterSwap', function(event) {
+            if (event.detail.target.id === 'cart-badge') {
+                const badge = document.getElementById('cart-badge');
+                if (parseInt(badge.innerText) > 0) {
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        });
+    </script>
 
 </body>
 </html>

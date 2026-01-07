@@ -20,7 +20,7 @@
                         <span class="label-text font-bold">شماره میز یا توضیحات</span>
                     </label>
                     <textarea name="notes" class="textarea textarea-bordered h-32 bg-base-200 focus:bg-base-100 transition-colors rounded-2xl" 
-                              placeholder="مثال: میز ۵ یا تحویل در سالن مطالعه"></textarea>
+                              placeholder="مثال: میز ۵ یا تحویل در سالن مطالعه">{% if suggested_location %}{{ suggested_location }}{% endif %}</textarea>
                     <label class="label">
                         <span class="label-text-alt opacity-50">اگر در فضای کار اشتراکی مستقر هستید، شماره میز خود را وارد کنید.</span>
                     </label>

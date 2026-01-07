@@ -1,6 +1,7 @@
 import re
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
+from django_jalali.db import models as jmodels
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -52,7 +53,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(_('phone number'), validators=[phone_regex], max_length=15, unique=True)
     national_id = models.CharField(_('national ID'), max_length=10, blank=True, null=True, validators=[validate_national_id_field])
     full_name = models.CharField(_('full name'), max_length=150, blank=True)
-    birth_date = models.DateField(_('birth date'), null=True, blank=True)
+    birth_date = jmodels.jDateField(_('birth date'), null=True, blank=True)
     
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

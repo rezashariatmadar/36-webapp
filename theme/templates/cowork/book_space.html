@@ -11,9 +11,12 @@
         <p class="text-sm opacity-60 mt-2">لطفا جزئیات رزرو خود را مشخص کنید</p>
     </div>
 
-    <div class="card bg-base-100 shadow-xl border border-base-200">
+    <div class="card bg-base-100 shadow-xl border border-base-200 rounded-3xl overflow-hidden">
         <div class="card-body p-6 md:p-8">
-            <form method="post" class="space-y-4">
+            <form method="post" class="space-y-6" id="booking-form"
+                  hx-on:htmx:before-request="document.getElementById('submit-btn').disabled = true; document.getElementById('submit-btn').innerText = 'در حال محاسبه...';"
+                  hx-on:htmx:after-request="document.getElementById('submit-btn').disabled = false; document.getElementById('submit-btn').innerText = 'تایید و رزرو';">
+                
                 {% csrf_token %}
                 
                 {% if form.non_field_errors %}
@@ -22,54 +25,61 @@
                     </div>
                 {% endif %}
 
+                <!-- Booking Type -->
+                {% if not form.booking_type.is_hidden %}
                 <div class="form-control w-full">
                     <label class="label">
                         <span class="label-text font-bold">نوع رزرو</span>
                     </label>
-                    <select name="{{ form.booking_type.name }}" class="select select-bordered w-full">
+                    <select name="booking_type" class="select select-bordered w-full bg-base-200 focus:bg-base-100 transition-all rounded-2xl"
+                            hx-get="{% url 'cowork:book_space' space.id %}"
+                            hx-trigger="change"
+                            hx-target="#booking-preview"
+                            hx-include="#booking-form">
                         {% for value, text in form.booking_type.field.choices %}
                             <option value="{{ value }}" {% if form.booking_type.value == value %}selected{% endif %}>{{ text }}</option>
                         {% endfor %}
                     </select>
                 </div>
+                {% else %}
+                    {{ form.booking_type }}
+                {% endif %}
 
+                <!-- Start Time -->
                 <div class="form-control w-full">
                     <label class="label">
-                        <span class="label-text font-bold">زمان شروع</span>
+                        <span class="label-text font-bold">تاریخ شروع</span>
                     </label>
-                    <input type="datetime-local" name="{{ form.start_time.name }}" 
-                           class="input input-bordered w-full text-left ltr" 
-                           required value="{{ form.start_time.value|default:'' }}">
+                    <input type="text" name="start_time" autocomplete="off"
+                           class="jalali-date input input-bordered w-full text-left ltr bg-base-200 focus:bg-base-100 transition-all rounded-2xl" 
+                           required value="{{ form.start_time.value|default:'' }}"
+                           hx-get="{% url 'cowork:book_space' space.id %}"
+                           hx-trigger="change"
+                           hx-target="#booking-preview"
+                           hx-include="#booking-form"
+                           hx-indicator="#booking-preview">
                     {% if form.start_time.errors %}
                         <span class="text-error text-xs mt-1">{{ form.start_time.errors|striptags }}</span>
                     {% endif %}
                 </div>
 
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-bold">زمان پایان</span>
-                    </label>
-                    <input type="datetime-local" name="{{ form.end_time.name }}" 
-                           class="input input-bordered w-full text-left ltr" 
-                           required value="{{ form.end_time.value|default:'' }}">
-                    {% if form.end_time.errors %}
-                        <span class="text-error text-xs mt-1">{{ form.end_time.errors|striptags }}</span>
-                    {% endif %}
-                </div>
-
-                <div class="bg-base-200/50 rounded-xl p-4 text-xs space-y-2 mt-4">
-                    <div class="flex justify-between">
-                        <span class="opacity-70">تعرفه روزانه:</span>
-                        <span class="font-bold">{{ space.pricing_plan.daily_rate }} تومان</span>
+                <!-- Dynamic Preview Area -->
+                <div id="booking-preview" class="relative">
+                    <div class="htmx-indicator absolute inset-0 bg-base-100/50 flex justify-center items-center z-10 rounded-2xl">
+                        <span class="loading loading-spinner text-primary"></span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="opacity-70">تعرفه ساعتی:</span>
-                        <span class="font-bold">{{ space.pricing_plan.hourly_rate }} تومان</span>
+                    
+                    <div class="bg-base-200/50 rounded-2xl p-5 text-sm space-y-3 border border-base-300">
+                        <div class="flex justify-between items-center italic opacity-50">
+                            <span>انتخاب تاریخ برای مشاهده قیمت...</span>
+                        </div>
                     </div>
+                    <!-- Hidden end_time -->
+                    {{ form.end_time }}
                 </div>
 
                 <div class="pt-4">
-                    <button type="submit" class="btn btn-primary btn-lg w-full font-black shadow-lg shadow-primary/20">
+                    <button type="submit" id="submit-btn" class="btn btn-primary btn-lg w-full font-black shadow-xl shadow-primary/20 rounded-2xl transition-all">
                         تایید و رزرو
                     </button>
                     <a href="{% url 'cowork:space_list' %}" class="btn btn-ghost w-full mt-2">انصراف</a>

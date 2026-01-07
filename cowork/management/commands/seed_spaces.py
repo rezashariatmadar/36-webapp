@@ -5,6 +5,10 @@ class Command(BaseCommand):
     help = 'Seeds the database with EXACT pricing and spaces.'
 
     def handle(self, *args, **options):
+        self.stdout.write('Clearing existing spaces and plans...')
+        Space.objects.all().delete()
+        PricingPlan.objects.all().delete()
+
         # 1. Long Table Plan (Daily Only)
         long_table_plan, _ = PricingPlan.objects.update_or_create(
             name='Long Table (Daily Only)',
@@ -43,7 +47,7 @@ class Command(BaseCommand):
             defaults={
                 'daily_rate': 300000,
                 'monthly_rate': 17380000,
-                'six_month_rate': 88320020, # Corrected based on user input
+                'six_month_rate': 88320000,
                 'yearly_rate': 110400000
             }
         )
@@ -61,23 +65,51 @@ class Command(BaseCommand):
             }
         )
 
-        # VIP Offices
-        Space.objects.update_or_create(
-            name='اتاق VIP دو نفره',
-            defaults={
-                'zone': Space.ZoneType.PRIVATE_ROOM,
-                'capacity': 2,
-                'pricing_plan': vip_2_plan
-            }
-        )
-        Space.objects.update_or_create(
-            name='اتاق VIP سه نفره',
-            defaults={
-                'zone': Space.ZoneType.PRIVATE_ROOM,
-                'capacity': 3,
-                'pricing_plan': vip_3_plan
-            }
-        )
+        # VIP Offices (2-Seat) - 6 Units
+        for i in range(1, 7):
+            parent_room, _ = Space.objects.update_or_create(
+                name=f'اتاق VIP دو نفره {i}',
+                defaults={
+                    'zone': Space.ZoneType.PRIVATE_ROOM_2,
+                    'capacity': 2,
+                    'pricing_plan': vip_2_plan,
+                    'sort_order': i
+                }
+            )
+            for s in range(1, 3):
+                Space.objects.update_or_create(
+                    name=f'صندلی {s} - اتاق {i} (2 نفره)',
+                    defaults={
+                        'zone': Space.ZoneType.PRIVATE_ROOM_2,
+                        'capacity': 1,
+                        'pricing_plan': vip_2_plan,
+                        'parent_table': parent_room,
+                        'sort_order': s
+                    }
+                )
+
+        # VIP Offices (3-Seat) - 4 Units
+        for i in range(1, 5):
+            parent_room, _ = Space.objects.update_or_create(
+                name=f'اتاق VIP سه نفره {i}',
+                defaults={
+                    'zone': Space.ZoneType.PRIVATE_ROOM_3,
+                    'capacity': 3,
+                    'pricing_plan': vip_3_plan,
+                    'sort_order': i
+                }
+            )
+            for s in range(1, 4):
+                Space.objects.update_or_create(
+                    name=f'صندلی {s} - اتاق {i} (3 نفره)',
+                    defaults={
+                        'zone': Space.ZoneType.PRIVATE_ROOM_3,
+                        'capacity': 1,
+                        'pricing_plan': vip_3_plan,
+                        'parent_table': parent_room,
+                        'sort_order': s
+                    }
+                )
 
         # Individual Desks (12 units)
         for i in range(1, 13):
@@ -86,19 +118,31 @@ class Command(BaseCommand):
                 defaults={
                     'zone': Space.ZoneType.DESK,
                     'capacity': 1,
-                    'pricing_plan': desk_plan
+                    'pricing_plan': desk_plan,
+                    'sort_order': i
                 }
             )
 
         # Monthly Tables (6 tables x 4 seats) = 24 seats
         for t in range(1, 7):
+            parent_table, _ = Space.objects.update_or_create(
+                name=f'میز ثابت شماره {t}',
+                defaults={
+                    'zone': Space.ZoneType.SHARED_DESK,
+                    'capacity': 4,
+                    'pricing_plan': desk_plan,
+                    'sort_order': t
+                }
+            )
             for s in range(1, 5):
                 Space.objects.update_or_create(
                     name=f'میز ثابت {t}-{s}',
                     defaults={
-                        'zone': Space.ZoneType.DESK,
+                        'zone': Space.ZoneType.SHARED_DESK,
                         'capacity': 1,
-                        'pricing_plan': desk_plan
+                        'pricing_plan': desk_plan,
+                        'parent_table': parent_table,
+                        'sort_order': s
                     }
                 )
 
@@ -109,7 +153,8 @@ class Command(BaseCommand):
                 defaults={
                     'zone': Space.ZoneType.LONG_TABLE,
                     'capacity': 1,
-                    'pricing_plan': long_table_plan
+                    'pricing_plan': long_table_plan,
+                    'sort_order': i
                 }
             )
 

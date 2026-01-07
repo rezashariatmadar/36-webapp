@@ -1,0 +1,166 @@
+<!-- Zone Hierarchical View (Client Side) -->
+<div class="join join-vertical w-full bg-base-100 shadow-xl rounded-2xl border border-base-200 animate-in fade-in duration-500">
+    {% for zone in zones_with_spaces %}
+        {% if zone.spaces %}
+        <div class="collapse collapse-arrow join-item border-base-300 group">
+            <input type="radio" name="zone-accordion" {% if forloop.first %}checked="checked"{% endif %} /> 
+            <div class="collapse-title text-xl font-black flex items-center gap-4 py-6">
+                <div class="w-2 h-8 bg-primary rounded-full group-hover:h-12 transition-all duration-300"></div>
+                {{ zone.label }}
+                <span class="badge badge-ghost badge-sm opacity-50">{{ zone.spaces|length }} مورد</span>
+            </div>
+            <div class="collapse-content"> 
+                <div class="py-6 px-4">
+                    {% if zone.code == 'SHARED_DESK' %}
+                        <!-- Nested Accordion for Shared Tables (Seat-by-Seat) -->
+                        <div class="join join-vertical w-full border border-base-200 rounded-xl overflow-hidden shadow-sm">
+                            {% for parent in zone.spaces %}
+                                <div class="collapse collapse-plus join-item border-b border-base-200 bg-base-200/20">
+                                    <input type="checkbox" name="parent-accordion" /> 
+                                    <div class="collapse-title text-lg font-bold flex justify-between items-center px-6 py-4">
+                                        <span>{{ parent.name }}</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="badge badge-ghost badge-sm">{{ parent.capacity }} نفره</span>
+                                            <span class="badge badge-primary badge-sm">{{ parent.seats.all|length }} صندلی</span>
+                                        </div>
+                                    </div>
+                                    <div class="collapse-content px-6 bg-base-100/50">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-6">
+                                            {% for seat in parent.seats.all %}
+                                                <div class="card bg-base-100 shadow-sm border border-base-200 p-4 flex flex-col items-center gap-3 hover:border-primary/30 transition-colors">
+                                                    <span class="font-bold text-sm">{{ seat.name }}</span>
+                                                    {% if seat.status == 'AVAILABLE' %}
+                                                        <a href="{% url 'cowork:book_space' seat.id %}" class="btn btn-primary btn-sm w-full">رزرو صندلی</a>
+                                                    {% elif seat.status == 'OCCUPIED' %}
+                                                        <button class="btn btn-disabled btn-sm w-full">رزرو شده</button>
+                                                    {% else %}
+                                                        <button class="btn btn-disabled btn-sm w-full">غیرفعال</button>
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% elif zone.code == 'PRIVATE_2' or zone.code == 'PRIVATE_3' %}
+                        <!-- VIP Rooms (Book Whole Room - No Seats) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                            {% for room in zone.spaces %}
+                                <div class="card bg-base-200/50 shadow-sm border border-base-200 hover:shadow-md transition-all group overflow-hidden">
+                                    <div class="h-2 
+                                        {% if room.status == 'AVAILABLE' %}bg-success/20 group-hover:bg-success
+                                        {% elif room.status == 'OCCUPIED' %}bg-error/20 group-hover:bg-error
+                                        {% else %}bg-base-300{% endif %} transition-colors"></div>
+                                    <div class="card-body p-6">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-lg font-black text-base-content">{{ room.name }}</h3>
+                                            {% if room.status == 'AVAILABLE' %}
+                                                <span class="badge badge-success badge-sm text-white border-none">آزاد</span>
+                                            {% elif room.status == 'OCCUPIED' %}
+                                                <span class="badge badge-error badge-sm text-white border-none">رزرو شده</span>
+                                            {% else %}
+                                                <span class="badge badge-ghost badge-sm">خارج از سرویس</span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="space-y-2 mb-6 bg-base-100/50 p-4 rounded-2xl">
+                                            <div class="flex justify-between text-xs opacity-60">
+                                                <span>ماهانه:</span>
+                                                <span class="font-bold">{{ room.pricing_plan.monthly_rate }} تومان</span>
+                                            </div>
+                                            <div class="flex justify-between text-xs text-secondary font-bold">
+                                                <span>۶ ماهه:</span>
+                                                <span>{{ room.pricing_plan.six_month_rate }} تومان</span>
+                                            </div>
+                                            <div class="flex justify-between text-sm text-primary font-black pt-1 border-t border-base-300">
+                                                <span>سالانه:</span>
+                                                <span>{{ room.pricing_plan.yearly_rate }} تومان</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="card-actions">
+                                            {% if room.status == 'AVAILABLE' %}
+                                                <a href="{% url 'cowork:book_space' room.id %}" class="btn btn-primary btn-sm w-full font-black shadow-lg shadow-primary/20">رزرو اتاق</a>
+                                            {% else %}
+                                                <button class="btn btn-disabled btn-sm w-full font-black">غیرقابل رزرو</button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <!-- Regular Grid for other zones (e.g. Desks, Long Table) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                            {% for space in zone.spaces %}
+                                <div class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-xl hover:border-primary/20 transition-all group overflow-hidden">
+                                    <div class="h-2 
+                                        {% if space.status == 'AVAILABLE' %}bg-success/20 group-hover:bg-success
+                                        {% elif space.status == 'OCCUPIED' %}bg-error/20 group-hover:bg-error
+                                        {% else %}bg-base-300{% endif %} transition-colors"></div>
+                                    <div class="card-body p-6">
+                                        <div class="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h2 class="card-title text-xl font-black mb-1">{{ space.name }}</h2>
+                                                <span class="badge badge-sm badge-ghost opacity-70">{{ space.get_zone_display }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-1 text-xs font-bold opacity-50">
+                                                {{ space.capacity }} نفره
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="space-y-3 mb-8 bg-base-200/30 p-4 rounded-2xl border border-base-200 min-h-[100px] flex flex-col justify-center">
+                                            {% if space.status == 'OCCUPIED' %}
+                                                <div class="text-center py-2">
+                                                    <span class="text-error font-black text-sm">در حال حاضر رزرو شده است</span>
+                                                </div>
+                                            {% elif not space.pricing_plan %}
+                                                <div class="text-center py-2">
+                                                    <span class="text-warning font-black text-sm">طرح قیمت‌گذاری تعیین نشده</span>
+                                                </div>
+                                            {% elif space.pricing_plan.is_contact_for_price %}
+                                                <div class="text-center py-2">
+                                                    <span class="text-primary font-black">برای قیمت تماس بگیرید</span>
+                                                </div>
+                                            {% else %}
+                                                {% if space.pricing_plan.daily_rate > 0 %}
+                                                    <div class="flex justify-between items-center text-sm">
+                                                        <span class="opacity-60">روزانه</span>
+                                                        <span class="font-bold">{{ space.pricing_plan.daily_rate }} تومان</span>
+                                                    </div>
+                                                {% endif %}
+                                                {% if space.pricing_plan.monthly_rate > 0 %}
+                                                    <div class="flex justify-between items-center text-sm">
+                                                        <span class="opacity-60">ماهانه</span>
+                                                        <span class="font-bold text-secondary">{{ space.pricing_plan.monthly_rate }} تومان</span>
+                                                    </div>
+                                                {% endif %}
+                                                {% if space.pricing_plan.yearly_rate > 0 %}
+                                                    <div class="flex justify-between items-center text-sm border-t border-base-200 pt-2 mt-2">
+                                                        <span class="opacity-60">سالانه</span>
+                                                        <span class="font-black text-primary">{{ space.pricing_plan.yearly_rate }} تومان</span>
+                                                    </div>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="card-actions">
+                                            {% if space.status == 'AVAILABLE' %}
+                                                <a href="{% url 'cowork:book_space' space.id %}" class="btn btn-primary w-full font-bold shadow-lg shadow-primary/20">
+                                                    رزرو آنلاین
+                                                </a>
+                                            {% else %}
+                                                <button class="btn btn-disabled w-full font-bold">غیرقابل رزرو</button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>

@@ -20,17 +20,5 @@ class CoworkUXTests(TestCase):
         self.assertContains(response, Space.ZoneType.LONG_TABLE.label)
         # Check for accordion structure
         self.assertContains(response, 'collapse-title')
-        # Should NOT contain the space name yet (lazy loaded)
-        self.assertNotContains(response, "Table 1")
-
-    def test_space_list_htmx_load(self):
-        # Simulate HTMX request for the specific zone
-        headers = {'HTTP_HX_REQUEST': 'true'}
-        url = reverse('cowork:space_list') + f'?zone={Space.ZoneType.LONG_TABLE}'
-        response = self.client.get(url, **headers)
-        
-        self.assertEqual(response.status_code, 200)
-        # Should now contain the space name
+        # Since we switched to client-side, the space name SHOULD be in the response
         self.assertContains(response, "Table 1")
-        # Should verify it's the partial template (no base html html/body tags)
-        self.assertNotContains(response, '<html')

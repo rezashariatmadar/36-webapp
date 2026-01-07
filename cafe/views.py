@@ -73,10 +73,11 @@ def admin_dashboard(request):
 def menu_view(request):
     categories = MenuCategory.objects.prefetch_related('items').all()
     cart = request.session.get('cart', {})
-    cart_items_count = sum(cart.values())
+    cart_items_count = sum(cart.values()) if isinstance(cart, dict) else 0
     return render(request, 'cafe/menu.html', {
         'categories': categories,
-        'cart_count': cart_items_count
+        'cart_count': cart_items_count,
+        'cart_data': cart
     })
 
 def add_to_cart(request, item_id):
@@ -84,8 +85,23 @@ def add_to_cart(request, item_id):
     item_id_str = str(item_id)
     cart[item_id_str] = cart.get(item_id_str, 0) + 1
     request.session['cart'] = cart
-    messages.success(request, _("Item added to your order."))
-    return redirect('cafe:menu')
+    
+    if request.htmx:
+        # If the request comes from the CART page, we might want to refresh the whole list
+        # otherwise we return the item-specific control
+        if 'cart' in request.META.get('HTTP_REFERER', ''):
+            return cart_detail(request)
+            
+        item = get_object_or_404(MenuItem, id=item_id)
+        quantity = cart[item_id_str]
+        return render(request, 'cafe/partials/item_quantity_control.html', {
+            'item': item,
+            'quantity': quantity,
+            'cart_count': sum(cart.values())
+        })
+        
+    next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or 'cafe:menu'
+    return redirect(next_url)
 
 def remove_from_cart(request, item_id):
     cart = request.session.get('cart', {})
@@ -96,7 +112,21 @@ def remove_from_cart(request, item_id):
         else:
             del cart[item_id_str]
         request.session['cart'] = cart
-    return redirect('cafe:cart_detail')
+    
+    if request.htmx:
+        if 'cart' in request.META.get('HTTP_REFERER', ''):
+            return cart_detail(request)
+            
+        item = get_object_or_404(MenuItem, id=item_id)
+        quantity = cart.get(item_id_str, 0)
+        return render(request, 'cafe/partials/item_quantity_control.html', {
+            'item': item,
+            'quantity': quantity,
+            'cart_count': sum(cart.values())
+        })
+
+    next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or 'cafe:cart_detail'
+    return redirect(next_url)
 
 def cart_detail(request):
     cart = request.session.get('cart', {})
@@ -110,12 +140,31 @@ def cart_detail(request):
             items.append({'item': item, 'quantity': quantity, 'subtotal': subtotal})
         except MenuItem.DoesNotExist:
             continue
-    return render(request, 'cafe/cart.html', {'items': items, 'total': total})
+            
+    context = {'items': items, 'total': total, 'cart_count': sum(cart.values())}
+    if request.htmx:
+        return render(request, 'cafe/partials/cart_list.html', context)
+        
+    return render(request, 'cafe/cart.html', context)
 
 @login_required
 def checkout(request):
     cart = request.session.get('cart', {})
     if not cart: return redirect('cafe:menu')
+    
+    # Try to find an active booking for this user to pre-fill the delivery location
+    now = timezone.now()
+    active_booking = Booking.objects.filter(
+        user=request.user,
+        status=Booking.Status.CONFIRMED,
+        start_time__lte=now,
+        end_time__gte=now
+    ).first()
+    
+    suggested_location = ""
+    if active_booking:
+        suggested_location = active_booking.space.name
+
     if request.method == 'POST':
         notes = request.POST.get('notes', '')
         with transaction.atomic():
@@ -128,7 +177,10 @@ def checkout(request):
         request.session['cart'] = {}
         messages.success(request, _("Order placed!"))
         return redirect('cafe:order_list')
-    return render(request, 'cafe/checkout.html')
+    
+    return render(request, 'cafe/checkout.html', {
+        'suggested_location': suggested_location
+    })
 
 @login_required
 def order_list(request):
@@ -158,11 +210,11 @@ def manual_order_entry(request):
     """View for Baristas to enter orders for walk-in customers."""
     if request.method == 'POST':
         customer_phone = request.POST.get('phone_number')
-        item_ids = request.POST.getlist('items')
         notes = request.POST.get('notes', 'Walk-in Guest')
         
         user = None
         if customer_phone:
+            from accounts.models import CustomUser
             user = CustomUser.objects.filter(phone_number=customer_phone).first()
             
         with transaction.atomic():
@@ -171,17 +223,28 @@ def manual_order_entry(request):
                 notes=notes,
                 is_paid=True # Assume paid for walk-ins usually
             )
-            for item_id in item_ids:
-                item = MenuItem.objects.get(id=item_id)
-                OrderItem.objects.create(order=order, menu_item=item, unit_price=item.price)
+            
+            # Extract items and quantities
+            # Expecting keys like 'qty_5' where 5 is the item ID
+            for key, value in request.POST.items():
+                if key.startswith('qty_') and int(value) > 0:
+                    item_id = int(key.replace('qty_', ''))
+                    quantity = int(value)
+                    item = MenuItem.objects.get(id=item_id)
+                    OrderItem.objects.create(
+                        order=order, 
+                        menu_item=item, 
+                        quantity=quantity, 
+                        unit_price=item.price
+                    )
         
-        messages.success(request, "Manual order recorded.")
+        messages.success(request, "سفارش با موفقیت ثبت شد.")
         return redirect('cafe:barista_dashboard')
         
-    menu_items = MenuItem.objects.filter(is_available=True)
+    categories = MenuCategory.objects.prefetch_related('items').all()
     initial_phone = request.GET.get('phone_number', '')
     return render(request, 'cafe/manual_order.html', {
-        'menu_items': menu_items,
+        'categories': categories,
         'initial_phone': initial_phone
     })
 
@@ -211,6 +274,10 @@ def customer_lookup(request):
 @user_passes_test(is_staff_member)
 def barista_dashboard(request):
     active_orders = CafeOrder.objects.filter(~Q(status__in=[CafeOrder.Status.DELIVERED, CafeOrder.Status.CANCELLED])).prefetch_related('items__menu_item').order_by('created_at')
+    
+    if request.htmx:
+        return render(request, 'cafe/partials/order_list.html', {'orders': active_orders})
+        
     return render(request, 'cafe/barista_dashboard.html', {'orders': active_orders})
 
 @user_passes_test(is_staff_member)
@@ -219,11 +286,23 @@ def update_order_status(request, order_id, new_status):
     if new_status in CafeOrder.Status.values:
         order.status = new_status
         order.save()
+    
+    if request.htmx:
+        return barista_dashboard(request)
+        
     return redirect('cafe:barista_dashboard')
 
 @user_passes_test(is_staff_member)
 def toggle_order_payment(request, order_id):
     order = get_object_or_404(CafeOrder, id=order_id)
     order.is_paid = not order.is_paid
+    if order.is_paid:
+        order.settled_at = timezone.now()
+    else:
+        order.settled_at = None
     order.save()
+    
+    if request.htmx:
+        return barista_dashboard(request)
+        
     return redirect('cafe:barista_dashboard')

@@ -2,7 +2,7 @@ import factory
 from factory.django import DjangoModelFactory
 from cowork.models import Space, Booking, PricingPlan
 from accounts.factories import UserFactory
-from django.utils import timezone
+import jdatetime
 from datetime import timedelta
 
 class PricingPlanFactory(DjangoModelFactory):
@@ -30,7 +30,7 @@ class BookingFactory(DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     space = factory.SubFactory(SpaceFactory)
-    start_time = factory.LazyFunction(timezone.now)
-    end_time = factory.LazyAttribute(lambda o: o.start_time + timedelta(hours=2))
+    start_time = factory.LazyFunction(jdatetime.date.today)
+    end_time = factory.LazyAttribute(lambda o: o.start_time + timedelta(days=1))
     booking_type = Booking.BookingType.HOURLY
     status = Booking.Status.CONFIRMED

@@ -30,3 +30,9 @@ class NavbarUXTests(TestCase):
         self.assertContains(response, 'dropdown md:hidden')
         # Check for hamburger icon svg
         self.assertContains(response, 'M4 6h16M4 12h16M4 18h7')
+
+    def test_rtl_alignment_classes(self):
+        # Check for explicit RTL positioning fixes
+        response = self.client.get(reverse('accounts:home'))
+        self.assertContains(response, 'rtl:left-0')
+        self.assertContains(response, 'rtl:right-auto')

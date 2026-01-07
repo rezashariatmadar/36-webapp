@@ -7,51 +7,79 @@
 <div class="max-w-6xl mx-auto">
     <div class="flex justify-between items-center mb-10">
         <h1 class="text-3xl font-black text-primary">مدیریت کاربران</h1>
-        <div class="badge badge-lg badge-outline font-bold">{{ users.count }} کاربر ثبت شده</div>
+        <div class="badge badge-lg badge-outline font-bold">{{ total_count }} کاربر ثبت شده</div>
     </div>
 
-    <div class="card bg-base-100 shadow-sm border border-base-200 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-                <thead>
-                    <tr class="opacity-50">
-                        <th>کاربر</th>
-                        <th>نقش‌ها</th>
-                        <th>وضعیت</th>
-                        <th class="text-left">عملیات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in users %}
-                        <tr>
-                            <td>
-                                <div class="font-bold">{{ u.full_name|default:"بدون نام" }}</div>
-                                <div class="text-xs opacity-50 ltr text-right">{{ u.phone_number }}</div>
-                            </td>
-                            <td>
-                                <div class="flex flex-wrap gap-1">
-                                    {% if u.is_admin %}<span class="badge badge-primary badge-xs">Admin</span>{% endif %}
-                                    {% if u.is_barista %}<span class="badge badge-accent badge-xs">Barista</span>{% endif %}
-                                    {% if u.is_customer %}<span class="badge badge-ghost badge-xs">Customer</span>{% endif %}
-                                </div>
-                            </td>
-                            <td>
-                                {% if u.is_active %}
-                                    <span class="badge badge-success badge-sm text-white">فعال</span>
-                                {% else %}
-                                    <span class="badge badge-error badge-sm text-white">غیرفعال</span>
-                                {% endif %}
-                            </td>
-                            <td class="text-left">
-                                <a href="{% url 'accounts:toggle_user_status' u.id %}" class="btn btn-ghost btn-xs">
-                                    {% if u.is_active %}تعلیق{% else %}فعال‌سازی{% endif %}
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <!-- Hierarchical Role View (Accordion) -->
+    <div class="join join-vertical w-full bg-base-100 shadow-xl rounded-2xl border border-base-200">
+        {% for role in roles_with_users %}
+            {% if role.users %}
+            <div class="collapse collapse-arrow join-item border-base-300 group">
+                <input type="radio" name="user-accordion" {% if forloop.first %}checked="checked"{% endif %} /> 
+                <div class="collapse-title text-xl font-black flex items-center gap-4 py-6">
+                    <div class="w-2 h-8 bg-primary rounded-full group-hover:h-12 transition-all duration-300"></div>
+                    {{ role.label }}
+                    <span class="badge {{ role.class }} badge-sm">{{ role.users|length }} نفر</span>
+                </div>
+                <div class="collapse-content px-0"> 
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead>
+                                <tr class="opacity-50">
+                                    <th class="px-8">کاربر</th>
+                                    <th>شماره تماس</th>
+                                    <th>وضعیت</th>
+                                    <th class="text-left px-8">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in role.users %}
+                                    <tr>
+                                        <td class="px-8">
+                                            <div class="flex items-center gap-3">
+                                                <div class="avatar placeholder">
+                                                    <div class="bg-neutral text-neutral-content rounded-full w-8">
+                                                        <span class="text-xs">{{ u.full_name|slice:":1"|default:"?" }}</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="font-bold">{{ u.full_name|default:"بدون نام" }}</div>
+                                                    <div class="text-xs opacity-50 ltr text-right">{{ u.phone_number }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="font-mono">{{ u.phone_number }}</span>
+                                        </td>
+                                        <td>
+                                            {% if u.is_active %}
+                                                <span class="badge badge-success badge-sm text-white">فعال</span>
+                                            {% else %}
+                                                <span class="badge badge-error badge-sm text-white">غیرفعال</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-left px-8 flex gap-2 justify-end items-center">
+                                            <div class="dropdown dropdown-left">
+                                                <div tabindex="0" role="button" class="btn btn-xs btn-outline">تغییر نقش</div>
+                                                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                                                    <li><a href="{% url 'accounts:change_user_role' u.id 'Admin' %}">مدیر (Admin)</a></li>
+                                                    <li><a href="{% url 'accounts:change_user_role' u.id 'Barista' %}">باریستا</a></li>
+                                                    <li><a href="{% url 'accounts:change_user_role' u.id 'Customer' %}">مشتری</a></li>
+                                                </ul>
+                                            </div>
+                                            <a href="{% url 'accounts:toggle_user_status' u.id %}" class="btn btn-ghost btn-xs text-error">
+                                                {% if u.is_active %}تعلیق{% else %}فعال‌سازی{% endif %}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
