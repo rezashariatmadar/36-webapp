@@ -14,3 +14,7 @@ This file tracks all major tracks for the project. Each track has its own detail
     -   Status: COMPLETED (83% coverage, 49 tests passed).
     -   Owner: Conductor
     -   Plan: `conductor/tracks/testing_20260106/plan.md`
+---
+
+## [~] Track: Liquid Glass UI Overhaul
+*Link: [./conductor/tracks/liquid_glass_ui_20260107/](./conductor/tracks/liquid_glass_ui_20260107/)*

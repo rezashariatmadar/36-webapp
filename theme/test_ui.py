@@ -1,0 +1,21 @@
+from django.test import TestCase, Client
+from django.urls import reverse
+
+class BaseUITests(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def test_liquid_glass_foundations(self):
+        """Verify that the base template contains the Liquid Glass foundations."""
+        response = self.client.get(reverse('accounts:home'))
+        self.assertEqual(response.status_code, 200)
+        
+        # Check for CSS classes in the style block (or linked stylesheet)
+        # Note: Since they will be in a <style> block in base.html initially
+        self.assertContains(response, '.liquid-background')
+        self.assertContains(response, '.glass-panel')
+        self.assertContains(response, '.blob')
+        
+        # Check for the HTML structure
+        self.assertContains(response, '<div class="liquid-background">')
+        self.assertContains(response, '<div class="blob blob-1"></div>')
