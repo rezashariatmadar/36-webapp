@@ -14,8 +14,12 @@
                     </div>
                 </div>
                 
-                <div class="space-y-3 mb-8 bg-base-200/30 p-4 rounded-2xl border border-base-200">
-                    {% if space.pricing_plan.is_contact_for_price %}
+                <div class="space-y-3 mb-8 bg-base-200/30 p-4 rounded-2xl border border-base-200 min-h-[100px] flex flex-col justify-center">
+                    {% if not space.pricing_plan %}
+                        <div class="text-center py-2">
+                            <span class="text-warning font-black text-sm">طرح قیمت‌گذاری تعیین نشده</span>
+                        </div>
+                    {% elif space.pricing_plan.is_contact_for_price %}
                         <div class="text-center py-2">
                             <span class="text-primary font-black">برای قیمت تماس بگیرید</span>
                         </div>
@@ -42,7 +46,7 @@
                 </div>
 
                 <div class="card-actions">
-                    {% if space.pricing_plan.is_contact_for_price %}
+                    {% if not space.pricing_plan or space.pricing_plan.is_contact_for_price %}
                         <a href="tel:02112345678" class="btn btn-outline btn-primary w-full font-bold">تماس با پذیرش</a>
                     {% else %}
                         <a href="{% url 'cowork:book_space' space.id %}" class="btn btn-primary w-full font-bold shadow-lg shadow-primary/20">
