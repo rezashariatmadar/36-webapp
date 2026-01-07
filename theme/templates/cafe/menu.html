@@ -63,8 +63,8 @@
                                             {{ item.price }} 
                                             <span class="text-[10px] mr-1 opacity-80 font-normal">تومان</span>
                                         </div>
-                                        <a href="{% url 'cafe:add_to_cart' item.id %}" class="btn btn-xs btn-circle btn-primary shadow-sm hover:scale-110 active:scale-95 transition-all">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <a href="{% url 'cafe:add_to_cart' item.id %}" class="btn btn-sm btn-circle btn-secondary shadow-lg hover:scale-110 active:scale-95 transition-all text-secondary-content">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                             </svg>
                                         </a>
@@ -78,21 +78,6 @@
         {% endfor %}
     </div>
 </div>
-
-<!-- Floating Cart Bar -->
-{% if cart_count %}
-    <div class="fixed bottom-6 left-0 right-0 z-50 px-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-        <a href="{% url 'cafe:cart_detail' %}" class="max-w-md mx-auto btn btn-primary w-full h-16 rounded-2xl shadow-2xl flex justify-between items-center px-6 border-none">
-            <div class="flex items-center gap-3">
-                <div class="badge badge-secondary font-black h-8 w-8 text-lg">{{ cart_count }}</div>
-                <span class="font-bold text-lg tracking-tight">مشاهده سفارش</span>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 17l-4 4m0 0l-4-4m4 4V3" />
-            </svg>
-        </a>
-    </div>
-{% endif %}
 
 <style>
     .no-scrollbar::-webkit-scrollbar {
