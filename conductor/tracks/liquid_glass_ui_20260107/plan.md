@@ -1,12 +1,12 @@
 # Plan: Liquid Glass UI Overhaul
 
 ## Phase 1: The Foundation (Deep Nebula)
-- [~] Task: Define CSS Animations & Classes in `base.html`
-    - [ ] Sub-task: Create `.liquid-background` class (fixed, z-index -50, Neutral-900).
-    - [ ] Sub-task: Create `.blob` animation class and modifiers (Blue #100370, Red #63021f, Cyan #00b5ff).
-    - [ ] Sub-task: Create `.glass-panel` utility class (backdrop-blur, white/3 bg, white/8 border).
-- [ ] Task: Inject HTML Structure in `base.html`
-    - [ ] Sub-task: Add `<div class="liquid-background">` with 3 blob children immediately inside `<body>`.
+- [x] Task: Define CSS Animations & Classes in `base.html` 91e665e
+    - [x] Sub-task: Create `.liquid-background` class (fixed, z-index -50, Neutral-900).
+    - [x] Sub-task: Create `.blob` animation class and modifiers (Blue #100370, Red #63021f, Cyan #00b5ff).
+    - [x] Sub-task: Create `.glass-panel` utility class (backdrop-blur, white/3 bg, white/8 border).
+- [x] Task: Inject HTML Structure in `base.html` 91e665e
+    - [x] Sub-task: Add `<div class="liquid-background">` with 3 blob children immediately inside `<body>`.
 - [ ] Task: Conductor - User Manual Verification 'The Foundation (Deep Nebula)' (Protocol in workflow.md)
 
 ## Phase 2: Structural Glass (Floating Layout)
