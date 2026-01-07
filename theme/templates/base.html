@@ -16,29 +16,25 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-base-200 text-base-content flex flex-col">
+<body class="min-h-screen bg-base-100 text-base-content flex flex-col">
     
-    <header class="bg-primary text-primary-content shadow-md sticky top-0 z-[100]">
+    <header class="bg-primary text-primary-content shadow-lg sticky top-0 z-[100] border-b border-white/10">
         <div class="container mx-auto px-4 h-16 flex items-center justify-between">
-            <!-- Logo (Right) -->
-            <a href="{% url 'accounts:home' %}" class="text-2xl font-black tracking-tighter shrink-0">۳۶</a>
+            <a href="{% url 'accounts:home' %}" class="text-3xl font-black tracking-tighter shrink-0 hover:text-accent transition-colors">۳۶</a>
             
-            <!-- Nav Links (Center) -->
             <nav class="hidden md:flex flex-1 justify-center">
-                <ul class="flex gap-4 items-center">
-                    <li><a href="{% url 'cafe:menu' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">منو</a></li>
-                    <li><a href="{% url 'cowork:space_list' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">رزرو فضا</a></li>
+                <ul class="flex gap-2 items-center">
+                    <li><a href="{% url 'cafe:menu' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content font-bold">منو</a></li>
+                    <li><a href="{% url 'cowork:space_list' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content font-bold">رزرو فضا</a></li>
                 </ul>
             </nav>
 
-            <!-- Profile & Staff (Left) -->
             <div class="flex items-center gap-2 shrink-0">
-                <!-- Mobile Menu Button (Visible on mobile only) -->
-                <div class="dropdown md:hidden">
+                <div class="dropdown md:hidden dropdown-end">
                     <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
                     </div>
-                    <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 text-base-content rtl:left-0 rtl:right-auto">
+                    <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-2xl bg-base-200 rounded-box w-52 text-base-content rtl:left-0 rtl:right-auto border border-white/5">
                         <li><a href="{% url 'cafe:menu' %}">منو</a></li>
                         <li><a href="{% url 'cowork:space_list' %}">رزرو فضا</a></li>
                     </ul>
@@ -46,10 +42,9 @@
 
                 {% if user.is_authenticated %}
                     {% if user.is_admin or user.is_barista %}
-                        <!-- Staff Tools Dropdown -->
                         <div class="dropdown dropdown-bottom dropdown-end">
-                            <div tabindex="0" role="button" class="btn btn-sm btn-accent text-accent-content font-black">پنل مدیریت</div>
-                            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-2xl bg-base-100 rounded-box w-52 mt-4 text-base-content border border-base-200 rtl:left-0 rtl:right-auto">
+                            <div tabindex="0" role="button" class="btn btn-sm btn-accent text-accent-content font-black shadow-lg shadow-accent/20">پنل مدیریت</div>
+                            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-2xl bg-base-200 rounded-box w-52 mt-4 text-base-content border border-white/5 rtl:left-0 rtl:right-auto">
                                 <li><a href="{% url 'cafe:barista_dashboard' %}" class="font-bold">سفارشات جاری</a></li>
                                 <li><a href="{% url 'cafe:manual_order' %}">ثبت سفارش حضوری</a></li>
                                 <li><a href="{% url 'cafe:customer_lookup' %}">جستجوی مشتری</a></li>
@@ -63,17 +58,16 @@
                         </div>
                     {% endif %}
 
-                    <!-- User Profile Dropdown -->
                     <div class="dropdown dropdown-bottom dropdown-end">
                         <div tabindex="0" role="button" class="btn btn-sm btn-ghost hover:bg-white/10 flex items-center gap-2">
                             <span class="hidden md:inline opacity-90 text-xs font-bold">{{ user.full_name|default:user.phone_number }}</span>
                             <div class="avatar placeholder">
-                                <div class="bg-secondary text-secondary-content rounded-full w-8 h-8">
+                                <div class="bg-secondary text-secondary-content rounded-full w-8 h-8 ring-2 ring-white/20">
                                     <span class="text-xs font-black">{{ user.phone_number|slice:"-2:" }}</span>
                                 </div>
                             </div>
                         </div>
-                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-base-100 rounded-box w-48 mt-4 text-base-content border border-base-200 rtl:left-0 rtl:right-auto">
+                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-2xl bg-base-200 rounded-box w-48 mt-4 text-base-content border border-white/5 rtl:left-0 rtl:right-auto">
                             <li><a href="{% url 'accounts:profile' %}" class="font-bold">پروفایل من</a></li>
                             <li><a href="{% url 'cafe:order_list' %}">سفارش‌های من</a></li>
                             <li><a href="{% url 'cowork:my_bookings' %}">رزروهای من</a></li>
@@ -88,7 +82,7 @@
                     </div>
                 {% else %}
                     <a href="{% url 'accounts:login' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">ورود</a>
-                    <a href="{% url 'accounts:register' %}" class="btn btn-sm btn-secondary text-secondary-content border-none">عضویت</a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-sm btn-accent text-accent-content border-none font-bold">عضویت</a>
                 {% endif %}
             </div>
         </div>
@@ -98,10 +92,10 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="footer p-10 bg-neutral text-neutral-content mt-auto">
+    <footer class="footer p-10 bg-neutral text-neutral-content mt-auto border-t border-white/5">
         <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
             <aside>
-                <span class="text-3xl font-black">۳۶</span>
+                <span class="text-3xl font-black text-white">۳۶</span>
                 <p class="font-bold opacity-80">سیستم مدیریت مدرن کافی‌شاپ</p>
                 <p class="text-sm opacity-60">طراحی شده با رویکرد داده‌محور</p>
             </aside> 
@@ -128,14 +122,13 @@
         </div>
     {% endif %}
 
-    <!-- Persistent Floating Cart Indicator -->
     {% if cart_count %}
-    <div class="fixed bottom-6 left-6 z-[150] animate-bounce">
-        <a href="{% url 'cafe:cart_detail' %}" class="btn btn-circle btn-lg btn-primary shadow-2xl border-4 border-base-100 relative group transition-all hover:scale-110">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="fixed bottom-6 right-6 z-[150] animate-bounce">
+        <a href="{% url 'cafe:cart_detail' %}" class="btn btn-circle btn-lg btn-accent shadow-2xl shadow-accent/40 border-4 border-base-100 relative group transition-all hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent-content" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <span class="badge badge-secondary badge-lg absolute -top-2 -right-2 font-black shadow-sm scale-110 group-hover:scale-125 transition-transform">{{ cart_count }}</span>
+            <span class="badge badge-secondary badge-lg absolute -top-2 -right-2 font-black shadow-sm scale-110 group-hover:scale-125 transition-transform text-white border-base-100">{{ cart_count }}</span>
         </a>
     </div>
     {% endif %}

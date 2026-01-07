@@ -19,20 +19,30 @@ module.exports = {
     themes: [
       {
         minimalist: {
-          "primary": "#100370",
+          // Dark Theme Configuration
+          "primary": "#100370",      // Company Blue (Keep for branding headers/accents)
           "primary-content": "#ffffff",
-          "secondary": "#63021f",
+          
+          "secondary": "#63021f",    // Company Red
           "secondary-content": "#ffffff",
-          "accent": "#00b5ff",
-          "neutral": "#1c1917",
-          "base-100": "#ffffff",
-          "base-200": "#f9fafb",
-          "base-300": "#f3f4f6",
+          
+          "accent": "#00b5ff",       // Cyan - CRITICAL for buttons on dark backgrounds
+          "accent-content": "#000000",
+          
+          "neutral": "#0f0f0f",      // Very dark gray for footers
+          "neutral-content": "#ffffff",
+          
+          "base-100": "#1c1917",     // Dark Grey (Main Background)
+          "base-200": "#171513",     // Slightly darker (Secondary Background)
+          "base-300": "#000000",     // Black (Borders/Inputs)
+          "base-content": "#e5e7eb", // Light text
+          
           "info": "#00b5ff",
           "success": "#00a96e",
           "warning": "#ffbe00",
           "error": "#ff5861",
-          "--rounded-box": "0.5rem", // More squared for minimalist
+          
+          "--rounded-box": "0.5rem",
           "--rounded-btn": "0.25rem",
           "--rounded-badge": "1.9rem",
           "--animation-btn": "0.25s",
