@@ -20,76 +20,77 @@
     
     <header class="bg-primary text-primary-content shadow-md sticky top-0 z-[100]">
         <div class="container mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="{% url 'accounts:home' %}" class="text-2xl font-black tracking-tighter">۳۶</a>
+            <!-- Logo (Right) -->
+            <a href="{% url 'accounts:home' %}" class="text-2xl font-black tracking-tighter shrink-0">۳۶</a>
             
-            <nav>
-                <ul class="flex gap-2 md:gap-4 items-center">
+            <!-- Nav Links (Center) -->
+            <nav class="hidden md:flex flex-1 justify-center">
+                <ul class="flex gap-4 items-center">
                     <li><a href="{% url 'cafe:menu' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">منو</a></li>
                     <li><a href="{% url 'cowork:space_list' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">رزرو فضا</a></li>
-                    
-                    <!-- Permanent Cart Icon -->
-                    <li>
-                        <a href="{% url 'cafe:cart_detail' %}" class="btn btn-sm btn-ghost hover:bg-white/10 relative px-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            {% if cart_count %}
-                                <span class="badge badge-secondary badge-xs absolute -top-1 -right-1 font-black">{{ cart_count }}</span>
-                            {% endif %}
-                        </a>
-                    </li>
-
-                    {% if user.is_authenticated %}
-                        {% if user.is_admin or user.is_barista %}
-                            <!-- Staff Tools Dropdown -->
-                            <li>
-                                <div class="dropdown dropdown-end">
-                                    <div tabindex="0" role="button" class="btn btn-sm btn-accent text-accent-content font-black">پنل مدیریت</div>
-                                    <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-2xl bg-base-100 rounded-box w-52 mt-4 text-base-content border border-base-200">
-                                        <li><a href="{% url 'cafe:barista_dashboard' %}" class="font-bold">سفارشات جاری</a></li>
-                                        <li><a href="{% url 'cafe:manual_order' %}">ثبت سفارش حضوری</a></li>
-                                        <li><a href="{% url 'cafe:customer_lookup' %}">جستجوی مشتری</a></li>
-                                        <li><a href="{% url 'cafe:manage_menu' %}">موجودی منو</a></li>
-                                        {% if user.is_admin %}
-                                            <div class="divider my-1 opacity-10"></div>
-                                            <li><a href="{% url 'cafe:admin_dashboard' %}" class="text-primary font-black">گزارش عملکرد</a></li>
-                                            <li><a href="{% url 'accounts:user_list' %}">مدیریت کاربران</a></li>
-                                        {% endif %}
-                                    </ul>
-                                </div>
-                            </li>
-                        {% endif %}
-
-                        <li>
-                            <div class="dropdown dropdown-end">
-                                <div tabindex="0" role="button" class="btn btn-sm btn-ghost hover:bg-white/10 flex items-center">
-                                    <span class="hidden md:inline ml-2 opacity-70 text-xs">{{ user.full_name|default:user.phone_number }}</span>
-                                    <div class="avatar placeholder">
-                                        <div class="bg-secondary text-secondary-content rounded-full w-6">
-                                            <span class="text-[10px] font-black">{{ user.phone_number|slice:"-2:" }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-base-100 rounded-box w-48 mt-4 text-base-content border border-base-200 rtl:right-auto rtl:left-0">
-                                    <li><a href="{% url 'accounts:profile' %}" class="font-bold">پروفایل من</a></li>
-                                    <li><a href="{% url 'cafe:order_list' %}">سفارش‌های من</a></li>
-                                    <li><a href="{% url 'cowork:my_bookings' %}">رزروهای من</a></li>
-                                    <div class="divider my-1 opacity-10"></div>
-                                    <li>
-                                        <form action="{% url 'accounts:logout' %}" method="post" class="w-full">
-                                            {% csrf_token %}
-                                            <button type="submit" class="text-error text-right w-full">خروج</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    {% else %}
-                        <li><a href="{% url 'accounts:login' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">ورود</a></li>
-                        <li><a href="{% url 'accounts:register' %}" class="btn btn-sm btn-secondary text-secondary-content border-none">عضویت</a></li>
-                    {% endif %}
                 </ul>
             </nav>
+
+            <!-- Profile & Staff (Left) -->
+            <div class="flex items-center gap-2 shrink-0">
+                <!-- Mobile Menu Button (Visible on mobile only) -->
+                <div class="dropdown md:hidden">
+                    <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                    </div>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 text-base-content rtl:left-0 rtl:right-auto">
+                        <li><a href="{% url 'cafe:menu' %}">منو</a></li>
+                        <li><a href="{% url 'cowork:space_list' %}">رزرو فضا</a></li>
+                    </ul>
+                </div>
+
+                {% if user.is_authenticated %}
+                    {% if user.is_admin or user.is_barista %}
+                        <!-- Staff Tools Dropdown -->
+                        <div class="dropdown dropdown-bottom dropdown-end">
+                            <div tabindex="0" role="button" class="btn btn-sm btn-accent text-accent-content font-black">پنل مدیریت</div>
+                            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-2xl bg-base-100 rounded-box w-52 mt-4 text-base-content border border-base-200 rtl:left-0 rtl:right-auto">
+                                <li><a href="{% url 'cafe:barista_dashboard' %}" class="font-bold">سفارشات جاری</a></li>
+                                <li><a href="{% url 'cafe:manual_order' %}">ثبت سفارش حضوری</a></li>
+                                <li><a href="{% url 'cafe:customer_lookup' %}">جستجوی مشتری</a></li>
+                                <li><a href="{% url 'cafe:manage_menu' %}">موجودی منو</a></li>
+                                {% if user.is_admin %}
+                                    <li class="divider my-1 opacity-10"></li>
+                                    <li><a href="{% url 'cafe:admin_dashboard' %}" class="text-primary font-black">گزارش عملکرد</a></li>
+                                    <li><a href="{% url 'accounts:user_list' %}">مدیریت کاربران</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <!-- User Profile Dropdown -->
+                    <div class="dropdown dropdown-bottom dropdown-end">
+                        <div tabindex="0" role="button" class="btn btn-sm btn-ghost hover:bg-white/10 flex items-center gap-2">
+                            <span class="hidden md:inline opacity-90 text-xs font-bold">{{ user.full_name|default:user.phone_number }}</span>
+                            <div class="avatar placeholder">
+                                <div class="bg-secondary text-secondary-content rounded-full w-8 h-8">
+                                    <span class="text-xs font-black">{{ user.phone_number|slice:"-2:" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-base-100 rounded-box w-48 mt-4 text-base-content border border-base-200 rtl:left-0 rtl:right-auto">
+                            <li><a href="{% url 'accounts:profile' %}" class="font-bold">پروفایل من</a></li>
+                            <li><a href="{% url 'cafe:order_list' %}">سفارش‌های من</a></li>
+                            <li><a href="{% url 'cowork:my_bookings' %}">رزروهای من</a></li>
+                            <li class="divider my-1 opacity-10"></li>
+                            <li>
+                                <form action="{% url 'accounts:logout' %}" method="post" class="w-full">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-error font-bold flex w-full">خروج</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-sm btn-ghost hover:bg-white/10 text-primary-content">ورود</a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-sm btn-secondary text-secondary-content border-none">عضویت</a>
+                {% endif %}
+            </div>
         </div>
     </header>
 
