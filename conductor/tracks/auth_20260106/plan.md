@@ -41,5 +41,5 @@
     -   Create a management command `init_roles` to create 'Admin', 'Barista', and 'Customer' groups.
     -   Run the command.
 
-## Phase 5: Verification
-- [ ] Task: Conductor - User Manual Verification 'Core Authentication System' (Protocol in workflow.md)
+## Phase 5: Verification [checkpoint: fd7e74a]
+- [x] Task: Conductor - User Manual Verification 'Core Authentication System' (Protocol in workflow.md) fd7e74a
