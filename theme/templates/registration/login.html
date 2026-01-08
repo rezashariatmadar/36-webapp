@@ -1,63 +1,38 @@
 {% extends "base.html" %}
-{% load i18n %}
 
-{% block title %}{% trans "Login" %} - ۳۶{% endblock %}
+{% block title %}ورود به سیستم{% endblock %}
 
 {% block content %}
-<div class="flex flex-col items-center justify-center min-h-[70vh]">
-    <div class="w-full max-w-sm">
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-black text-primary mb-2">۳۶</h1>
-            <h2 class="text-xl font-bold">{% trans "Welcome Back" %}</h2>
-        </div>
+<div class="flex justify-center items-center min-h-[80vh]">
+    <div class="glass-panel p-8 rounded-2xl w-full max-w-md shadow-2xl text-white">
+        <h2 class="text-3xl font-black text-center mb-8 text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent">ورود به سیستم</h2>
         
-        <div class="bg-base-100 shadow-sm border border-base-300 rounded-lg p-6 md:p-8">
-            <form method="post" class="space-y-4">
-                {% csrf_token %}
-                
-                {% if form.non_field_errors %}
-                    <div class="alert alert-error rounded-md text-sm py-2">
-                        <span>{{ form.non_field_errors|striptags }}</span>
-                    </div>
-                {% endif %}
-
-                <div class="form-control w-full">
-                    <label class="label pb-1">
-                        <span class="label-text font-bold text-sm">{{ form.username.label }}</span>
-                    </label>
-                    <input type="text" name="{{ form.username.name }}" 
-                           class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-primary transition-colors" 
-                           placeholder="۰۹xxxxxxxxx" required autofocus>
-                    {% if form.username.errors %}
-                        <span class="text-error text-xs mt-1">{{ form.username.errors|striptags }}</span>
-                    {% endif %}
-                </div>
-
-                <div class="form-control w-full">
-                    <label class="label pb-1">
-                        <span class="label-text font-bold text-sm">{{ form.password.label }}</span>
-                    </label>
-                    <input type="password" name="{{ form.password.name }}" 
-                           class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-primary transition-colors" 
-                           placeholder="******" required>
-                    {% if form.password.errors %}
-                        <span class="text-error text-xs mt-1">{{ form.password.errors|striptags }}</span>
-                    {% endif %}
-                </div>
-
-                <div class="pt-2">
-                    <button type="submit" class="btn btn-primary btn-sm w-full font-bold">
-                        {% trans "Login" %}
-                    </button>
-                </div>
-            </form>
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
             
-            <div class="mt-6 text-center border-t border-base-200 pt-4">
-                <p class="text-xs text-base-content/70">
-                    {% trans "Don't have an account?" %} 
-                    <a href="{% url 'accounts:register' %}" class="link link-primary font-bold no-underline hover:underline">{% trans "Register now" %}</a>
-                </p>
-            </div>
+            {% if form.non_field_errors %}
+                <div class="alert alert-error bg-error/20 border-error/50 text-white shadow-lg">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-bold text-white/80">{{ field.label }}</span>
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-error text-sm mt-1 font-bold">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-accent w-full font-black shadow-lg shadow-accent/20 hover:scale-[1.02] transition-transform">ورود</button>
+        </form>
+        
+        <div class="mt-6 text-center text-sm opacity-80">
+            <p>حساب کاربری ندارید؟ <a href="{% url 'accounts:register' %}" class="link link-accent font-bold hover:text-white transition-colors">عضو شوید</a></p>
         </div>
     </div>
 </div>

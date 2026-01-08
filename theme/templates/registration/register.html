@@ -1,98 +1,41 @@
 {% extends "base.html" %}
-{% load i18n %}
 
-{% block title %}{% trans "Register" %} - ۳۶{% endblock %}
+{% block title %}عضویت در ۳۶{% endblock %}
 
 {% block content %}
-<div class="flex flex-col items-center justify-center min-h-[80vh]">
-    <div class="w-full max-w-md">
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-black text-secondary mb-2">۳۶</h1>
-            <h2 class="text-xl font-bold">{% trans "Create Account" %}</h2>
-        </div>
+<div class="flex justify-center items-center min-h-[80vh]">
+    <div class="glass-panel p-8 rounded-2xl w-full max-w-md shadow-2xl text-white">
+        <h2 class="text-3xl font-black text-center mb-8 text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent">عضویت جدید</h2>
         
-        <div class="bg-base-100 shadow-sm border border-base-300 rounded-lg p-6 md:p-8">
-            <form method="post" class="space-y-4">
-                {% csrf_token %}
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Phone Number -->
-                    <div class="form-control w-full md:col-span-2">
-                        <label class="label pb-1">
-                            <span class="label-text font-bold text-sm">{{ form.phone_number.label }}</span>
-                        </label>
-                        <input type="text" name="{{ form.phone_number.name }}" 
-                               class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-secondary transition-colors" 
-                               placeholder="۰۹xxxxxxxxx" required value="{{ form.phone_number.value|default:'' }}">
-                        {% if form.phone_number.errors %}
-                            <span class="text-error text-xs mt-1">{{ form.phone_number.errors|striptags }}</span>
-                        {% endif %}
-                    </div>
-
-                    <!-- National ID -->
-                    <div class="form-control w-full">
-                        <label class="label pb-1">
-                            <span class="label-text font-bold text-sm">{{ form.national_id.label }}</span>
-                        </label>
-                        <input type="text" name="{{ form.national_id.name }}" 
-                               class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-secondary transition-colors" 
-                               placeholder="۰۰xxxxxxx" required value="{{ form.national_id.value|default:'' }}">
-                        {% if form.national_id.errors %}
-                            <span class="text-error text-xs mt-1">{{ form.national_id.errors|striptags }}</span>
-                        {% endif %}
-                    </div>
-
-                    <!-- Full Name -->
-                    <div class="form-control w-full">
-                        <label class="label pb-1">
-                            <span class="label-text font-bold text-sm">{{ form.full_name.label }}</span>
-                        </label>
-                        <input type="text" name="{{ form.full_name.name }}" 
-                               class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-secondary transition-colors" 
-                               placeholder="{% trans 'Full Name' %}" required value="{{ form.full_name.value|default:'' }}">
-                        {% if form.full_name.errors %}
-                            <span class="text-error text-xs mt-1">{{ form.full_name.errors|striptags }}</span>
-                        {% endif %}
-                    </div>
-
-                    <!-- Password -->
-                    <div class="form-control w-full">
-                        <label class="label pb-1">
-                            <span class="label-text font-bold text-sm">{{ form.password.label }}</span>
-                        </label>
-                        <input type="password" name="{{ form.password.name }}" 
-                               class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-secondary transition-colors" 
-                               placeholder="******" required>
-                        <label class="label pt-1"><span class="label-text-alt opacity-60 text-[10px]">{% trans "Use National ID for initial login" %}</span></label>
-                    </div>
-
-                    <!-- Confirm Password -->
-                    <div class="form-control w-full">
-                        <label class="label pb-1">
-                            <span class="label-text font-bold text-sm">{{ form.confirm_password.label }}</span>
-                        </label>
-                        <input type="password" name="{{ form.confirm_password.name }}" 
-                               class="input input-bordered input-sm w-full bg-base-200 focus:bg-base-100 focus:border-secondary transition-colors" 
-                               placeholder="******" required>
-                        {% if form.confirm_password.errors %}
-                            <span class="text-error text-xs mt-1">{{ form.confirm_password.errors|striptags }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="pt-4">
-                    <button type="submit" class="btn btn-secondary btn-sm w-full font-bold">
-                        {% trans "Register" %}
-                    </button>
-                </div>
-            </form>
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
             
-            <div class="mt-6 text-center border-t border-base-200 pt-4">
-                <p class="text-xs text-base-content/70">
-                    {% trans "Already have an account?" %} 
-                    <a href="{% url 'accounts:login' %}" class="link link-secondary font-bold no-underline hover:underline">{% trans "Login" %}</a>
-                </p>
-            </div>
+            {% if form.non_field_errors %}
+                <div class="alert alert-error bg-error/20 border-error/50 text-white shadow-lg">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-bold text-white/80">{{ field.label }}</span>
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p class="text-xs text-white/50 mt-1 px-1">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="text-error text-sm mt-1 font-bold">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-accent w-full font-black shadow-lg shadow-accent/20 hover:scale-[1.02] transition-transform">ثبت نام</button>
+        </form>
+        
+        <div class="mt-6 text-center text-sm opacity-80">
+            <p>قبلاً عضو شده‌اید؟ <a href="{% url 'accounts:login' %}" class="link link-accent font-bold hover:text-white transition-colors">وارد شوید</a></p>
         </div>
     </div>
 </div>

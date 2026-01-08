@@ -3,23 +3,26 @@
 {% block title %}خانه - ۳۶{% endblock %}
 
 {% block content %}
-<div class="hero bg-base-200 rounded-box p-10">
+<div class="hero glass-panel rounded-3xl p-10 min-h-[60vh] text-white">
     <div class="hero-content text-center">
         <div class="max-w-md">
-            <h1 class="text-5xl font-bold italic text-primary">۳۶</h1>
-            <p class="py-6 font-medium">به سامانه مدیریت ۳۶ خوش آمدید.</p>
+            <h1 class="text-8xl font-black italic mb-4 text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent">۳۶</h1>
+            <p class="py-6 font-bold text-xl opacity-90">به سامانه مدیریت ۳۶ خوش آمدید.</p>
             {% if user.is_authenticated %}
-                <p class="mb-4">شما با شماره <span class="badge badge-outline">{{ user.phone_number }}</span> وارد شده‌اید.</p>
-                <div class="grid grid-cols-1 gap-2">
-                    <form action="{% url 'accounts:logout' %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-outline btn-sm w-full">خروج از حساب</button>
-                    </form>
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-sm">
+                    <p class="mb-4 font-medium opacity-80">شما با شماره وارد شده‌اید:</p>
+                    <span class="badge badge-accent badge-lg font-black mb-6 px-6">{{ user.phone_number }}</span>
+                    <div class="grid grid-cols-1 gap-2">
+                        <form action="{% url 'accounts:logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-error btn-outline btn-sm w-full font-bold">خروج از حساب</button>
+                        </form>
+                    </div>
                 </div>
             {% else %}
-                <div class="flex gap-2 justify-center">
-                    <a href="{% url 'accounts:login' %}" class="btn btn-primary">ورود به سیستم</a>
-                    <a href="{% url 'accounts:register' %}" class="btn btn-ghost">عضویت جدید</a>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'accounts:login' %}" class="btn btn-accent btn-lg px-12 font-black shadow-lg shadow-accent/20">ورود به سیستم</a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-ghost btn-glass btn-lg px-12 font-bold text-white hover:bg-white/10 border border-white/20">عضویت جدید</a>
                 </div>
             {% endif %}
         </div>
