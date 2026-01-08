@@ -3,28 +3,36 @@
 {% block title %}خانه - ۳۶{% endblock %}
 
 {% block content %}
-<div class="hero glass-panel rounded-3xl p-10 min-h-[60vh] text-white">
-    <div class="hero-content text-center">
-        <div class="max-w-md">
-            <h1 class="text-8xl font-black italic mb-4 text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent">۳۶</h1>
-            <p class="py-6 font-bold text-xl opacity-90">به سامانه مدیریت ۳۶ خوش آمدید.</p>
-            {% if user.is_authenticated %}
-                <div class="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-sm">
-                    <p class="mb-4 font-medium opacity-80">شما با شماره وارد شده‌اید:</p>
-                    <span class="badge badge-accent badge-lg font-black mb-6 px-6">{{ user.phone_number }}</span>
-                    <div class="grid grid-cols-1 gap-2">
-                        <form action="{% url 'accounts:logout' %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-error btn-outline btn-sm w-full font-bold">خروج از حساب</button>
-                        </form>
-                    </div>
+<div class="max-w-4xl mx-auto py-12 md:py-20">
+    <div class="hero card-glass min-h-[60vh] text-white overflow-hidden relative">
+        <!-- Decorative subtle glow -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[120px] -z-10"></div>
+        
+        <div class="hero-content text-center py-12">
+            <div class="max-w-lg">
+                <h1 class="text-8xl md:text-9xl font-black italic mb-6 text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent drop-shadow-2xl">۳۶</h1>
+                <p class="py-6 font-bold text-xl md:text-2xl opacity-90 leading-relaxed">به سامانه مدیریت هوشمند ۳۶ خوش آمدید.</p>
+                
+                <div class="mt-8">
+                    {% if user.is_authenticated %}
+                        <div class="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm max-w-sm mx-auto">
+                            <p class="mb-4 font-bold text-white/60">خوش آمدید، کاربر گرامی</p>
+                            <div class="flex flex-col gap-4">
+                                <a href="{% url 'accounts:profile' %}" class="btn-primary">مشاهده پروفایل</a>
+                                <form action="{% url 'accounts:logout' %}" method="post" class="w-full">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-secondary w-full border-destructive/20 text-destructive hover:bg-destructive/10 hover:border-destructive/40">خروج از حساب</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <a href="{% url 'accounts:login' %}" class="btn-primary px-16 h-14">ورود به سیستم</a>
+                            <a href="{% url 'accounts:register' %}" class="btn-secondary px-16 h-14">عضویت جدید</a>
+                        </div>
+                    {% endif %}
                 </div>
-            {% else %}
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{% url 'accounts:login' %}" class="btn btn-accent btn-lg px-12 font-black shadow-lg shadow-accent/20">ورود به سیستم</a>
-                    <a href="{% url 'accounts:register' %}" class="btn btn-ghost btn-glass btn-lg px-12 font-bold text-white hover:bg-white/10 border border-white/20">عضویت جدید</a>
-                </div>
-            {% endif %}
+            </div>
         </div>
     </div>
 </div>

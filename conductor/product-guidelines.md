@@ -1,10 +1,10 @@
 # Product Guidelines - 36 Webapp
 
 ## Tone and Voice
-- **Professional and Corporate:** The system should feel reliable and business-oriented, instilling confidence in coworking members and management.
+- **Futuristic and Premium:** The system should feel cutting-edge, sleek, and high-end, reflecting a modern and innovative coworking environment.
 
 ## Visual Identity & UI Design
-- **Dark Theme Primary:** Leverage the existing dark-themed CSS to provide a sleek, modern, and high-tech aesthetic.
+- **Liquid Glass Aesthetic:** Implement a "Liquid Glass" design language featuring a global animated "Deep Nebula" background with frosted glass panels (`glass-panel`).
 - **Persian-First & Strict RTL:** 
     - Full Right-to-Left (RTL) support is mandatory for all layouts.
     - Implement bidirectional text rendering to handle mixed-language content if necessary.

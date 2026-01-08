@@ -5,12 +5,15 @@ from datetime import timedelta
 from django.utils import timezone
 import jdatetime
 from django_jalali import forms as jforms
+from accounts.forms_mixins import DigitNormalizationMixin
 
-class BookingForm(forms.ModelForm):
+class BookingForm(DigitNormalizationMixin, forms.ModelForm):
+    normalize_fields = ['start_time']
+    
     # Use django-jalali form fields for automatic validation and conversion
     start_time = jforms.jDateField(
         label=_("Start Date"),
-        widget=forms.TextInput(attrs={'class': 'jalali-date input input-bordered w-full', 'autocomplete': 'off'})
+        widget=forms.TextInput(attrs={'class': 'jalali-date input-standard', 'autocomplete': 'off'})
     )
     end_time = jforms.jDateField(
         label=_("End Date"),
@@ -22,7 +25,7 @@ class BookingForm(forms.ModelForm):
         model = Booking
         fields = ['booking_type', 'start_time', 'end_time']
         widgets = {
-            'booking_type': forms.Select(attrs={'class': 'select select-bordered w-full'}),
+            'booking_type': forms.Select(attrs={'class': 'select select-bordered w-full bg-white/5 border-white/10 text-white rounded-2xl'}),
         }
     
     def __init__(self, *args, **kwargs):

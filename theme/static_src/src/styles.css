@@ -1,11 +1,153 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-/**
-  * A catch-all path to Django template files, JavaScript, and Python files
-  * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.
-  *
-  * If your final CSS file is not being updated after code changes, you may want to broaden or narrow
-  * the scope of this path.
-  */
 @source "../../../**/*.{html,py,js}";
+
+@theme {
+  /* Colors */
+  --color-accent: #00b5ff;
+  --color-destructive: #ff5861;
+  --color-glass-surface: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --color-scrim: rgba(0, 0, 0, 0.5);
+
+  /* Radii */
+  --radius-box: 1.5rem;
+  --radius-btn: 0.75rem;
+  --radius-badge: 1.9rem;
+
+  /* Shadows */
+  --shadow-glass: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+@layer base {
+  /* Global Focus Visible Style */
+  :focus-visible {
+    @apply outline-accent outline-2 outline-offset-2 rounded-lg transition-all;
+  }
+
+  /* Typographic Scale */
+  h1 {
+    @apply text-[32px] md:text-[36px] font-black leading-tight;
+  }
+  h2 {
+    @apply text-[20px] md:text-[24px] font-bold leading-snug;
+  }
+  body {
+    @apply text-[14px] md:text-[16px] font-normal leading-relaxed;
+  }
+  .caption {
+    @apply text-[12px] md:text-[13px] font-normal;
+  }
+
+  /* Scrim Wrapper */
+  .scrim-wrapper {
+    position: relative;
+  }
+  .scrim-wrapper::before {
+    content: "";
+    @apply fixed inset-0 bg-scrim -z-10 pointer-events-none;
+  }
+
+  /* Liquid Glass Foundations */
+  .liquid-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #020205; /* Very Dark Blue/Black Base */
+    background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/static/img/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -50;
+    overflow: hidden;
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    z-index: -40;
+    animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+    mix-blend-mode: screen;
+  }
+
+  .blob-1 {
+    background: #100370;
+    width: 600px;
+    height: 600px;
+    top: -150px;
+    left: -150px;
+    animation-duration: 25s;
+  }
+
+  .blob-2 {
+    background: #850024;
+    width: 500px;
+    height: 500px;
+    bottom: -100px;
+    right: -100px;
+    animation-duration: 30s;
+    animation-delay: -5s;
+  }
+
+  .blob-3 {
+    background: #00b5ff;
+    width: 400px;
+    height: 400px;
+    top: 40%;
+    left: 40%;
+    opacity: 0.4;
+    animation-duration: 22s;
+    animation-delay: -8s;
+  }
+
+  @keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(120px, 60px) scale(1.1); }
+    66% { transform: translate(-60px, 80px) scale(0.95); }
+    100% { transform: translate(20px, -40px) scale(1.05); }
+  }
+}
+
+@layer components {
+  /* Custom Glass Panel with Fallback */
+  .glass-panel {
+    @apply bg-white/5 border border-white/10;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* Cards */
+  .card-glass {
+    /* Apply glass styles directly instead of @apply glass-panel */
+    @apply bg-white/5 border border-white/10 shadow-glass rounded-box p-6 md:p-8;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  @supports not (backdrop-filter: blur(1px)) {
+    .glass-panel, .card-glass {
+      @apply bg-neutral-900/95;
+    }
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply bg-accent text-black border-none font-black hover:scale-[1.02] transition-transform shadow-lg shadow-accent/20;
+  }
+  .btn-secondary {
+    @apply text-white border-white/20 font-bold hover:bg-white/10;
+  }
+  .btn-destructive {
+    @apply bg-destructive text-white border-none font-bold hover:bg-destructive/80;
+  }
+
+  /* Inputs */
+  .input-standard {
+    @apply w-full h-[48px] px-4 bg-white/5 border-white/10 text-white placeholder-white/50 focus:bg-white/10 focus:border-accent focus:outline-none transition-all;
+  }
+}

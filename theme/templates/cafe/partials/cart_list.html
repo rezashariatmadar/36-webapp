@@ -1,64 +1,58 @@
-<div id="cart-list-container" class="animate-in fade-in duration-300">
+<div id="cart-list-container" class="animate-in fade-in duration-300 text-white">
     {# Sync the NAVBAR cart badge too #}
-    <span hx-swap-oob="true" id="cart-badge" class="badge badge-secondary badge-sm font-black {% if not cart_count %}hidden{% endif %}">
+    <span hx-swap-oob="true" id="cart-badge" class="badge badge-accent badge-xs font-black absolute -top-1 -right-1 {% if not cart_count %}hidden{% endif %}">
         {{ cart_count|default:0 }}
     </span>
 
     {% if items %}
-        <div class="bg-base-100 rounded-3xl shadow-sm border border-base-200 overflow-hidden mb-8">
-            <div class="divide-y divide-base-200">
+        <div class="card-glass overflow-hidden mb-8 p-0">
+            <div class="divide-y divide-white/10">
                 {% for item in items %}
                     <div class="p-6 flex items-center justify-between gap-4">
                         <div class="flex-grow">
-                            <h3 class="font-bold text-lg">{{ item.item.name }}</h3>
-                            <p class="text-xs opacity-60">{{ item.item.price }} تومان</p>
+                            <h3 class="font-black text-xl">{{ item.item.name }}</h3>
+                            <p class="text-sm text-white/60 font-medium mt-1">{{ item.item.price }} تومان</p>
                         </div>
                         
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center bg-base-200 rounded-xl p-1">
+                        <div class="flex items-center gap-6">
+                            <div class="flex items-center glass-panel rounded-xl p-1 border border-white/10">
                                 <button hx-post="{% url 'cafe:remove_from_cart' item.item.id %}" 
                                         hx-target="#cart-list-container"
                                         hx-swap="outerHTML"
-                                        class="btn btn-ghost btn-xs btn-square">-</button>
+                                        class="btn btn-ghost btn-xs btn-square text-white hover:bg-white/10">-</button>
                                 <span class="w-8 text-center font-black">{{ item.quantity }}</span>
                                 <button hx-post="{% url 'cafe:add_to_cart' item.item.id %}" 
                                         hx-target="#cart-list-container"
                                         hx-swap="outerHTML"
-                                        class="btn btn-ghost btn-xs btn-square">+</button>
+                                        class="btn btn-ghost btn-xs btn-square text-white hover:bg-white/10">+</button>
                             </div>
                             <div class="text-right w-24">
-                                <span class="font-black text-primary format-price">{{ item.subtotal }}</span>
-                                <span class="text-[10px] opacity-60 block">تومان</span>
+                                <span class="font-black text-accent text-lg format-price">{{ item.subtotal }}</span>
+                                <span class="text-[10px] text-white/40 block font-bold">تومان</span>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
             
-            <div class="bg-base-200/50 p-6 flex justify-between items-center border-t border-base-200">
-                <span class="text-lg font-bold opacity-60">جمع کل</span>
+            <div class="bg-white/5 p-8 flex justify-between items-center border-t border-white/10">
+                <span class="text-xl font-bold text-white/60">جمع کل</span>
                 <div class="text-right">
-                    <span class="text-2xl font-black text-primary format-price">{{ total }}</span>
-                    <span class="text-xs opacity-60">تومان</span>
+                    <span class="text-3xl font-black text-accent format-price">{{ total }}</span>
+                    <span class="text-xs text-white/40 font-bold">تومان</span>
                 </div>
             </div>
         </div>
 
         <div class="flex flex-col gap-4">
-            <a href="{% url 'cafe:checkout' %}" class="btn btn-primary btn-lg rounded-2xl font-black shadow-xl shadow-primary/20">
-                تایید نهایی و ثبت سفارش
+            <a href="{% url 'cafe:checkout' %}" class="btn-primary h-16 rounded-2xl flex items-center justify-center gap-3 group text-lg">
+                <span class="font-black">تایید نهایی و ثبت سفارش</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:translate-x-[-4px] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                </svg>
             </a>
         </div>
     {% else %}
-        <div class="text-center py-20">
-            <div class="bg-base-200 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-base-content/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-            </div>
-            <h2 class="text-xl font-bold mb-2">سبد شما خالی است</h2>
-            <p class="text-sm opacity-60 mb-8">هنوز موردی را انتخاب نکرده‌اید.</p>
-            <a href="{% url 'cafe:menu' %}" class="btn btn-primary rounded-xl px-8">مشاهده منو</a>
-        </div>
+        {% include "components/empty_state.html" with title="سبد شما خالی است" description="هنوز موردی را انتخاب نکرده‌اید. با انتخاب خوشمزه‌های ۳۶ شروع کنید!" icon_emoji="☕" primary_cta_text="مشاهده منو" primary_cta_url="/cafe/menu/" %}
     {% endif %}
 </div>

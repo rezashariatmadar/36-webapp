@@ -1,0 +1,31 @@
+<!-- Standard Empty State Component -->
+<div class="flex flex-col items-center text-center py-16 px-6 glass-panel rounded-3xl border border-dashed border-white/20 animate-in fade-in duration-500">
+    <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10">
+        {% if icon_svg %}
+            {{ icon_svg|safe }}
+        {% else %}
+            <span class="text-4xl opacity-40">{{ icon_emoji|default:"✨" }}</span>
+        {% endif %}
+    </div>
+    
+    <h3 class="text-2xl font-black text-white mb-2">{{ title }}</h3>
+    <p class="text-white/60 font-medium max-w-xs mx-auto mb-8">{{ description }}</p>
+    
+    <div class="flex flex-col sm:flex-row gap-3">
+        {% if primary_cta_url %}
+            <a href="{{ primary_cta_url }}" class="btn-primary px-8">
+                {{ primary_cta_text }}
+            </a>
+        {% endif %}
+        
+        {% if secondary_cta_url %}
+            <a href="{{ secondary_cta_url }}" class="btn-secondary px-8">
+                {{ secondary_cta_text }}
+            </a>
+        {% endif %}
+    </div>
+
+    {% if help_text %}
+        <p class="mt-6 text-xs text-white/40 italic">{{ help_text }}</p>
+    {% endif %}
+</div>

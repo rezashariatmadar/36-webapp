@@ -10,8 +10,7 @@ class BaseUITests(TestCase):
         response = self.client.get(reverse('accounts:home'))
         self.assertEqual(response.status_code, 200)
         
-        # Check for CSS classes in the style block (or linked stylesheet)
-        # Note: Since they will be in a <style> block in base.html initially
+        # Check for CSS classes in the style block
         self.assertContains(response, '.liquid-background')
         self.assertContains(response, '.glass-panel')
         self.assertContains(response, '.blob')
@@ -19,3 +18,16 @@ class BaseUITests(TestCase):
         # Check for the HTML structure
         self.assertContains(response, '<div class="liquid-background">')
         self.assertContains(response, '<div class="blob blob-1"></div>')
+
+    def test_auth_portals(self):
+        """Verify that Login and Register pages use the glass terminal layout."""
+        # Test Login
+        response = self.client.get(reverse('accounts:login'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'glass-panel')
+        self.assertContains(response, 'text-transparent bg-clip-text')
+        
+        # Test Register
+        response = self.client.get(reverse('accounts:register'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'glass-panel')

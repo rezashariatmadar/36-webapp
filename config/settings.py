@@ -74,6 +74,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.csrf',
                 'cafe.context_processors.cart_context',
+                'accounts.context_processors.navigation',
             ],
         },
     },

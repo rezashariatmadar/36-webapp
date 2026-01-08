@@ -18,10 +18,10 @@ This project integrates a coworking space reservation system with a café manage
 ## MVP Features
 - **User Authentication & Roles:**
     - Login via Phone Number and Iranian National ID.
-    - National ID validation logic.
+    - Futuristic "Access Terminal" login interface.
     - Role-based access for Admin, Barista, and Customer.
 - **Coworking Space Management:**
-    - Interactive Floor Plan using the provided SVG (`Interior Design Kit - Floor plans made easy! (Community).svg`) as the visual basis.
+    - "Space Command" dashboard with glass-panel tiles and interactive filters.
     - Support for Daily, Hourly, and Monthly reservations.
     - Zone-based booking rules (e.g., communal tables for daily use only).
 - **Café Management:**

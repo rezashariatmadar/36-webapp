@@ -1,26 +1,27 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import CustomUser
+from .forms_mixins import DigitNormalizationMixin
 
-GLASS_INPUT_CLASSES = 'bg-white/5 border-white/10 text-white placeholder-white/50 focus:bg-white/10 focus:border-accent input input-bordered w-full'
-
-class UserRegistrationForm(forms.ModelForm):
+class UserRegistrationForm(DigitNormalizationMixin, forms.ModelForm):
+    normalize_fields = ['phone_number', 'national_id']
+    
     password = forms.CharField(
         label=_("Password"), 
-        widget=forms.PasswordInput(attrs={'placeholder': _('Password'), 'class': GLASS_INPUT_CLASSES})
+        widget=forms.PasswordInput(attrs={'placeholder': _('Password'), 'class': 'input-standard'})
     )
     confirm_password = forms.CharField(
         label=_("Confirm Password"), 
-        widget=forms.PasswordInput(attrs={'placeholder': _('Confirm Password'), 'class': GLASS_INPUT_CLASSES})
+        widget=forms.PasswordInput(attrs={'placeholder': _('Confirm Password'), 'class': 'input-standard'})
     )
 
     class Meta:
         model = CustomUser
         fields = ('phone_number', 'national_id', 'full_name')
         widgets = {
-            'phone_number': forms.TextInput(attrs={'class': GLASS_INPUT_CLASSES, 'placeholder': '09xxxxxxxxx'}),
-            'national_id': forms.TextInput(attrs={'class': GLASS_INPUT_CLASSES, 'placeholder': '10-digit National ID'}),
-            'full_name': forms.TextInput(attrs={'class': GLASS_INPUT_CLASSES, 'placeholder': 'Full Name'}),
+            'phone_number': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': '09xxxxxxxxx'}),
+            'national_id': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': 'کد ملی ۱۰ رقمی'}),
+            'full_name': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': 'نام و نام خانوادگی'}),
         }
 
     def clean_confirm_password(self):
@@ -35,23 +36,25 @@ class UserRegistrationForm(forms.ModelForm):
         if commit: user.save()
         return user
 
-class ProfileForm(forms.ModelForm):
+class ProfileForm(DigitNormalizationMixin, forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ('full_name', 'birth_date')
         widgets = {
-            'birth_date': forms.DateInput(attrs={'type': 'date', 'class': GLASS_INPUT_CLASSES}),
-            'full_name': forms.TextInput(attrs={'class': GLASS_INPUT_CLASSES}),
+            'birth_date': forms.DateInput(attrs={'type': 'date', 'class': 'input-standard'}),
+            'full_name': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': 'نام و نام خانوادگی'}),
         }
 
 from django.contrib.auth.forms import AuthenticationForm
 
-class CustomAuthenticationForm(AuthenticationForm):
+class CustomAuthenticationForm(DigitNormalizationMixin, AuthenticationForm):
+    normalize_fields = ['username']
+    
     username = forms.CharField(
         label=_("Phone Number"), 
-        widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': '09xxxxxxxxx', 'class': GLASS_INPUT_CLASSES})
+        widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': '09xxxxxxxxx', 'class': 'input-standard'})
     )
     password = forms.CharField(
         label=_("Password"), 
-        widget=forms.PasswordInput(attrs={'placeholder': '******', 'class': GLASS_INPUT_CLASSES})
+        widget=forms.PasswordInput(attrs={'placeholder': '******', 'class': 'input-standard'})
     )
