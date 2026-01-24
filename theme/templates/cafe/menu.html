@@ -11,17 +11,35 @@
         <p class="opacity-70 font-bold text-lg">تجربه‌ای متفاوت از طعم‌ها</p>
     </div>
 
-    <div class="sticky top-24 z-40 glass-panel border border-white/10 -mx-4 md:-mx-8 px-4 md:px-8 py-4 mb-12 overflow-x-auto no-scrollbar flex gap-3 snap-x shadow-2xl rounded-xl mx-auto max-w-4xl" id="category-nav">
-        {% for category in categories %}
-            {% if category.items.all %}
-                <a href="#category-{{ category.id }}" 
-                   class="px-6 py-2 rounded-full whitespace-nowrap snap-start font-black text-sm transition-all border border-white/10 hover:bg-white/10
-                          data-[active=true]:bg-accent data-[active=true]:text-black data-[active=true]:border-none data-[active=true]:shadow-lg data-[active=true]:shadow-accent/20"
-                   data-target="category-{{ category.id }}">
-                    {{ category.name }}
-                </a>
-            {% endif %}
-        {% endfor %}
+    <div class="relative max-w-4xl mx-auto mb-12 group px-4 md:px-0">
+        <!-- Right Arrow (Start/Previous in RTL) -->
+        <button type="button" onclick="document.getElementById('category-nav').scrollBy({left: 200, behavior: 'smooth'})"
+                class="absolute -right-12 top-1/2 -translate-y-1/2 z-50 btn btn-circle btn-sm bg-black/20 hover:bg-accent hover:text-black border-none text-white hidden md:flex backdrop-blur-sm shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+
+        <div class="sticky top-24 z-40 glass-panel border border-white/10 px-4 py-4 overflow-x-auto no-scrollbar flex flex-nowrap gap-3 snap-x shadow-2xl rounded-2xl w-full scroll-smooth" id="category-nav">
+            {% for category in categories %}
+                {% if category.items.all %}
+                    <a href="#category-{{ category.id }}" 
+                       class="px-6 py-2 rounded-full whitespace-nowrap snap-start font-black text-sm transition-all border border-white/10 hover:bg-white/10
+                              data-[active=true]:bg-accent data-[active=true]:text-black data-[active=true]:border-none data-[active=true]:shadow-lg data-[active=true]:shadow-accent/20"
+                       data-target="category-{{ category.id }}">
+                        {{ category.name }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Left Arrow (End/Next in RTL) -->
+        <button type="button" onclick="document.getElementById('category-nav').scrollBy({left: -200, behavior: 'smooth'})"
+                class="absolute -left-12 top-1/2 -translate-y-1/2 z-50 btn btn-circle btn-sm bg-black/20 hover:bg-accent hover:text-black border-none text-white hidden md:flex backdrop-blur-sm shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
     </div>
 
     <div class="space-y-20 max-w-4xl mx-auto px-1">
@@ -33,30 +51,33 @@
                         <h2 class="text-3xl font-black tracking-tight">{{ category.name }}</h2>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {% for item in category.items.all %}
-                            <div class="card card-side glass-panel shadow-xl border border-white/10 hover:bg-white/5 transition-all duration-300 p-4 items-center group rounded-2xl">
+                            <div class="card glass-panel shadow-xl border border-white/10 hover:bg-white/5 transition-all duration-300 p-0 group rounded-3xl overflow-hidden flex flex-col h-full">
                                 {% if item.image %}
-                                    <figure class="w-24 h-24 shrink-0 rounded-xl overflow-hidden ml-4 bg-white/5 border border-white/5">
-                                        <img src="{{ item.image.url }}" loading="lazy" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    <figure class="w-full h-56 bg-white/5 relative overflow-hidden">
+                                        <img src="{{ item.image.url }}" loading="lazy" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60"></div>
                                     </figure>
                                 {% else %}
-                                    <div class="w-24 h-24 shrink-0 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center ml-4 text-white/20 group-hover:text-accent/40 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    <div class="w-full h-56 bg-white/5 flex items-center justify-center text-white/20 group-hover:text-accent/40 transition-colors relative">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                     </div>
                                 {% endif %}
                                 
-                                <div class="flex-grow min-w-0 py-1">
-                                    <div class="flex justify-between items-start mb-1">
-                                        <h3 class="font-black text-xl text-white leading-tight group-hover:text-accent transition-colors">{{ item.name }}</h3>
+                                <div class="p-6 flex flex-col flex-grow relative">
+                                    <!-- Title & Desc -->
+                                    <div class="mb-4">
+                                        <h3 class="font-black text-2xl text-white mb-2 leading-tight group-hover:text-accent transition-colors">{{ item.name }}</h3>
+                                        {% if item.description %}
+                                            <p class="text-sm text-white/60 line-clamp-2 leading-relaxed font-medium">{{ item.description }}</p>
+                                        {% endif %}
                                     </div>
-                                    {% if item.description %}
-                                        <p class="text-sm text-white/60 line-clamp-2 mb-4 leading-relaxed font-medium">{{ item.description }}</p>
-                                    {% endif %}
                                     
-                                    <div id="item-control-container-{{ item.id }}" class="mt-auto">
+                                    <!-- Controls (Pushed to bottom) -->
+                                    <div id="item-control-container-{{ item.id }}" class="mt-auto pt-4 border-t border-white/5">
                                         {% with quantity=cart_data|get_item:item.id %}
                                             {% include "cafe/partials/item_quantity_control.html" with item=item quantity=quantity|default:0 %}
                                         {% endwith %}
@@ -78,6 +99,11 @@
     .no-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;
+    }
+    
+    /* Ensure the container has enough padding for shadows to not get clipped during scroll */
+    #category-nav {
+        -webkit-overflow-scrolling: touch;
     }
 </style>
 

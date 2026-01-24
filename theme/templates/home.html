@@ -3,32 +3,32 @@
 {% block title %}خانه - ۳۶{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-12 md:py-20">
-    <div class="hero card-glass min-h-[60vh] text-white overflow-hidden relative">
+<div class="max-w-4xl mx-auto py-12 md:py-20 px-4">
+    <div class="hero card-glass min-h-[60vh] text-white overflow-hidden relative rounded-3xl">
         <!-- Decorative subtle glow -->
         <div class="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[120px] -z-10"></div>
         
         <div class="hero-content text-center py-12">
             <div class="max-w-lg">
-                <h1 class="text-8xl md:text-9xl font-black italic mb-6 text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent drop-shadow-2xl">۳۶</h1>
-                <p class="py-6 font-bold text-xl md:text-2xl opacity-90 leading-relaxed">به سامانه مدیریت هوشمند ۳۶ خوش آمدید.</p>
+                <h1 class="text-6xl md:text-9xl font-black italic mb-6 text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent drop-shadow-2xl tracking-tighter">۳۶</h1>
+                <p class="py-6 font-bold text-lg md:text-2xl opacity-90 leading-relaxed">به سامانه مدیریت هوشمند ۳۶ خوش آمدید.</p>
                 
                 <div class="mt-8">
                     {% if user.is_authenticated %}
                         <div class="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm max-w-sm mx-auto">
                             <p class="mb-4 font-bold text-white/60">خوش آمدید، کاربر گرامی</p>
                             <div class="flex flex-col gap-4">
-                                <a href="{% url 'accounts:profile' %}" class="btn-primary">مشاهده پروفایل</a>
+                                <a href="{% url 'accounts:profile' %}" class="btn btn-accent text-black font-black w-full shadow-lg shadow-accent/20">مشاهده پروفایل</a>
                                 <form action="{% url 'accounts:logout' %}" method="post" class="w-full">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn-secondary w-full border-destructive/20 text-destructive hover:bg-destructive/10 hover:border-destructive/40">خروج از حساب</button>
+                                    <button type="submit" class="btn btn-ghost text-destructive hover:bg-destructive/10 w-full font-bold">خروج از حساب</button>
                                 </form>
                             </div>
                         </div>
                     {% else %}
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                            <a href="{% url 'accounts:login' %}" class="btn-primary px-16 h-14">ورود به سیستم</a>
-                            <a href="{% url 'accounts:register' %}" class="btn-secondary px-16 h-14">عضویت جدید</a>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                            <a href="{% url 'accounts:login' %}" class="btn btn-accent text-black font-black px-12 h-14 min-h-0 text-lg shadow-lg shadow-accent/20 rounded-xl hover:scale-105 transition-transform w-full sm:w-auto">ورود به سیستم</a>
+                            <a href="{% url 'accounts:register' %}" class="btn btn-ghost text-white font-bold px-12 h-14 min-h-0 text-lg border border-white/20 hover:bg-white/10 rounded-xl w-full sm:w-auto">عضویت جدید</a>
                         </div>
                     {% endif %}
                 </div>
