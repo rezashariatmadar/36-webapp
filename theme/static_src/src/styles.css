@@ -123,4 +123,9 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Django Form Input Overrides */
+  input[type="text"], input[type="password"], input[type="email"], input[type="number"] {
+    @apply w-full h-12 px-4 rounded-xl bg-white/5 border border-white/5 text-white placeholder-white/20 focus:bg-white/10 focus:border-primary/50 focus:ring-0 focus:outline-none transition-all duration-300;
+  }
 }
