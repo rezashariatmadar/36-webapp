@@ -13,6 +13,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import serializers
 
+VALID_ROLES = ('Admin', 'Barista', 'Customer')
+
 @login_required
 def profile_view(request):
     if request.method == 'POST':
@@ -87,9 +89,7 @@ def toggle_user_status(request, user_id):
 def change_user_role(request, user_id, new_role):
     user = get_object_or_404(CustomUser, id=user_id)
     
-    # Define valid roles
-    valid_roles = ['Admin', 'Barista', 'Customer']
-    if new_role not in valid_roles:
+    if new_role not in VALID_ROLES:
         messages.error(request, "Invalid role selected.")
         return redirect('accounts:user_list')
         
@@ -102,7 +102,7 @@ def change_user_role(request, user_id, new_role):
         user.groups.add(group)
         
         # Update is_staff flag if needed
-        if new_role in ['Admin', 'Barista']:
+        if new_role in ('Admin', 'Barista'):
             user.is_staff = True
         else:
             user.is_staff = False
