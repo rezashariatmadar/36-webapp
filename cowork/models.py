@@ -28,6 +28,12 @@ class Space(models.Model):
         PRIVATE_ROOM_3 = 'PRIVATE_3', _('اتاق VIP (۳ نفره)')
         MEETING_ROOM = 'MEETING_ROOM', _('اتاق جلسه')
 
+    _NESTED_ZONES = {
+        ZoneType.SHARED_DESK,
+        ZoneType.PRIVATE_ROOM_2,
+        ZoneType.PRIVATE_ROOM_3,
+    }
+
     class Status(models.TextChoices):
         AVAILABLE = 'AVAILABLE', _('Available')
         OCCUPIED = 'OCCUPIED', _('Occupied')
@@ -76,11 +82,7 @@ class Space(models.Model):
     @property
     def is_nested(self):
         """Returns True if this zone should use the nested accordion UI."""
-        return self.zone in [
-            self.ZoneType.SHARED_DESK,
-            self.ZoneType.PRIVATE_ROOM_2,
-            self.ZoneType.PRIVATE_ROOM_3
-        ]
+        return self.zone in self._NESTED_ZONES
 
 class Booking(models.Model):
     class BookingType(models.TextChoices):
