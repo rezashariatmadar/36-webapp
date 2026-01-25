@@ -8,6 +8,9 @@ from .models import MenuCategory, MenuItem, CafeOrder, OrderItem
 from cowork.models import Booking, Space, PricingPlan
 from django.utils import timezone
 from datetime import timedelta
+import logging
+
+logger = logging.getLogger(__name__)
 
 def is_staff_member(user):
     return user.is_authenticated and (user.is_staff or user.groups.filter(name__in=['Barista', 'Admin']).exists())
@@ -132,13 +135,20 @@ def cart_detail(request):
     cart = request.session.get('cart', {})
     items = []
     total = 0
+
+    # Fetch all items in one query
+    fetched_items = MenuItem.objects.filter(id__in=cart.keys())
+    items_dict = {str(item.id): item for item in fetched_items}
+
     for item_id, quantity in cart.items():
-        try:
-            item = MenuItem.objects.get(id=item_id)
+        item = items_dict.get(str(item_id))
+
+        if item:
             subtotal = item.price * quantity
             total += subtotal
             items.append({'item': item, 'quantity': quantity, 'subtotal': subtotal})
-        except MenuItem.DoesNotExist:
+        else:
+            logger.warning(f"Item with ID {item_id} found in cart but does not exist in database.")
             continue
             
     context = {'items': items, 'total': total, 'cart_count': sum(cart.values())}
