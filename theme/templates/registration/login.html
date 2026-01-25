@@ -28,8 +28,7 @@
                         <span class="label-text text-xs font-bold text-white/60 uppercase tracking-wider group-focus-within:text-white transition-colors">{{ field.label }}</span>
                     </label>
                     <div class="relative">
-                        <!-- We assume the widget has 'input-standard' class or similar. We can force styling via CSS or add class here if possible, but easier to wrap or style input inside -->
-                        <!-- Injecting class via JS or assuming widget tweak is hard. I'll rely on global input styles or specific targeting -->
+                        <!-- Input styling handled globally in styles.css -->
                         {{ field }}
                     </div>
                     {% if field.errors %}
@@ -48,11 +47,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    /* Scoped override for Django form inputs if they don't have classes */
-    input[type="text"], input[type="password"], input[type="email"], input[type="number"] {
-        @apply w-full h-12 px-4 rounded-xl bg-white/5 border border-white/5 text-white placeholder-white/20 focus:bg-white/10 focus:border-primary/50 focus:ring-0 focus:outline-none transition-all duration-300;
-    }
-</style>
 {% endblock %}
