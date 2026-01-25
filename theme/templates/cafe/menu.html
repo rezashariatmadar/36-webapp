@@ -6,17 +6,17 @@
 {% block content %}
 <div class="pb-32 text-white">
     
-    <div class="text-center mb-8 p-10 glass-panel rounded-3xl">
-        <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent mb-4 tracking-tight">منوی ۳۶</h1>
-        <p class="opacity-70 font-bold text-lg">تجربه‌ای متفاوت از طعم‌ها</p>
+    <div class="text-center mb-8 p-6 md:p-10 glass-panel rounded-3xl">
+        <h1 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent mb-2 md:mb-4 tracking-tight">منوی ۳۶</h1>
+        <p class="opacity-70 font-bold text-sm md:text-lg">تجربه‌ای متفاوت از طعم‌ها</p>
     </div>
 
-    <div class="sticky top-24 z-40 glass-panel border border-white/10 -mx-4 md:-mx-8 px-4 md:px-8 py-4 mb-12 overflow-x-auto no-scrollbar flex gap-3 snap-x shadow-2xl rounded-xl mx-auto max-w-4xl" id="category-nav">
+    <div class="sticky top-20 md:top-24 z-40 glass-panel border border-white/10 -mx-4 md:-mx-8 px-4 md:px-8 py-3 mb-12 overflow-x-auto no-scrollbar flex gap-3 snap-x shadow-2xl rounded-xl mx-auto max-w-4xl backdrop-blur-xl bg-black/40" id="category-nav">
         {% for category in categories %}
             {% if category.items.all %}
                 <a href="#category-{{ category.id }}" 
-                   class="px-6 py-2 rounded-full whitespace-nowrap snap-start font-black text-sm transition-all border border-white/10 hover:bg-white/10
-                          data-[active=true]:bg-accent data-[active=true]:text-black data-[active=true]:border-none data-[active=true]:shadow-lg data-[active=true]:shadow-accent/20"
+                   class="px-5 py-3 rounded-full whitespace-nowrap snap-start font-black text-xs md:text-sm transition-all border border-white/10 hover:bg-white/10
+                          data-[active=true]:bg-accent data-[active=true]:text-black data-[active=true]:border-none data-[active=true]:shadow-[0_0_15px_rgba(0,181,255,0.4)]"
                    data-target="category-{{ category.id }}">
                     {{ category.name }}
                 </a>
@@ -35,28 +35,28 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {% for item in category.items.all %}
-                            <div class="card card-side glass-panel shadow-xl border border-white/10 hover:bg-white/5 transition-all duration-300 p-4 items-center group rounded-2xl">
+                            <div class="card md:card-side glass-panel shadow-xl border border-white/10 hover:bg-white/5 transition-all duration-300 p-0 md:p-4 group rounded-3xl overflow-hidden">
                                 {% if item.image %}
-                                    <figure class="w-24 h-24 shrink-0 rounded-xl overflow-hidden ml-4 bg-white/5 border border-white/5">
-                                        <img src="{{ item.image.url }}" loading="lazy" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    <figure class="w-full h-48 md:w-32 md:h-32 shrink-0 md:rounded-2xl md:ml-4 bg-white/5 relative border-b md:border-b-0 md:border border-white/5">
+                                        <img src="{{ item.image.url }}" loading="lazy" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                     </figure>
                                 {% else %}
-                                    <div class="w-24 h-24 shrink-0 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center ml-4 text-white/20 group-hover:text-accent/40 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <div class="w-full h-32 md:w-32 md:h-32 shrink-0 md:rounded-2xl md:ml-4 bg-white/5 border-b md:border-b-0 md:border border-white/5 flex items-center justify-center text-white/20 group-hover:text-accent/40 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                         </svg>
                                     </div>
                                 {% endif %}
                                 
-                                <div class="flex-grow min-w-0 py-1">
+                                <div class="flex-grow min-w-0 p-4 md:p-0 md:py-1 flex flex-col">
                                     <div class="flex justify-between items-start mb-1">
                                         <h3 class="font-black text-xl text-white leading-tight group-hover:text-accent transition-colors">{{ item.name }}</h3>
                                     </div>
                                     {% if item.description %}
-                                        <p class="text-sm text-white/60 line-clamp-2 mb-4 leading-relaxed font-medium">{{ item.description }}</p>
+                                        <p class="text-sm text-white/70 line-clamp-2 mb-4 leading-relaxed font-medium">{{ item.description }}</p>
                                     {% endif %}
                                     
-                                    <div id="item-control-container-{{ item.id }}" class="mt-auto">
+                                    <div id="item-control-container-{{ item.id }}" class="mt-auto w-full">
                                         {% with quantity=cart_data|get_item:item.id %}
                                             {% include "cafe/partials/item_quantity_control.html" with item=item quantity=quantity|default:0 %}
                                         {% endwith %}

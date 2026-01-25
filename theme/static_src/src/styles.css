@@ -69,7 +69,7 @@
     position: absolute;
     border-radius: 50%;
     filter: blur(80px);
-    opacity: 0.5;
+    opacity: 0.3;
     z-index: -40;
     animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
     mix-blend-mode: screen;
@@ -116,17 +116,17 @@
 @layer components {
   /* Custom Glass Panel with Fallback */
   .glass-panel {
-    @apply bg-white/5 border border-white/10;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    @apply bg-black/20 border border-white/10 shadow-glass;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
   }
 
   /* Cards */
   .card-glass {
     /* Apply glass styles directly instead of @apply glass-panel */
-    @apply bg-white/5 border border-white/10 shadow-glass rounded-box p-6 md:p-8;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    @apply bg-black/20 border border-white/10 shadow-glass rounded-box p-6 md:p-8;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
   }
 
   @supports not (backdrop-filter: blur(1px)) {
@@ -135,9 +135,14 @@
     }
   }
 
+  /* Utilities */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
   /* Buttons */
   .btn-primary {
-    @apply bg-accent text-black border-none font-black hover:scale-[1.02] transition-transform shadow-lg shadow-accent/20;
+    @apply bg-accent text-black border-none font-black hover:scale-[1.02] transition-transform shadow-[0_0_20px_rgba(0,181,255,0.3)];
   }
   .btn-secondary {
     @apply text-white border-white/20 font-bold hover:bg-white/10;

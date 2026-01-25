@@ -23,13 +23,15 @@ class NavbarUXTests(TestCase):
         self.assertContains(response, 'رزرو فضا')
         self.assertContains(response, 'ورود')
 
-    def test_mobile_menu_present(self):
+    def test_mobile_navigation_present(self):
         response = self.client.get(reverse('accounts:home'))
         self.assertEqual(response.status_code, 200)
-        # Check for mobile dropdown container
-        self.assertContains(response, 'dropdown md:hidden')
-        # Check for hamburger icon svg
-        self.assertContains(response, 'M4 6h16M4 12h16M4 18h7')
+        # Check for mobile bottom nav container
+        self.assertContains(response, 'btm-nav md:hidden')
+        # Check for bottom nav items
+        self.assertContains(response, 'منو')
+        self.assertContains(response, 'سبد خرید')
+        self.assertContains(response, 'پروفایل')
 
     def test_rtl_alignment_classes(self):
         # Check for explicit RTL positioning fixes
