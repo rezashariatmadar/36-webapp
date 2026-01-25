@@ -179,11 +179,38 @@ def checkout(request):
         notes = request.POST.get('notes', '')
         with transaction.atomic():
             order = CafeOrder.objects.create(user=request.user, notes=notes)
-            for item_id, quantity in cart.items():
-                try:
-                    menu_item = MenuItem.objects.get(id=item_id)
-                    OrderItem.objects.create(order=order, menu_item=menu_item, quantity=quantity, unit_price=menu_item.price)
-                except MenuItem.DoesNotExist: continue
+
+            # Optimization: Fetch all items at once to avoid N+1 queries
+            item_ids = [int(k) for k in cart.keys() if str(k).isdigit()]
+            menu_items = MenuItem.objects.in_bulk(item_ids)
+
+            order_items = []
+            total_price = 0
+
+            for item_id_str, quantity in cart.items():
+                if not str(item_id_str).isdigit():
+                    continue
+                item_id = int(item_id_str)
+                quantity = int(quantity)
+
+                if item_id in menu_items:
+                    menu_item = menu_items[item_id]
+                    # Create OrderItem instance
+                    order_items.append(OrderItem(
+                        order=order,
+                        menu_item=menu_item,
+                        quantity=quantity,
+                        unit_price=menu_item.price
+                    ))
+                    total_price += menu_item.price * quantity
+
+            if order_items:
+                OrderItem.objects.bulk_create(order_items)
+
+            # Update total price once
+            order.total_price = total_price
+            order.save()
+
         request.session['cart'] = {}
         messages.success(request, _("Order placed!"))
         return redirect('cafe:order_list')
