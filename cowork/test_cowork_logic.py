@@ -65,3 +65,14 @@ class CoworkLogicTests(TestCase):
         
         with self.assertRaises(ValidationError):
             booking.full_clean()
+
+    def test_is_nested_property(self):
+        # Nested zones
+        for zone in [Space.ZoneType.SHARED_DESK, Space.ZoneType.PRIVATE_ROOM_2, Space.ZoneType.PRIVATE_ROOM_3]:
+            space = SpaceFactory(zone=zone)
+            self.assertTrue(space.is_nested, f"Zone {zone} should be nested")
+
+        # Non-nested zones
+        for zone in [Space.ZoneType.DESK, Space.ZoneType.LONG_TABLE, Space.ZoneType.MEETING_ROOM]:
+            space = SpaceFactory(zone=zone)
+            self.assertFalse(space.is_nested, f"Zone {zone} should not be nested")
