@@ -41,7 +41,7 @@ class ProfileForm(DigitNormalizationMixin, forms.ModelForm):
         model = CustomUser
         fields = ('full_name', 'birth_date')
         widgets = {
-            'birth_date': forms.DateInput(attrs={'type': 'date', 'class': 'input-standard'}),
+            'birth_date': forms.TextInput(attrs={'class': 'input-standard jalali-date', 'placeholder': '----/--/--'}),
             'full_name': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': 'نام و نام خانوادگی'}),
         }
 

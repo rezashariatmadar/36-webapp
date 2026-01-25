@@ -11,17 +11,19 @@
         <p class="opacity-70 font-bold text-lg">تجربه‌ای متفاوت از طعم‌ها</p>
     </div>
 
-    <div class="sticky top-24 z-40 glass-panel border border-white/10 -mx-4 md:-mx-8 px-4 md:px-8 py-4 mb-12 overflow-x-auto no-scrollbar flex gap-3 snap-x shadow-2xl rounded-xl mx-auto max-w-4xl" id="category-nav">
-        {% for category in categories %}
-            {% if category.items.all %}
-                <a href="#category-{{ category.id }}" 
-                   class="px-6 py-2 rounded-full whitespace-nowrap snap-start font-black text-sm transition-all border border-white/10 hover:bg-white/10
-                          data-[active=true]:bg-accent data-[active=true]:text-black data-[active=true]:border-none data-[active=true]:shadow-lg data-[active=true]:shadow-accent/20"
-                   data-target="category-{{ category.id }}">
-                    {{ category.name }}
-                </a>
-            {% endif %}
-        {% endfor %}
+    <div class="sticky top-24 z-40 flex justify-center w-full mb-12">
+        <div class="glass-panel bg-black/60 backdrop-blur-xl border border-white/10 px-4 py-3 overflow-x-auto no-scrollbar flex gap-3 snap-x shadow-2xl rounded-2xl w-fit max-w-full" id="category-nav">
+            {% for category in categories %}
+                {% if category.items.all %}
+                    <a href="#category-{{ category.id }}" 
+                       class="px-6 py-2 rounded-full whitespace-nowrap snap-start font-black text-sm transition-all border border-white/10 hover:bg-white/10
+                              data-[active=true]:bg-accent data-[active=true]:text-black data-[active=true]:border-none data-[active=true]:shadow-lg data-[active=true]:shadow-accent/20"
+                       data-target="category-{{ category.id }}">
+                        {{ category.name }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
 
     <div class="space-y-20 max-w-4xl mx-auto px-1">
