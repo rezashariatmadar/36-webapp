@@ -67,11 +67,14 @@ class Space(models.Model):
             end_time__gte=now
         ).exists()
         
+        original_status = self.status
         if active_booking:
             self.status = self.Status.OCCUPIED
         else:
             self.status = self.Status.AVAILABLE
-        self.save()
+
+        if self.status != original_status:
+            self.save()
 
     @property
     def is_nested(self):
