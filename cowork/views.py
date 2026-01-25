@@ -4,14 +4,38 @@ from django.contrib import messages
 from django.utils import timezone
 from .models import Space, Booking, PricingPlan
 from .forms import BookingForm
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef
 from decimal import Decimal
 
 def space_list(request):
     # Refresh statuses based on current time
-    all_active_spaces = Space.objects.filter(is_active=True)
+    now = timezone.now().date()
+
+    # Check for active bookings efficiently
+    active_booking_exists = Booking.objects.filter(
+        space=OuterRef('pk'),
+        status=Booking.Status.CONFIRMED,
+        start_time__lte=now,
+        end_time__gte=now
+    )
+
+    all_active_spaces = Space.objects.filter(is_active=True).annotate(
+        has_active_booking=Exists(active_booking_exists)
+    )
+
+    spaces_to_update = []
     for s in all_active_spaces:
-        s.refresh_status()
+        if s.status == Space.Status.UNAVAILABLE:
+            continue
+
+        new_status = Space.Status.OCCUPIED if s.has_active_booking else Space.Status.AVAILABLE
+
+        if s.status != new_status:
+            s.status = new_status
+            spaces_to_update.append(s)
+
+    if spaces_to_update:
+        Space.objects.bulk_update(spaces_to_update, ['status'])
         
     # Fetch all active spaces that are NOT individual seats of a parent table
     all_top_level_spaces = Space.objects.filter(is_active=True, parent_table__isnull=True).select_related('pricing_plan').prefetch_related('seats')
