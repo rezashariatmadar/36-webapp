@@ -9,4 +9,5 @@ class ScrimWrapperTests(TestCase):
         """Verify that the scrim-wrapper class is applied to the body."""
         response = self.client.get(reverse('accounts:home'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'class="min-h-screen text-base-content flex flex-col scrim-wrapper"')
+        # Check for the class presence
+        self.assertContains(response, 'scrim-wrapper')

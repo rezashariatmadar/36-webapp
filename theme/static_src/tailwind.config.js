@@ -22,40 +22,58 @@ module.exports = {
     themes: [
       {
         minimalist: {
-          // Dark Theme Configuration
-          "primary": "#100370",      // Company Blue (Headers/Branding)
+          // Apple Dark Mode Premium Configuration
+          "primary": "#0A84FF",      // iOS System Blue
           "primary-content": "#ffffff",
           
-          "secondary": "#63021f",    // Company Red
+          "secondary": "#5E5CE6",    // iOS System Indigo
           "secondary-content": "#ffffff",
           
-          "accent": "#00b5ff",       // Cyan (High visibility actions)
+          "accent": "#32D74B",       // iOS System Green (Success/Action)
           "accent-content": "#000000",
           
-          "neutral": "#0f0f0f",      // Very dark gray (Footer)
+          "neutral": "#1C1C1E",      // Secondary System Background
           "neutral-content": "#ffffff",
           
-          "base-100": "#1c1917",     // Dark Grey (Main Background)
-          "base-200": "#171513",     // Slightly darker (Secondary Background)
-          "base-300": "#000000",     // Black (Borders/Inputs)
-          "base-content": "#e5e7eb", // Light text
+          "base-100": "#000000",     // Pure Black (OLED)
+          "base-200": "#1C1C1E",     // Secondary Grouped
+          "base-300": "#2C2C2E",     // Tertiary Grouped
+          "base-content": "#FFFFFF", // Primary Text
           
-          "info": "#00b5ff",
-          "success": "#00a96e",
-          "warning": "#ffbe00",
-          "error": "#ff5861",
+          "info": "#64D2FF",
+          "success": "#30D158",
+          "warning": "#FFD60A",
+          "error": "#FF453A",        // iOS System Red
           
-          "--rounded-box": "1.5rem",
-          "--rounded-btn": "0.75rem",
-          "--rounded-badge": "1.9rem",
-          "--animation-btn": "0.25s",
+          "--rounded-box": "1.25rem",  // iOS 20pt
+          "--rounded-btn": "9999px",   // Pill shape default
+          "--rounded-badge": "9999px",
+          "--animation-btn": "0.2s",
           "--animation-input": "0.2s",
           "--btn-focus-scale": "0.98",
-          "--border-btn": "1px",
-          "--tab-border": "1px",
-          "--tab-radius": "0.75rem",
+          "--border-btn": "0px",       // Apple style often uses no border or 1px subtle
+          "--tab-border": "0px",
+          "--tab-radius": "0.5rem",
         },
       },
     ],
+  },
+  theme: {
+    extend: {
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideInRight: {
+          '0%': { transform: 'translateX(100%)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        }
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-out forwards',
+        'slide-in-right': 'slideInRight 0.3s cubic-bezier(0, 0, 0.2, 1) forwards',
+      }
+    }
   },
 }
