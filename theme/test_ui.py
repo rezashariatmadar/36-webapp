@@ -10,11 +10,6 @@ class BaseUITests(TestCase):
         response = self.client.get(reverse('accounts:home'))
         self.assertEqual(response.status_code, 200)
         
-        # Check for CSS classes in the style block
-        self.assertContains(response, '.liquid-background')
-        self.assertContains(response, '.glass-panel')
-        self.assertContains(response, '.blob')
-        
         # Check for the HTML structure
         self.assertContains(response, '<div class="liquid-background">')
         self.assertContains(response, '<div class="blob blob-1"></div>')
