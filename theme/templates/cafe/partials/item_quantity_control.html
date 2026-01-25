@@ -1,4 +1,4 @@
-<div id="item-control-{{ item.id }}" class="flex items-center justify-between gap-4 w-full transition-all duration-300">
+<div id="item-control-{{ item.id }}" class="flex items-center justify-between gap-4 transition-all duration-300 w-full mt-4 bg-white/5 p-2 rounded-2xl border border-white/5">
     {# Signal the NAVBAR cart badge to update its count #}
     {% if request.htmx %}
     <span hx-swap-oob="true" id="cart-badge" class="badge badge-accent badge-xs font-black absolute -top-1 -right-1 {% if not cart_count %}hidden{% endif %}">
@@ -7,33 +7,34 @@
     {% endif %}
 
     <div class="flex flex-col">
+        <span class="text-xs font-bold text-white/40 mb-0.5">قیمت واحد</span>
         <div class="flex items-baseline gap-1">
-            <span class="font-black text-white text-xl tracking-tight format-price">{{ item.price }}</span>
-            <span class="text-[10px] text-white/50 font-bold">تومان</span>
+            <span class="font-black text-accent text-lg">{{ item.price }}</span>
+            <span class="text-[10px] text-white/60 font-bold">تومان</span>
         </div>
     </div>
 
     {% if quantity > 0 %}
-        <div class="flex items-center bg-white/5 rounded-xl p-1 border border-white/10 shadow-lg">
+        <div class="flex items-center glass-panel rounded-xl p-1 border border-white/10 shadow-lg">
             <button hx-post="{% url 'cafe:remove_from_cart' item.id %}" 
                     hx-target="#item-control-{{ item.id }}" 
                     hx-swap="outerHTML"
-                    class="btn btn-ghost btn-sm btn-square text-white hover:bg-white/10 font-black">-</button>
-            <span class="w-8 text-center font-black text-lg text-white">{{ quantity }}</span>
+                    class="btn btn-ghost btn-xs btn-square text-white hover:bg-white/10 font-black">-</button>
+            <span class="w-8 text-center font-black text-sm text-white">{{ quantity }}</span>
             <button hx-post="{% url 'cafe:add_to_cart' item.id %}" 
                     hx-target="#item-control-{{ item.id }}" 
                     hx-swap="outerHTML"
-                    class="btn btn-ghost btn-sm btn-square text-white hover:bg-white/10 font-black">+</button>
+                    class="btn btn-ghost btn-xs btn-square text-white hover:bg-white/10 font-black">+</button>
         </div>
     {% else %}
         <button hx-post="{% url 'cafe:add_to_cart' item.id %}" 
                 hx-target="#item-control-{{ item.id }}" 
                 hx-swap="outerHTML"
-                class="btn btn-accent btn-sm px-6 h-10 rounded-xl flex items-center gap-2 group shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:scale-105 active:scale-95 transition-all duration-300 text-black border-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                class="btn-primary btn-sm px-6 h-10 rounded-xl flex items-center gap-2 group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            <span class="font-black text-sm">افزودن</span>
+            <span class="font-black text-xs">افزودن</span>
         </button>
     {% endif %}
 </div>

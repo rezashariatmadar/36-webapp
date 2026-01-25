@@ -1,6 +1,6 @@
 <div id="cart-list-container" class="animate-in fade-in duration-300 text-white">
     {# Sync the NAVBAR cart badge too #}
-    <span hx-swap-oob="true" id="cart-badge" class="badge badge-accent badge-xs font-black absolute -top-1 -right-1 {% if not cart_count %}hidden{% endif %}">
+    <span hx-swap-oob="true" id="cart-badge-desktop" class="badge badge-accent badge-xs font-black absolute -top-1 -right-1 {% if not cart_count %}hidden{% endif %}">
         {{ cart_count|default:0 }}
     </span>
 
@@ -8,25 +8,25 @@
         <div class="card-glass overflow-hidden mb-8 p-0">
             <div class="divide-y divide-white/10">
                 {% for item in items %}
-                    <div class="p-6 flex items-center justify-between gap-4">
+                    <div class="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div class="flex-grow">
-                            <h3 class="font-black text-xl">{{ item.item.name }}</h3>
+                            <h3 class="font-black text-lg md:text-xl">{{ item.item.name }}</h3>
                             <p class="text-sm text-white/60 font-medium mt-1">{{ item.item.price }} تومان</p>
                         </div>
                         
-                        <div class="flex items-center gap-6">
-                            <div class="flex items-center glass-panel rounded-xl p-1 border border-white/10">
+                        <div class="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto">
+                            <div class="flex items-center bg-black/20 rounded-xl p-1 border border-white/10">
                                 <button hx-post="{% url 'cafe:remove_from_cart' item.item.id %}" 
                                         hx-target="#cart-list-container"
                                         hx-swap="outerHTML"
-                                        class="btn btn-ghost btn-xs btn-square text-white hover:bg-white/10">-</button>
-                                <span class="w-8 text-center font-black">{{ item.quantity }}</span>
+                                        class="btn btn-ghost h-9 w-9 btn-square text-white hover:bg-white/10 font-bold text-lg">-</button>
+                                <span class="w-8 text-center font-black text-lg">{{ item.quantity }}</span>
                                 <button hx-post="{% url 'cafe:add_to_cart' item.item.id %}" 
                                         hx-target="#cart-list-container"
                                         hx-swap="outerHTML"
-                                        class="btn btn-ghost btn-xs btn-square text-white hover:bg-white/10">+</button>
+                                        class="btn btn-ghost h-9 w-9 btn-square text-white hover:bg-white/10 font-bold text-lg">+</button>
                             </div>
-                            <div class="text-right w-24">
+                            <div class="text-right w-auto md:w-24">
                                 <span class="font-black text-accent text-lg format-price">{{ item.subtotal }}</span>
                                 <span class="text-[10px] text-white/40 block font-bold">تومان</span>
                             </div>

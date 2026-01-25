@@ -25,6 +25,9 @@ class CafeLogicTests(TestCase):
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
         
+        # Add HTMX support (mock)
+        request.htmx = False
+
         return request
 
     def test_add_to_cart(self):
