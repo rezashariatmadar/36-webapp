@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="flex flex-col h-screen" x-data="mapBuilder()">
+    <div class="p-4 bg-black/50 backdrop-blur-md border-b border-white/10 flex justify-between items-center z-50">
+        <h1 class="text-xl font-bold">نقشه ساز (Map Builder)</h1>
+        <div class="text-sm opacity-60">نقطه‌ها را بکشید و رها کنید. تغییرات خودکار ذخیره می‌شوند.</div>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        <!-- Sidebar List -->
+        <div class="w-64 bg-black/30 border-l border-white/10 overflow-y-auto p-4 hidden md:block z-40">
+            <h2 class="text-xs font-bold uppercase text-white/40 mb-4">جایگذاری نشده‌ها</h2>
+            <template x-for="space in unplacedSpaces" :key="space.id">
+                <div
+                    draggable="true"
+                    @dragstart="startDrag($event, space)"
+                    class="p-3 mb-2 bg-white/5 rounded-lg cursor-move hover:bg-white/10 transition-colors border border-white/5 group"
+                >
+                    <div class="font-bold text-sm" x-text="space.name"></div>
+                    <div class="text-[10px] text-white/50" x-text="space.zone_label"></div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Map Canvas -->
+        <div class="flex-1 relative overflow-auto bg-[#1a1a1a] flex justify-center items-start" id="map-container">
+            <div
+                class="relative select-none shadow-2xl overflow-hidden bg-white mx-auto my-8"
+                style="width: 2624px; height: 3615px; background-image: url('{% static 'img/floorplan.svg' %}'); background-size: cover;"
+                @dragover.prevent
+                @drop="drop($event)"
+                x-ref="map"
+            >
+                <!-- Existing Placed Markers -->
+                <template x-for="space in placedSpaces" :key="space.id">
+                    <div
+                        class="absolute w-12 h-12 -ml-6 -mt-6 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-move flex items-center justify-center border-2 border-white/80 transition-transform hover:scale-125 z-10 backdrop-blur-sm"
+                        :class="getZoneColor(space.zone)"
+                        :style="`left: ${space.x}%; top: ${space.y}%;`"
+                        @mousedown="startMoving($event, space)"
+                    >
+                        <span class="text-xs font-black text-white drop-shadow-md" x-text="space.name"></span>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function mapBuilder() {
+        return {
+            spaces: [
+                {% for space in spaces %}
+                {
+                    id: {{ space.id }},
+                    name: "{{ space.name }}",
+                    zone: "{{ space.zone }}",
+                    zone_label: "{{ space.get_zone_display }}",
+                    x: {{ space.x_pos|default:0|stringformat:"f" }},
+                    y: {{ space.y_pos|default:0|stringformat:"f" }},
+                    placed: {% if space.x_pos > 0 or space.y_pos > 0 %}true{% else %}false{% endif %}
+                },
+                {% endfor %}
+            ],
+
+            get unplacedSpaces() {
+                return this.spaces.filter(s => !s.placed);
+            },
+
+            get placedSpaces() {
+                return this.spaces.filter(s => s.placed);
+            },
+
+            getZoneColor(zone) {
+                const colors = {
+                    'LONG_TABLE': 'bg-blue-500/80',
+                    'DESK': 'bg-green-500/80',
+                    'SHARED_DESK': 'bg-yellow-500/80',
+                    'PRIVATE_2': 'bg-purple-500/80',
+                    'PRIVATE_3': 'bg-pink-500/80',
+                    'MEETING_ROOM': 'bg-red-500/80'
+                };
+                return colors[zone] || 'bg-gray-500/80';
+            },
+
+            // Drag from Sidebar
+            startDrag(event, space) {
+                event.dataTransfer.setData('spaceId', space.id);
+            },
+
+            drop(event) {
+                const spaceId = event.dataTransfer.getData('spaceId');
+                if (!spaceId) return;
+
+                const space = this.spaces.find(s => s.id == spaceId);
+                this.updatePosition(event, space);
+            },
+
+            // Move existing on Map
+            startMoving(event, space) {
+                event.stopPropagation();
+                event.preventDefault(); // Prevent text selection
+
+                const mapRect = this.$refs.map.getBoundingClientRect();
+
+                const onMouseMove = (e) => {
+                    const x = ((e.clientX - mapRect.left) / mapRect.width) * 100;
+                    const y = ((e.clientY - mapRect.top) / mapRect.height) * 100;
+
+                    space.x = Math.max(0, Math.min(100, x));
+                    space.y = Math.max(0, Math.min(100, y));
+                    space.placed = true;
+                };
+
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    this.saveSpace(space);
+                };
+
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            },
+
+            updatePosition(event, space) {
+                const mapRect = this.$refs.map.getBoundingClientRect();
+                const x = ((event.clientX - mapRect.left) / mapRect.width) * 100;
+                const y = ((event.clientY - mapRect.top) / mapRect.height) * 100;
+
+                space.x = Math.max(0, Math.min(100, x));
+                space.y = Math.max(0, Math.min(100, y));
+                space.placed = true;
+
+                this.saveSpace(space);
+            },
+
+            saveSpace(space) {
+                fetch(`/cowork/api/update-coords/${space.id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ x: space.x, y: space.y })
+                }).then(res => {
+                    if(res.ok) console.log('Saved');
+                    else console.error('Save failed');
+                });
+            }
+        }
+    }
+</script>
+{% endblock %}

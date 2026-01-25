@@ -45,6 +45,10 @@ class Space(models.Model):
     
     grid_row = models.IntegerField(_("Grid Row"), default=0)
     grid_col = models.IntegerField(_("Grid Col"), default=0)
+
+    x_pos = models.FloatField(_("X Position (%)"), default=0.0, help_text="Horizontal position (0-100%)")
+    y_pos = models.FloatField(_("Y Position (%)"), default=0.0, help_text="Vertical position (0-100%)")
+
     sort_order = models.PositiveIntegerField(_("Sort Order"), default=0)
 
     class Meta:

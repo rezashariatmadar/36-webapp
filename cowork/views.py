@@ -6,6 +6,10 @@ from .models import Space, Booking, PricingPlan
 from .forms import BookingForm
 from django.db.models import Q
 from decimal import Decimal
+from django.contrib.admin.views.decorators import staff_member_required
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 def space_list(request):
     # Refresh statuses based on current time
@@ -29,10 +33,33 @@ def space_list(request):
         return render(request, 'cowork/partials/zone_list.html', {
             'zones_with_spaces': zones_with_spaces
         })
+
+    map_spaces = Space.objects.filter(is_active=True, x_pos__gt=0).select_related('pricing_plan')
         
     return render(request, 'cowork/space_list.html', {
-        'zones_with_spaces': zones_with_spaces
+        'zones_with_spaces': zones_with_spaces,
+        'map_spaces': map_spaces,
     })
+
+@staff_member_required
+def map_builder(request):
+    spaces = Space.objects.filter(is_active=True).order_by('zone', 'name')
+    return render(request, 'cowork/map_builder.html', {'spaces': spaces})
+
+@staff_member_required
+@csrf_exempt
+def update_space_coordinates(request, space_id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            space = Space.objects.get(id=space_id)
+            space.x_pos = float(data.get('x'))
+            space.y_pos = float(data.get('y'))
+            space.save()
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'invalid method'}, status=405)
 
 @login_required
 def book_space(request, space_id):
