@@ -47,7 +47,6 @@ def map_builder(request):
     return render(request, 'cowork/map_builder.html', {'spaces': spaces})
 
 @staff_member_required
-@csrf_exempt
 def update_space_coordinates(request, space_id):
     if request.method == 'POST':
         try:

@@ -15,8 +15,8 @@ class CafeUITests(TestCase):
     def test_menu_add_button_style(self):
         response = self.client.get(reverse('cafe:menu'))
         self.assertEqual(response.status_code, 200)
-        # Check for new button class 'btn-accent'
-        self.assertContains(response, 'btn-accent')
+        # Check for new button class 'btn-primary'
+        self.assertContains(response, 'btn-primary')
         # Check for new size 'btn-sm'
         self.assertContains(response, 'btn-sm')
 

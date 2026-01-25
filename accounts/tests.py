@@ -39,26 +39,26 @@ class NationalIDValidatorTests(TestCase):
 
 class PhoneNumberValidatorTests(TestCase):
     def test_valid_phone_number(self):
-        user = UserFactory.build(phone_number='09123456789')
+        user = UserFactory.build(phone_number='09123456789', national_id='1234567891')
         # Should not raise validation error
         user.full_clean()
 
     def test_invalid_phone_number_length(self):
-        user = UserFactory.build(phone_number='0912345678') # Short
+        user = UserFactory.build(phone_number='0912345678', national_id='1234567891') # Short
         with self.assertRaises(ValidationError):
             user.full_clean()
         
-        user = UserFactory.build(phone_number='091234567890') # Long
+        user = UserFactory.build(phone_number='091234567890', national_id='1234567891') # Long
         with self.assertRaises(ValidationError):
             user.full_clean()
 
     def test_invalid_phone_number_prefix(self):
-        user = UserFactory.build(phone_number='08123456789') # Wrong prefix
+        user = UserFactory.build(phone_number='08123456789', national_id='1234567891') # Wrong prefix
         with self.assertRaises(ValidationError):
             user.full_clean()
 
     def test_invalid_phone_number_chars(self):
-        user = UserFactory.build(phone_number='0912345678a') # Non-digit
+        user = UserFactory.build(phone_number='0912345678a', national_id='1234567891') # Non-digit
         with self.assertRaises(ValidationError):
             user.full_clean()
 
