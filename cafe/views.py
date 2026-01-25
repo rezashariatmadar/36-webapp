@@ -226,17 +226,29 @@ def manual_order_entry(request):
             
             # Extract items and quantities
             # Expecting keys like 'qty_5' where 5 is the item ID
+            item_quantities = {}
             for key, value in request.POST.items():
                 if key.startswith('qty_') and int(value) > 0:
                     item_id = int(key.replace('qty_', ''))
-                    quantity = int(value)
-                    item = MenuItem.objects.get(id=item_id)
-                    OrderItem.objects.create(
-                        order=order, 
-                        menu_item=item, 
-                        quantity=quantity, 
-                        unit_price=item.price
-                    )
+                    item_quantities[item_id] = int(value)
+
+            if item_quantities:
+                items = MenuItem.objects.in_bulk(list(item_quantities.keys()))
+                items_to_create = []
+
+                for item_id, quantity in item_quantities.items():
+                    if item_id in items:
+                        item = items[item_id]
+                        items_to_create.append(OrderItem(
+                            order=order,
+                            menu_item=item,
+                            quantity=quantity,
+                            unit_price=item.price
+                        ))
+
+                if items_to_create:
+                    OrderItem.objects.bulk_create(items_to_create)
+                    order.update_total_price()
         
         messages.success(request, "سفارش با موفقیت ثبت شد.")
         return redirect('cafe:barista_dashboard')
