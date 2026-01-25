@@ -3,36 +3,55 @@
 {% block title %}خانه - ۳۶{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-12 md:py-20">
-    <div class="hero card-glass min-h-[60vh] text-white overflow-hidden relative">
-        <!-- Decorative subtle glow -->
-        <div class="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[120px] -z-10"></div>
+<div class="flex flex-col items-center justify-center min-h-[70vh] text-center relative">
+
+    <!-- Hero Text -->
+    <div class="relative z-10 w-full max-w-4xl mx-auto animate-fade-in flex flex-col items-center">
+        <!-- Big Number -->
+        <h1 class="text-[180px] md:text-[280px] font-black italic leading-[0.8] tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white/50 to-transparent select-none drop-shadow-2xl opacity-90">
+            ۳۶
+        </h1>
         
-        <div class="hero-content text-center py-12">
-            <div class="max-w-lg">
-                <h1 class="text-8xl md:text-9xl font-black italic mb-6 text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent drop-shadow-2xl">۳۶</h1>
-                <p class="py-6 font-bold text-xl md:text-2xl opacity-90 leading-relaxed">به سامانه مدیریت هوشمند ۳۶ خوش آمدید.</p>
-                
-                <div class="mt-8">
-                    {% if user.is_authenticated %}
-                        <div class="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm max-w-sm mx-auto">
-                            <p class="mb-4 font-bold text-white/60">خوش آمدید، کاربر گرامی</p>
-                            <div class="flex flex-col gap-4">
-                                <a href="{% url 'accounts:profile' %}" class="btn-primary">مشاهده پروفایل</a>
-                                <form action="{% url 'accounts:logout' %}" method="post" class="w-full">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn-secondary w-full border-destructive/20 text-destructive hover:bg-destructive/10 hover:border-destructive/40">خروج از حساب</button>
-                                </form>
+        <!-- Tagline -->
+        <div class="relative -top-8 md:-top-16 backdrop-blur-sm bg-black/30 px-8 py-4 rounded-full border border-white/5">
+            <p class="text-lg md:text-2xl font-bold text-white tracking-wide">
+                تجربه‌ای متفاوت از <span class="text-accent">مدیریت کافه</span>
+            </p>
+        </div>
+
+        <!-- Auth Card / Actions -->
+        <div class="mt-12 w-full max-w-sm mx-auto">
+            {% if user.is_authenticated %}
+                <div class="material-glass p-8 rounded-[2.5rem] w-full text-center border border-white/10 shadow-2xl relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div class="avatar mb-4 placeholder">
+                            <div class="bg-gradient-to-br from-primary to-secondary text-white rounded-full w-20 h-20 shadow-lg ring-4 ring-white/10">
+                                <span class="text-2xl font-black">{{ user.phone_number|slice:"-2:" }}</span>
                             </div>
                         </div>
-                    {% else %}
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                            <a href="{% url 'accounts:login' %}" class="btn-primary px-16 h-14">ورود به سیستم</a>
-                            <a href="{% url 'accounts:register' %}" class="btn-secondary px-16 h-14">عضویت جدید</a>
+                        <h3 class="text-2xl font-bold mb-1 text-white">خوش آمدید</h3>
+                        <p class="opacity-50 mb-8 text-sm font-mono">{{ user.full_name|default:user.phone_number }}</p>
+
+                        <div class="flex flex-col gap-3 w-full">
+                            <a href="{% url 'accounts:profile' %}" class="btn-apple-primary w-full shadow-lg shadow-primary/20">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                ورود به پنل
+                            </a>
+                            <form action="{% url 'accounts:logout' %}" method="post" class="w-full">
+                                {% csrf_token %}
+                                <button class="btn-apple-glass w-full text-destructive hover:bg-destructive/10 hover:border-destructive/30">خروج</button>
+                            </form>
                         </div>
-                    {% endif %}
+                    </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="flex flex-col gap-4 w-full">
+                    <a href="{% url 'accounts:login' %}" class="btn-apple-primary h-14 text-lg w-full shadow-[0_0_30px_rgba(10,132,255,0.4)]">ورود به سیستم</a>
+                    <a href="{% url 'accounts:register' %}" class="btn-apple-glass h-14 text-lg w-full">ثبت‌نام جدید</a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

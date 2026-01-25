@@ -4,155 +4,123 @@
 @source "../../../**/*.{html,py,js}";
 
 @theme {
-  /* Colors */
-  --color-accent: #00b5ff;
-  --color-destructive: #ff5861;
-  --color-glass-surface: rgba(255, 255, 255, 0.05);
-  --color-glass-border: rgba(255, 255, 255, 0.1);
-  --color-scrim: rgba(0, 0, 0, 0.5);
-
-  /* Radii */
-  --radius-box: 1.5rem;
-  --radius-btn: 0.75rem;
-  --radius-badge: 1.9rem;
-
-  /* Shadows */
-  --shadow-glass: 0 4px 30px rgba(0, 0, 0, 0.1);
+  --color-glass-border: rgba(255, 255, 255, 0.12);
+  --color-glass-highlight: rgba(255, 255, 255, 0.08);
 }
 
 @layer base {
-  /* Global Focus Visible Style */
-  :focus-visible {
-    @apply outline-accent outline-2 outline-offset-2 rounded-lg transition-all;
+  :root {
+    color-scheme: dark;
   }
 
-  /* Typographic Scale */
-  h1 {
-    @apply text-[32px] md:text-[36px] font-black leading-tight;
-  }
-  h2 {
-    @apply text-[20px] md:text-[24px] font-bold leading-snug;
-  }
   body {
-    @apply text-[14px] md:text-[16px] font-normal leading-relaxed;
-  }
-  .caption {
-    @apply text-[12px] md:text-[13px] font-normal;
-  }
-
-  /* Scrim Wrapper */
-  .scrim-wrapper {
-    position: relative;
-  }
-  .scrim-wrapper::before {
-    content: "";
-    @apply fixed inset-0 bg-scrim -z-10 pointer-events-none;
+    /* San Francisco Text clone stack + Vazirmatn for Persian */
+    font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    @apply antialiased tracking-tight text-white/90;
+    font-feature-settings: "cv11", "ss01";
   }
 
-  /* Liquid Glass Foundations */
-  .liquid-background {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    @apply font-bold tracking-tight text-white;
+  }
+
+  /* Premium Mesh Background */
+  .mesh-gradient {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #020205; /* Very Dark Blue/Black Base */
-    background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/static/img/background.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-color: #000000;
     z-index: -50;
     overflow: hidden;
   }
 
-  .blob {
+  .mesh-gradient::before {
+    content: '';
     position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.3;
-    z-index: -40;
-    animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-    mix-blend-mode: screen;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(10, 132, 255, 0.08), transparent 40%),
+      radial-gradient(circle at 80% 20%, rgba(94, 92, 230, 0.08), transparent 30%),
+      radial-gradient(circle at 20% 80%, rgba(48, 209, 88, 0.05), transparent 30%);
+    animation: mesh-spin 60s linear infinite;
+    filter: blur(60px);
+    opacity: 1;
   }
 
-  .blob-1 {
-    background: #100370;
-    width: 600px;
-    height: 600px;
-    top: -150px;
-    left: -150px;
-    animation-duration: 25s;
+  @keyframes mesh-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 
-  .blob-2 {
-    background: #850024;
-    width: 500px;
-    height: 500px;
-    bottom: -100px;
-    right: -100px;
-    animation-duration: 30s;
-    animation-delay: -5s;
-  }
-
-  .blob-3 {
-    background: #00b5ff;
-    width: 400px;
-    height: 400px;
-    top: 40%;
-    left: 40%;
-    opacity: 0.4;
-    animation-duration: 22s;
-    animation-delay: -8s;
-  }
-
-  @keyframes float {
-    0% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(120px, 60px) scale(1.1); }
-    66% { transform: translate(-60px, 80px) scale(0.95); }
-    100% { transform: translate(20px, -40px) scale(1.05); }
+  /* Scrim for heavy overlays */
+  .scrim-bg {
+    @apply fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity;
   }
 }
 
 @layer components {
-  /* Custom Glass Panel with Fallback */
-  .glass-panel {
-    @apply bg-black/20 border border-white/10 shadow-glass;
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+  /* Materials (Apple Style) */
+  .material-sidebar {
+    /* Chrome-like material for sidebars */
+    @apply bg-[#1C1C1E]/80 backdrop-blur-xl border-l border-white/5;
+    /* border-l because RTL layout puts sidebar on right usually, but we'll handle layout explicitly */
   }
 
-  /* Cards */
-  .card-glass {
-    /* Apply glass styles directly instead of @apply glass-panel */
-    @apply bg-black/20 border border-white/10 shadow-glass rounded-box p-6 md:p-8;
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+  .material-glass {
+    /* Standard Card Material */
+    @apply bg-[#1C1C1E]/60 backdrop-blur-lg border border-white/10 shadow-lg;
+    box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
   }
 
-  @supports not (backdrop-filter: blur(1px)) {
-    .glass-panel, .card-glass {
-      @apply bg-neutral-900/95;
-    }
+  .material-glass-heavy {
+    /* Modals / Popovers */
+    @apply bg-[#2C2C2E]/90 backdrop-blur-2xl border border-white/10 shadow-2xl;
   }
 
-  /* Utilities */
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom);
+  /* Typography Utilities */
+  .text-display {
+    @apply text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white to-white/50;
   }
 
-  /* Buttons */
-  .btn-primary {
-    @apply bg-accent text-black border-none font-black hover:scale-[1.02] transition-transform shadow-[0_0_20px_rgba(0,181,255,0.3)];
-  }
-  .btn-secondary {
-    @apply text-white border-white/20 font-bold hover:bg-white/10;
-  }
-  .btn-destructive {
-    @apply bg-destructive text-white border-none font-bold hover:bg-destructive/80;
+  .text-label {
+    @apply text-xs font-medium uppercase tracking-widest text-white/40;
   }
 
-  /* Inputs */
-  .input-standard {
-    @apply w-full h-[48px] px-4 bg-white/5 border-white/10 text-white placeholder-white/50 focus:bg-white/10 focus:border-accent focus:outline-none transition-all;
+  /* Form Elements */
+  .input-apple {
+    @apply w-full h-12 px-4 rounded-xl bg-white/5 border-none text-white placeholder-white/30 focus:bg-white/10 focus:ring-0 focus:outline-none transition-all;
+  }
+
+  .btn-apple {
+    @apply h-11 px-6 rounded-full font-semibold transition-all active:scale-95 duration-200 flex items-center justify-center gap-2;
+  }
+
+  .btn-apple-primary {
+    @apply h-11 px-6 rounded-full font-semibold transition-all active:scale-95 duration-200 flex items-center justify-center gap-2;
+    @apply bg-[#0A84FF] text-white hover:bg-[#0077ED] shadow-[0_4px_12px_rgba(10,132,255,0.4)] border-t border-white/10;
+  }
+
+  .btn-apple-secondary {
+    @apply h-11 px-6 rounded-full font-semibold transition-all active:scale-95 duration-200 flex items-center justify-center gap-2;
+    @apply bg-[#2C2C2E] text-white hover:bg-[#3A3A3C] border-t border-white/5;
+  }
+
+  .btn-apple-glass {
+    @apply h-11 px-6 rounded-full font-semibold transition-all active:scale-95 duration-200 flex items-center justify-center gap-2;
+    @apply bg-white/10 hover:bg-white/15 text-white backdrop-blur-md border border-white/5;
+  }
+
+  /* Scrollbar Hide */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

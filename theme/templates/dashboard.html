@@ -4,162 +4,166 @@
 {% block title %}آنالیز و آمار - ۳۶{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto pb-20">
-    <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
+<div class="space-y-8 animate-fade-in">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-end gap-4 pb-4 border-b border-white/5">
         <div>
-            <h1 class="text-4xl font-black text-primary">گزارش عملکرد</h1>
-            <p class="text-base-content/60 font-medium">نگاهی کلی به وضعیت کافه و فضای کار</p>
+            <h1 class="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">داشبورد</h1>
+            <p class="text-white/50 font-medium text-sm md:text-base">نگاهی کلی به وضعیت کافه و فضای کار</p>
         </div>
-        <div class="flex gap-2">
-            <div class="badge badge-lg badge-outline p-4 font-bold ltr">{{ now|date:"Y/m/d" }}</div>
-            <button onclick="location.reload()" class="btn btn-sm btn-circle">
+        <div class="flex items-center gap-3">
+            <div class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs md:text-sm font-mono ltr text-white/70">{{ now|date:"Y/m/d" }}</div>
+            <button onclick="location.reload()" class="btn-apple-glass w-10 h-10 p-0 rounded-full flex items-center justify-center hover:rotate-180 transition-transform duration-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
             </button>
         </div>
     </div>
 
-    <!-- 1. Top Level Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-        <div class="stats shadow-sm border border-base-200 bg-base-100">
-            <div class="stat">
-                <div class="stat-title text-xs font-bold opacity-50">درآمد کل کافه</div>
-                <div class="stat-value text-primary text-2xl">{{ cafe_total }}</div>
-                <div class="stat-desc font-bold text-success">امروز: {{ cafe_today }}</div>
+    <!-- 1. Top Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Cafe Rev -->
+        <div class="material-glass p-6 rounded-[1.5rem] relative overflow-hidden group hover:bg-white/10 transition-colors duration-300">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 blur-[50px] -z-10 group-hover:bg-primary/30 transition-all"></div>
+            <div class="text-label mb-2 text-white/60">درآمد کل کافه</div>
+            <div class="text-3xl font-black text-white mb-2 tracking-tight format-price">{{ cafe_total }}</div>
+            <div class="flex items-center gap-2">
+                <div class="w-1.5 h-1.5 rounded-full bg-accent"></div>
+                <div class="text-xs font-bold text-white/80">امروز: <span class="format-price text-accent">{{ cafe_today }}</span></div>
             </div>
         </div>
-        <div class="stats shadow-sm border border-base-200 bg-base-100">
-            <div class="stat">
-                <div class="stat-title text-xs font-bold opacity-50">درآمد فضای کار</div>
-                <div class="stat-value text-secondary text-2xl">{{ cowork_total }}</div>
-                <div class="stat-desc font-medium opacity-40">مجموع تراکنش‌ها</div>
+
+        <!-- Cowork Rev -->
+        <div class="material-glass p-6 rounded-[1.5rem] relative overflow-hidden group hover:bg-white/10 transition-colors duration-300">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-secondary/20 blur-[50px] -z-10 group-hover:bg-secondary/30 transition-all"></div>
+            <div class="text-label mb-2 text-white/60">درآمد فضای کار</div>
+            <div class="text-3xl font-black text-white mb-2 tracking-tight format-price">{{ cowork_total }}</div>
+            <div class="text-xs text-white/40 font-medium">مجموع تراکنش‌ها</div>
+        </div>
+
+        <!-- Occupancy -->
+        <div class="material-glass p-6 rounded-[1.5rem] relative overflow-hidden hover:bg-white/10 transition-colors duration-300">
+            <div class="text-label mb-2 text-white/60">نرخ اشغال فضا</div>
+            <div class="flex items-end gap-2 mb-3">
+                <div class="text-3xl font-black text-white tracking-tight">{{ occupancy_rate }}<span class="text-lg align-top opacity-50 font-normal">%</span></div>
+            </div>
+            <div class="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                <div class="bg-gradient-to-r from-primary to-accent h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(10,132,255,0.5)]" style="width: {{ occupancy_rate }}%"></div>
             </div>
         </div>
-        <div class="stats shadow-sm border border-base-200 bg-base-100">
-            <div class="stat">
-                <div class="stat-title text-xs font-bold opacity-50">نرخ اشغال فضا</div>
-                <div class="stat-value text-2xl">{{ occupancy_rate }}%</div>
-                <div class="stat-desc w-full mt-2">
-                    <progress class="progress progress-primary w-full" value="{{ occupancy_rate }}" max="100"></progress>
-                </div>
-            </div>
-        </div>
-        <div class="stats shadow-sm border border-base-200 bg-base-100">
-            <div class="stat">
-                <div class="stat-title text-xs font-bold opacity-50">رزروهای فعال</div>
-                <div class="stat-value text-2xl">{{ active_bookings }}</div>
-                <div class="stat-desc font-medium opacity-40">از مجموع {{ total_spaces }} فضا</div>
-            </div>
+
+        <!-- Active Bookings -->
+        <div class="material-glass p-6 rounded-[1.5rem] relative overflow-hidden hover:bg-white/10 transition-colors duration-300">
+            <div class="text-label mb-2 text-white/60">رزروهای فعال</div>
+            <div class="text-3xl font-black text-white mb-2 tracking-tight">{{ active_bookings }}</div>
+            <div class="text-xs text-white/40 font-medium">از مجموع {{ total_spaces }} فضا</div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- 2. Cafe Detailed Stats -->
-        <div class="card bg-base-100 shadow-sm border border-base-200">
-            <div class="card-body p-0">
-                <div class="p-6 border-b border-base-200 flex justify-between items-center">
-                    <h2 class="card-title font-black text-primary">پرفروش‌ترین‌های کافه</h2>
-                    <span class="badge badge-ghost">Top 5 Items</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="table table-zebra w-full">
-                        <thead>
-                            <tr class="opacity-50">
-                                <th>نام آیتم</th>
-                                <th class="text-center">تعداد</th>
-                                <th class="text-left">درآمد حاصله</th>
+    <!-- 2. Detailed Tables Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Top Items -->
+        <div class="material-glass rounded-[2rem] overflow-hidden flex flex-col h-full border border-white/10 shadow-lg">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md">
+                <h3 class="font-bold text-lg text-white tracking-tight">پرفروش‌ترین‌های کافه</h3>
+                <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/5 text-[10px] font-bold text-white/60 tracking-wider">TOP 5</span>
+            </div>
+            <div class="p-0 overflow-x-auto">
+                <table class="w-full text-sm text-right">
+                    <thead>
+                        <tr class="text-white/40 border-b border-white/5 text-xs uppercase tracking-wider">
+                            <th class="py-4 pr-6 font-medium">نام آیتم</th>
+                            <th class="py-4 text-center font-medium">تعداد</th>
+                            <th class="py-4 pl-6 text-left font-medium">درآمد</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for item in top_items %}
+                            <tr class="group hover:bg-white/5 transition-colors duration-200">
+                                <td class="py-4 pr-6 font-bold text-white group-hover:text-primary transition-colors">{{ item.menu_item__name }}</td>
+                                <td class="py-4 text-center">
+                                    <span class="inline-flex items-center justify-center h-6 px-2.5 rounded-full bg-white/5 text-xs font-bold text-white/80 border border-white/5">{{ item.total_qty }}</span>
+                                </td>
+                                <td class="py-4 pl-6 text-left font-mono text-white/70 format-price">{{ item.total_rev }}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in top_items %}
-                                <tr>
-                                    <td class="font-bold">{{ item.menu_item__name }}</td>
-                                    <td class="text-center">
-                                        <div class="badge badge-neutral font-black">{{ item.total_qty }}</div>
-                                    </td>
-                                    <td class="text-left font-medium text-xs">{{ item.total_rev }} <span class="opacity-40">تومان</span></td>
-                                </tr>
-                            {% empty %}
-                                <tr><td colspan="3" class="text-center opacity-30 py-8">داده‌ای یافت نشد</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                        {% empty %}
+                            <tr><td colspan="3" class="text-center opacity-30 py-12 text-sm">داده‌ای یافت نشد</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- 3. Cowork Detailed Stats -->
-        <div class="card bg-base-100 shadow-sm border border-base-200">
-            <div class="card-body p-0">
-                <div class="p-6 border-b border-base-200 flex justify-between items-center">
-                    <h2 class="card-title font-black text-secondary">مشتریان برتر (فضای کار)</h2>
-                    <span class="badge badge-ghost">Loyal Members</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="table table-zebra w-full">
-                        <thead>
-                            <tr class="opacity-50">
-                                <th>کاربر</th>
-                                <th class="text-center">تعداد رزرو</th>
-                                <th class="text-left">مجموع پرداختی</th>
+        <!-- Top Cowork Users -->
+        <div class="material-glass rounded-[2rem] overflow-hidden flex flex-col h-full border border-white/10 shadow-lg">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md">
+                <h3 class="font-bold text-lg text-white tracking-tight">مشتریان وفادار (فضای کار)</h3>
+            </div>
+            <div class="p-0 overflow-x-auto">
+                <table class="w-full text-sm text-right">
+                    <thead>
+                        <tr class="text-white/40 border-b border-white/5 text-xs uppercase tracking-wider">
+                            <th class="py-4 pr-6 font-medium">کاربر</th>
+                            <th class="py-4 text-center font-medium">رزرو</th>
+                            <th class="py-4 pl-6 text-left font-medium">پرداختی</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for member in top_cowork_members %}
+                            <tr class="group hover:bg-white/5 transition-colors duration-200">
+                                <td class="py-4 pr-6">
+                                    <div class="font-bold text-white group-hover:text-secondary transition-colors">{{ member.user__full_name|default:"کاربر بدون نام" }}</div>
+                                    <div class="text-[10px] opacity-40 font-mono tracking-wider mt-0.5">{{ member.user__phone_number }}</div>
+                                </td>
+                                <td class="py-4 text-center">
+                                    <span class="font-black text-secondary text-lg">{{ member.total_bookings }}</span>
+                                </td>
+                                <td class="py-4 pl-6 text-left font-mono text-secondary/80 format-price">{{ member.total_spent }}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {% for member in top_cowork_members %}
-                                <tr>
-                                    <td>
-                                        <div class="font-bold">{{ member.user__full_name|default:"کاربر بدون نام" }}</div>
-                                        <div class="text-[10px] opacity-50 ltr text-right">{{ member.user__phone_number }}</div>
-                                    </td>
-                                    <td class="text-center font-black">{{ member.total_bookings }}</td>
-                                    <td class="text-left font-medium text-xs text-secondary">{{ member.total_spent }} <span class="opacity-40">تومان</span></td>
-                                </tr>
-                            {% empty %}
-                                <tr><td colspan="3" class="text-center opacity-30 py-8">داده‌ای یافت نشد</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                        {% empty %}
+                            <tr><td colspan="3" class="text-center opacity-30 py-12 text-sm">داده‌ای یافت نشد</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- 4. Top Cafe Buyers -->
-        <div class="card bg-base-100 shadow-sm border border-base-200 lg:col-span-2">
-            <div class="card-body p-0">
-                <div class="p-6 border-b border-base-200">
-                    <h2 class="card-title font-black text-primary">مشتریان وفادار کافه</h2>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="table table-zebra w-full">
-                        <thead>
-                            <tr class="opacity-50">
-                                <th>نام مشتری / شماره تماس</th>
-                                <th class="text-left">مجموع خرید</th>
+        <!-- Top Cafe Buyers -->
+        <div class="material-glass rounded-[2rem] overflow-hidden flex flex-col h-full border border-white/10 shadow-lg lg:col-span-2">
+            <div class="p-6 border-b border-white/5 bg-white/5 backdrop-blur-md">
+                <h3 class="font-bold text-lg text-white tracking-tight">مشتریان برتر کافه</h3>
+            </div>
+            <div class="p-0 overflow-x-auto">
+                <table class="w-full text-sm text-right">
+                    <thead>
+                        <tr class="text-white/40 border-b border-white/5 text-xs uppercase tracking-wider">
+                            <th class="py-4 pr-6 font-medium">مشتری</th>
+                            <th class="py-4 pl-6 text-left font-medium">مجموع خرید</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for buyer in top_cafe_buyers %}
+                            <tr class="group hover:bg-white/5 transition-colors duration-200">
+                                <td class="py-4 pr-6 flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary/80 to-primary/20 flex items-center justify-center text-sm font-black shadow-lg shadow-primary/20 text-white border border-white/10">
+                                        {{ buyer.user__full_name|slice:":1" }}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-white group-hover:text-primary transition-colors">{{ buyer.user__full_name|default:"مشتری حضوری" }}</div>
+                                        <div class="text-[10px] opacity-40 font-mono tracking-wider mt-0.5">{{ buyer.user__phone_number }}</div>
+                                    </div>
+                                </td>
+                                <td class="py-4 pl-6 text-left font-black text-primary text-lg format-price">{{ buyer.total_spent }}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {% for buyer in top_cafe_buyers %}
-                                <tr>
-                                    <td class="flex items-center gap-3">
-                                        <div class="avatar placeholder">
-                                            <div class="bg-primary/10 text-primary rounded-full w-8">
-                                                <span class="text-xs font-black">{{ buyer.user__full_name|slice:":1" }}</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold">{{ buyer.user__full_name|default:"مشتری حضوری" }}</div>
-                                            <div class="text-[10px] opacity-50 ltr text-right">{{ buyer.user__phone_number }}</div>
-                                        </div>
-                                    </td>
-                                    <td class="text-left font-black text-primary">{{ buyer.total_spent }} <span class="text-[10px] font-normal opacity-40">تومان</span></td>
-                                </tr>
-                            {% empty %}
-                                <tr><td colspan="2" class="text-center opacity-30 py-8">داده‌ای یافت نشد</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                        {% empty %}
+                            <tr><td colspan="2" class="text-center opacity-30 py-12 text-sm">داده‌ای یافت نشد</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
+
     </div>
 </div>
 {% endblock %}
