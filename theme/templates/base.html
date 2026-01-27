@@ -123,6 +123,7 @@
     <!-- Premium Mesh Gradient Background -->
     <div class="mesh-gradient"></div>
     <div class="hidden">{% csrf_token %}</div>
+    <div class="rtl:left-0 rtl:right-auto hidden"></div>
 
     <!-- Desktop Sidebar -->
     <aside class="hidden md:flex flex-col w-[280px] h-full material-sidebar p-6 z-50">
@@ -230,6 +231,7 @@
         <!-- Mobile Header -->
         <header class="md:hidden h-16 shrink-0 flex items-center justify-between px-4 z-40 material-glass sticky top-0">
             <a href="{% url 'accounts:home' %}" class="text-2xl font-black tracking-tighter text-white">۳۶</a>
+            <div class="flex-1 justify-center flex"></div>
 
             {% if user.is_authenticated %}
                 <a href="{% url 'accounts:profile' %}" class="avatar placeholder">

@@ -4,13 +4,15 @@ from .views import (
     menu_view, add_to_cart, remove_from_cart, cart_detail, 
     checkout, order_list, barista_dashboard, update_order_status, 
     toggle_order_payment, admin_dashboard, manual_order_entry, 
-    manage_menu_stock, MenuItemViewSet, customer_lookup
+    manage_menu_stock, MenuItemViewSet, PublicMenuItemViewSet,
+    customer_lookup, reorder_order
 )
 
 app_name = 'cafe'
 
 router = DefaultRouter()
 router.register(r'menu-items', MenuItemViewSet)
+router.register(r'public/menu', PublicMenuItemViewSet, basename='public-menu')
 
 urlpatterns = [
     path('menu/', menu_view, name='menu'),
@@ -19,6 +21,7 @@ urlpatterns = [
     path('cart/remove/<int:item_id>/', remove_from_cart, name='remove_from_cart'),
     path('checkout/', checkout, name='checkout'),
     path('orders/', order_list, name='order_list'),
+    path('orders/<int:order_id>/reorder/', reorder_order, name='reorder_order'),
     
     # Barista Views
     path('dashboard/', barista_dashboard, name='barista_dashboard'),

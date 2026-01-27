@@ -1,5 +1,7 @@
 import re
 from django.core.exceptions import PermissionDenied
+from django.core.cache import cache
+from time import time
 
 def normalize_digits(text):
     """
@@ -15,6 +17,35 @@ def normalize_digits(text):
     }
     
     return ''.join(mapping.get(char, char) for char in text)
+
+
+def _client_identifier(request):
+    """
+    Returns a stable identifier for throttling: user id if authenticated else IP.
+    """
+    if hasattr(request, "user") and request.user.is_authenticated:
+        return f"user:{request.user.id}"
+    return f"ip:{request.META.get('REMOTE_ADDR', 'unknown')}"
+
+
+def rate_limit(request, scope: str, limit: int, window_seconds: int) -> bool:
+    """
+    Simple fixed-window rate limiter using Django cache.
+    Returns True if the request is allowed, False if rate limit exceeded.
+    """
+    ident = _client_identifier(request)
+    key = f"ratelimit:{scope}:{ident}"
+    now = int(time())
+    window_start = now - (now % window_seconds)
+    window_key = f"{key}:{window_start}"
+    current = cache.get(window_key)
+    if current is None:
+        cache.set(window_key, 1, timeout=window_seconds)
+        return True
+    if current >= limit:
+        return False
+    cache.incr(window_key)
+    return True
 
 def admin_required(view_func):
     def wrap(request, *args, **kwargs):

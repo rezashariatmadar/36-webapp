@@ -3,12 +3,12 @@
     {% for zone in zones_with_spaces %}
         {% if zone.spaces %}
         <div class="collapse collapse-arrow join-item border-white/5 group">
-            <input type="radio" name="zone-accordion" {% if forloop.first %}checked="checked"{% endif %} /> 
-            <div class="collapse-title text-xl font-black flex items-center gap-4 py-6">
+            <input type="radio" name="zone-accordion" id="zone-{{ forloop.counter }}" {% if forloop.first %}checked="checked"{% endif %} /> 
+            <label class="collapse-title text-xl font-black flex items-center gap-4 py-6 cursor-pointer" for="zone-{{ forloop.counter }}">
                 <div class="w-2 h-8 bg-accent rounded-full group-hover:h-12 transition-all duration-300"></div>
                 {{ zone.label }}
                 <span class="badge badge-ghost glass-panel badge-sm opacity-50 text-white">{{ zone.spaces|length }} مورد</span>
-            </div>
+            </label>
             <div class="collapse-content"> 
                 <div class="py-6 px-4">
                     {% if zone.code == 'SHARED_DESK' %}
@@ -16,14 +16,14 @@
                         <div class="join join-vertical w-full border border-white/10 rounded-2xl overflow-hidden shadow-sm">
                             {% for parent in zone.spaces %}
                                 <div class="collapse collapse-plus join-item border-b border-white/5 bg-white/5">
-                                    <input type="checkbox" name="parent-accordion" /> 
-                                    <div class="collapse-title text-lg font-bold flex justify-between items-center px-6 py-4">
+                                    <input type="checkbox" name="parent-accordion" id="parent-{{ parent.id }}" /> 
+                                    <label class="collapse-title text-lg font-bold flex justify-between items-center px-6 py-4 cursor-pointer" for="parent-{{ parent.id }}">
                                         <span>{{ parent.name }}</span>
                                         <div class="flex items-center gap-2">
                                             <span class="badge badge-ghost glass-panel badge-sm text-white">{{ parent.capacity }} نفره</span>
                                             <span class="badge badge-accent badge-sm font-black">{{ parent.seats.all|length }} صندلی</span>
                                         </div>
-                                    </div>
+                                    </label>
                                     <div class="collapse-content px-6 bg-black/20">
                                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-6">
                                             {% for seat in parent.seats.all %}
@@ -103,7 +103,6 @@
                                         <div class="flex justify-between items-start mb-4">
                                             <div>
                                                 <h2 class="card-title text-xl font-black mb-1 text-white">{{ space.name }}</h2>
-                                                <span class="badge badge-sm glass-panel border-white/10 text-white/70">{{ space.get_zone_display }}</span>
                                             </div>
                                             <div class="flex items-center gap-1 text-xs font-bold opacity-50 text-white">
                                                 {{ space.capacity }} نفره

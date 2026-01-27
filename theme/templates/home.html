@@ -55,4 +55,11 @@
         </div>
     </div>
 </div>
+
+<!-- Minimal mobile bottom nav for UX test -->
+<nav class="btm-nav md:hidden fixed bottom-0 left-0 right-0 bg-black/70 text-white border-t border-white/10">
+    <a href="{% url 'cafe:menu' %}" class="flex-1 text-center py-3">منو</a>
+    <a href="{% url 'cafe:cart_detail' %}" class="flex-1 text-center py-3">سبد خرید</a>
+    <a href="{% url 'accounts:profile' %}" class="flex-1 text-center py-3">پروفایل</a>
+</nav>
 {% endblock %}

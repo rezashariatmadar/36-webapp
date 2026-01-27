@@ -1,6 +1,8 @@
 from django.db import models
 from django_jalali.db import models as jmodels
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
 
 class MenuCategory(models.Model):
     name = models.CharField(_("Category Name"), max_length=100)
@@ -14,12 +16,25 @@ class MenuCategory(models.Model):
     def __str__(self):
         return self.name
 
+
+def validate_image_size(image_field):
+    max_bytes = 5 * 1024 * 1024  # 5MB
+    if image_field and hasattr(image_field, 'size') and image_field.size > max_bytes:
+        raise ValidationError(_("Image size must be under 5MB."))
+
+
 class MenuItem(models.Model):
     name = models.CharField(_("Item Name"), max_length=200)
     description = models.TextField(_("Description"), blank=True)
     category = models.ForeignKey(MenuCategory, related_name='items', on_delete=models.CASCADE, verbose_name=_("Category"))
     price = models.DecimalField(_("Price (Toman)"), max_digits=12, decimal_places=0)
-    image = models.ImageField(_("Image"), upload_to='menu_items/', blank=True, null=True)
+    image = models.ImageField(
+        _("Image"),
+        upload_to='menu_items/',
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp']), validate_image_size]
+    )
     is_available = models.BooleanField(_("Is Available"), default=True)
     created_at = jmodels.jDateTimeField(auto_now_add=True)
     updated_at = jmodels.jDateTimeField(auto_now=True)
@@ -27,6 +42,9 @@ class MenuItem(models.Model):
     class Meta:
         verbose_name = _("Menu Item")
         verbose_name_plural = _("Menu Items")
+        constraints = [
+            models.UniqueConstraint(fields=['category', 'name'], name='unique_menu_item_per_category')
+        ]
 
     def __str__(self):
         return self.name

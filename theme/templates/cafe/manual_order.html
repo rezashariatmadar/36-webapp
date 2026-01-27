@@ -5,12 +5,12 @@
 
 {% block content %}
 <div class="max-w-5xl mx-auto">
-    <div class="mb-10 flex justify-between items-end">
+    <div class="mb-8 md:mb-10 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-            <h1 class="text-3xl font-black text-primary">ثبت سفارش حضوری</h1>
+            <h1 class="text-3xl md:text-4xl font-black text-white">ثبت سفارش حضوری</h1>
             <p class="text-sm opacity-60">ویژه مشتریان گذری و ثبت دستی</p>
         </div>
-        <a href="{% url 'cafe:barista_dashboard' %}" class="btn btn-ghost btn-sm">بازگشت به داشبورد</a>
+        <a href="{% url 'cafe:barista_dashboard' %}" class="btn-apple-glass">بازگشت به داشبورد</a>
     </div>
 
     <form method="post" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -18,39 +18,39 @@
         
         <!-- Left: Categorized Item Selection -->
         <div class="lg:col-span-2 space-y-4">
-            <div class="join join-vertical w-full bg-base-100 shadow-sm border border-base-200">
+            <div class="join join-vertical w-full material-glass border border-white/10 overflow-hidden rounded-3xl">
                 {% for category in categories %}
                     {% if category.items.all %}
-                    <div class="collapse collapse-arrow join-item border-b border-base-200">
+                    <div class="collapse collapse-arrow join-item border-b border-white/10">
                         <input type="checkbox" name="cat-accordion" {% if forloop.first %}checked{% endif %} /> 
-                        <div class="collapse-title text-lg font-bold flex items-center gap-3">
-                            <span class="w-2 h-6 bg-secondary rounded-full"></span>
+                        <div class="collapse-title text-lg font-black flex items-center gap-3 text-white/90">
+                            <span class="w-2 h-6 bg-accent rounded-full"></span>
                             {{ category.name }}
                         </div>
-                        <div class="collapse-content bg-base-200/20"> 
+                        <div class="collapse-content bg-white/5"> 
                             <div class="grid grid-cols-1 gap-3 py-4">
                                 {% for item in category.items.all %}
                                     {% if item.is_available %}
-                                    <div class="flex items-center justify-between p-4 bg-base-100 rounded-2xl border border-base-200 group hover:border-primary/30 transition-all">
+                                    <div class="flex items-center justify-between p-4 glass-panel rounded-2xl border border-white/10 group hover:border-accent/40 transition-all">
                                         <div>
-                                            <div class="font-black text-sm">{{ item.name }}</div>
-                                            <div class="text-[10px] opacity-50">{{ item.price }} تومان</div>
+                                            <div class="font-black text-sm text-white">{{ item.name }}</div>
+                                            <div class="text-[10px] opacity-60 format-price">{{ item.price }}</div>
                                         </div>
                                         
                                         <!-- Quantity Control -->
-                                        <div class="flex items-center gap-3 bg-base-200 p-1 rounded-xl">
+                                        <div class="flex items-center gap-3 bg-white/10 p-1 rounded-xl">
                                             <button type="button" 
                                                     onclick="changeQty('qty_{{ item.id }}', -1)"
-                                                    class="btn btn-xs btn-circle btn-ghost">-</button>
+                                                    class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80 text-sm font-black">-</button>
                                             <input type="number" 
                                                    name="qty_{{ item.id }}" 
                                                    id="qty_{{ item.id }}" 
                                                    value="0" 
                                                    min="0"
-                                                   class="w-10 text-center bg-transparent border-none font-bold text-sm focus:ring-0 appearance-none pointer-events-none">
+                                                   class="w-10 text-center bg-transparent border-none font-bold text-sm text-white focus:ring-0 appearance-none pointer-events-none">
                                             <button type="button" 
                                                     onclick="changeQty('qty_{{ item.id }}', 1)"
-                                                    class="btn btn-xs btn-circle btn-ghost">+</button>
+                                                    class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80 text-sm font-black">+</button>
                                         </div>
                                     </div>
                                     {% endif %}
@@ -65,25 +65,25 @@
 
         <!-- Right: Customer Info & Submit -->
         <div class="space-y-6">
-            <div class="card bg-base-100 shadow-xl border border-primary/20 sticky top-24 rounded-3xl overflow-hidden">
-                <div class="card-body p-6">
-                    <h2 class="card-title text-primary font-black mb-4">جزئیات سفارش</h2>
+            <div class="material-glass border border-white/10 sticky top-24 rounded-3xl overflow-hidden">
+                <div class="p-6">
+                    <h2 class="text-xl font-black mb-4 text-white">جزئیات سفارش</h2>
                     
                     <div class="form-control w-full mb-4">
-                        <label class="label"><span class="label-text font-bold">شماره تماس (اختیاری)</span></label>
+                        <label class="label"><span class="label-text font-bold text-white/70">شماره تماس (اختیاری)</span></label>
                         <input type="text" name="phone_number" value="{{ initial_phone }}" 
-                               class="input input-bordered w-full ltr bg-base-200 rounded-2xl" placeholder="09xxxxxxxxx">
+                               class="input-apple ltr rounded-2xl" placeholder="09xxxxxxxxx">
                     </div>
 
                     <div class="form-control w-full mb-6">
-                        <label class="label"><span class="label-text font-bold">یادداشت / میز</span></label>
-                        <textarea name="notes" class="textarea textarea-bordered h-24 bg-base-200 rounded-2xl" 
+                        <label class="label"><span class="label-text font-bold text-white/70">یادداشت / میز</span></label>
+                        <textarea name="notes" class="h-24 bg-white/5 border border-white/10 rounded-2xl p-3 text-white placeholder-white/30 focus:outline-none focus:ring-0" 
                                   placeholder="مثال: بیرون‌بر یا میز شماره ۴"></textarea>
                     </div>
 
                     <div class="divider opacity-10"></div>
 
-                    <button type="submit" class="btn btn-primary w-full font-black text-lg h-16 shadow-xl shadow-primary/20 rounded-2xl">
+                    <button type="submit" class="btn-apple-primary w-full font-black text-lg h-16 shadow-xl shadow-primary/20 rounded-2xl">
                         ثبت نهایی سفارش
                     </button>
                 </div>
@@ -102,11 +102,11 @@
         // Visual feedback
         const parent = input.closest('.flex');
         if (val > 0) {
-            parent.classList.add('bg-primary/10');
-            parent.classList.remove('bg-base-200');
+            parent.classList.add('bg-accent/10');
+            parent.classList.remove('bg-white/10');
         } else {
-            parent.classList.remove('bg-primary/10');
-            parent.classList.add('bg-base-200');
+            parent.classList.remove('bg-accent/10');
+            parent.classList.add('bg-white/10');
         }
     }
 </script>

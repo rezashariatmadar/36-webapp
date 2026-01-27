@@ -5,14 +5,13 @@
 
 {% block content %}
 <div class="pb-32 text-white">
-    
-    <div class="text-center mb-8 p-10 glass-panel rounded-3xl">
-        <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent mb-4 tracking-tight">منوی ۳۶</h1>
-        <p class="opacity-70 font-bold text-lg">تجربه‌ای متفاوت از طعم‌ها</p>
+    <div class="text-center mb-6 md:mb-8 p-6 md:p-10 glass-panel rounded-3xl max-w-5xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent mb-4 tracking-tight">منوی ۳۶</h1>
+        <p class="opacity-70 font-bold text-base md:text-lg">تجربه‌ای متفاوت از طعم‌ها</p>
     </div>
 
-    <div class="sticky top-24 z-40 flex justify-center w-full mb-12">
-        <div class="glass-panel bg-black/60 backdrop-blur-xl border border-white/10 px-4 py-3 overflow-x-auto no-scrollbar flex gap-3 snap-x shadow-2xl rounded-2xl w-fit max-w-full" id="category-nav">
+    <div class="sticky top-20 md:top-6 z-40 w-full mb-8 md:mb-12">
+        <div class="glass-panel bg-black/60 backdrop-blur-xl border border-white/10 px-3 md:px-4 py-2 md:py-3 overflow-x-auto no-scrollbar flex gap-2 md:gap-3 snap-x shadow-2xl rounded-2xl w-full max-w-5xl mx-auto" id="category-nav">
             {% for category in categories %}
                 {% if category.items.all %}
                     <a href="#category-{{ category.id }}" 
@@ -26,10 +25,10 @@
         </div>
     </div>
 
-    <div class="space-y-20 max-w-4xl mx-auto px-1">
+    <div class="space-y-16 md:space-y-20 max-w-5xl mx-auto px-1">
         {% for category in categories %}
             {% if category.items.all %}
-                <section id="category-{{ category.id }}" class="scroll-mt-48 section-category">
+                <section id="category-{{ category.id }}" class="scroll-mt-40 md:scroll-mt-32 section-category">
                     <div class="flex items-center gap-4 mb-8">
                         <div class="h-10 w-2 bg-accent rounded-full shadow-lg shadow-accent/20"></div>
                         <h2 class="text-3xl font-black tracking-tight">{{ category.name }}</h2>

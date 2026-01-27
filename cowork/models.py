@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django_jalali.db import models as jmodels
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -128,6 +129,13 @@ class Booking(models.Model):
         verbose_name = _("Booking")
         verbose_name_plural = _("Bookings")
         ordering = ['-start_time']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['space', 'start_time', 'end_time'],
+                condition=~Q(status__in=['CANCELLED', 'REFUNDED']),
+                name='unique_active_booking_slot'
+            ),
+        ]
 
     def __str__(self):
         return f"{self.user} - {self.space} ({self.start_time})"
@@ -194,7 +202,7 @@ class Booking(models.Model):
             
             overlapping = Booking.objects.filter(
                 space=self.space,
-                status=self.Status.CONFIRMED,
+                status__in=[self.Status.PENDING_PAYMENT, self.Status.CONFIRMED, self.Status.COMPLETED],
                 start_time__lt=self.end_time,
                 end_time__gt=self.start_time
             ).exclude(pk=self.pk)

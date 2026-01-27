@@ -2,6 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import CustomUser
 from .forms_mixins import DigitNormalizationMixin
+import jdatetime
 
 class UserRegistrationForm(DigitNormalizationMixin, forms.ModelForm):
     normalize_fields = ['phone_number', 'national_id']
@@ -44,6 +45,21 @@ class ProfileForm(DigitNormalizationMixin, forms.ModelForm):
             'birth_date': forms.TextInput(attrs={'class': 'input-standard jalali-date', 'placeholder': '----/--/--'}),
             'full_name': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': 'نام و نام خانوادگی'}),
         }
+
+    def clean_birth_date(self):
+        value = self.cleaned_data.get('birth_date')
+        if not value:
+            return value
+
+        if isinstance(value, str):
+            try:
+                parts = [int(p) for p in value.replace('-', '/').split('/') if p]
+                if len(parts) != 3:
+                    raise ValueError
+                value = jdatetime.date(parts[0], parts[1], parts[2])
+            except Exception:
+                raise forms.ValidationError(_("Invalid birth date format. Use YYYY/MM/DD."))
+        return value
 
 from django.contrib.auth.forms import AuthenticationForm
 

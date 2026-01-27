@@ -6,9 +6,10 @@ from django.views.generic import CreateView
 from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from .forms import UserRegistrationForm, CustomAuthenticationForm, ProfileForm
 from .models import CustomUser
-from .utils import admin_required
+from .utils import admin_required, rate_limit
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import serializers
@@ -18,6 +19,9 @@ VALID_ROLES = ('Admin', 'Barista', 'Customer')
 @login_required
 def profile_view(request):
     if request.method == 'POST':
+        if not rate_limit(request, scope="profile_update", limit=5, window_seconds=300):
+            messages.error(request, "Too many profile updates. Please wait a few minutes.")
+            return redirect('accounts:profile')
         form = ProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
@@ -36,8 +40,21 @@ class UserListAPI(APIView):
     def get(self, request):
         if not (request.user.is_authenticated and request.user.is_admin):
             return Response({"detail": "Permission denied"}, status=403)
-        users = CustomUser.objects.all()
-        serializer = UserSerializer(users, many=True)
+        qs = CustomUser.objects.order_by("id")
+        if "page" in request.GET or "page_size" in request.GET:
+            page = max(int(request.GET.get("page", 1)), 1)
+            page_size = min(max(int(request.GET.get("page_size", 25)), 1), 100)
+            offset = (page - 1) * page_size
+            total = qs.count()
+            users = qs[offset:offset + page_size]
+            serializer = UserSerializer(users, many=True)
+            return Response({
+                "count": total,
+                "page": page,
+                "page_size": page_size,
+                "results": serializer.data,
+            })
+        serializer = UserSerializer(qs, many=True)
         return Response(serializer.data)
 
 @admin_required
@@ -78,6 +95,7 @@ def admin_user_list(request):
     })
 
 @admin_required
+@require_POST
 def toggle_user_status(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     user.is_active = not user.is_active
@@ -88,7 +106,7 @@ def toggle_user_status(request, user_id):
 @admin_required
 def change_user_role(request, user_id, new_role):
     user = get_object_or_404(CustomUser, id=user_id)
-    
+
     if new_role not in VALID_ROLES:
         messages.error(request, "Invalid role selected.")
         return redirect('accounts:user_list')
@@ -120,6 +138,9 @@ class RegisterView(CreateView):
     success_url = reverse_lazy('accounts:login')
 
     def form_valid(self, form):
+        if not rate_limit(self.request, scope="register", limit=5, window_seconds=900):
+            messages.error(self.request, "Too many sign-up attempts. Please try again later.")
+            return redirect('accounts:register')
         response = super().form_valid(form)
         customer_group, created = Group.objects.get_or_create(name='Customer')
         self.object.groups.add(customer_group)
@@ -128,6 +149,12 @@ class RegisterView(CreateView):
 class CustomLoginView(LoginView):
     authentication_form = CustomAuthenticationForm
     template_name = 'registration/login.html'
+
+    def post(self, request, *args, **kwargs):
+        if not rate_limit(request, scope="login", limit=10, window_seconds=300):
+            messages.error(request, "Too many login attempts. Please wait a few minutes.")
+            return redirect('accounts:login')
+        return super().post(request, *args, **kwargs)
 
 def home_view(request):
     return render(request, 'home.html')
