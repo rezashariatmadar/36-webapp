@@ -45,15 +45,15 @@ module.exports = {
           "warning": "#FFD60A",
           "error": "#FF453A",        // iOS System Red
           
-          "--rounded-box": "1.25rem",  // iOS 20pt
+          "--rounded-box": "1.5rem",   // Slightly softer, more liquid
           "--rounded-btn": "9999px",   // Pill shape default
           "--rounded-badge": "9999px",
           "--animation-btn": "0.2s",
           "--animation-input": "0.2s",
           "--btn-focus-scale": "0.98",
-          "--border-btn": "0px",       // Apple style often uses no border or 1px subtle
+          "--border-btn": "1px",       // Subtle edge for liquid glass
           "--tab-border": "0px",
-          "--tab-radius": "0.5rem",
+          "--tab-radius": "0.75rem",
         },
       },
     ],

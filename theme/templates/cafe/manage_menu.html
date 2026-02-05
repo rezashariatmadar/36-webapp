@@ -10,7 +10,7 @@
         <a href="{% url 'cafe:barista_dashboard' %}" class="btn-apple-glass">بازگشت به داشبورد</a>
     </div>
 
-    <div class="material-glass border border-white/10 rounded-3xl p-6 mb-8">
+    <div class="material-glass glass-sheen hover-lift border border-white/10 rounded-3xl p-6 mb-8 fade-in-once">
         <h2 class="text-lg font-black text-white mb-4">افزودن آیتم جدید</h2>
         <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             {% csrf_token %}
@@ -28,7 +28,7 @@
 
             <div>
                 <label class="label"><span class="label-text text-white/70 font-bold">دسته‌بندی موجود</span></label>
-                <select name="category_id" class="w-full h-12 px-4 rounded-2xl bg-white/5 border border-white/10 text-white focus:bg-white/10 focus:outline-none">
+                <select name="category_id" class="w-full h-12 px-4 rounded-2xl glass-inset text-white focus:bg-white/10 focus:outline-none">
                     <option value="">انتخاب کنید</option>
                     {% for category in categories %}
                         <option value="{{ category.id }}" class="text-black">{{ category.name }}</option>
@@ -43,7 +43,7 @@
 
             <div class="md:col-span-2">
                 <label class="label"><span class="label-text text-white/70 font-bold">توضیحات (اختیاری)</span></label>
-                <textarea name="description" class="w-full min-h-[96px] bg-white/5 border border-white/10 rounded-2xl p-3 text-white placeholder-white/30 focus:outline-none focus:ring-0" placeholder="توضیح کوتاه آیتم"></textarea>
+                <textarea name="description" class="w-full min-h-[96px] glass-inset rounded-2xl p-3 text-white placeholder-white/30 focus:outline-none focus:ring-0" placeholder="توضیح کوتاه آیتم"></textarea>
             </div>
 
             <label class="flex items-center gap-2 text-sm font-bold text-white/70">
@@ -57,10 +57,10 @@
         </form>
     </div>
 
-    <div class="material-glass border border-white/10 rounded-3xl overflow-hidden">
+    <div class="material-glass glass-sheen hover-lift border border-white/10 rounded-3xl overflow-hidden fade-in-once">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-white/5 text-white/60">
+                <thead class="glass-header text-white/70">
                     <tr>
                         <th class="px-4 py-4 text-right font-bold">آیتم</th>
                         <th class="px-4 py-4 text-right font-bold">دسته‌بندی</th>
@@ -72,7 +72,7 @@
                         <tr class="hover:bg-white/5 transition-colors">
                             <td class="px-4 py-4"><span class="font-bold text-white">{{ item.name }}</span></td>
                             <td class="px-4 py-4">
-                                <span class="px-3 py-1 rounded-full text-[11px] font-black bg-white/10 text-white/70">
+                                <span class="px-3 py-1 rounded-full text-[11px] font-black glass-chip text-white/70">
                                     {{ item.category.name }}
                                 </span>
                             </td>

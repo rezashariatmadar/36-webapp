@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="view-transition" content="same-origin" />
     <title>{% block title %}۳۶ - کافی‌شاپ{% endblock %}</title>
+    <link rel="icon" type="image/webp" href="{% static 'img/36cowork/36-coworking-space.webp' %}">
+    <link rel="shortcut icon" type="image/webp" href="{% static 'img/36cowork/36-coworking-space.webp' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/36cowork/36-coworking-space.webp' %}">
     {% tailwind_css %}
     
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
@@ -121,7 +124,12 @@
 <body class="h-screen w-screen overflow-hidden bg-black text-white antialiased flex flex-col md:flex-row scrim-wrapper" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     
     <!-- Premium Mesh Gradient Background -->
-    <div class="mesh-gradient"></div>
+    <div class="mesh-gradient mesh-gradient--liquid"></div>
+    <div class="ambient-orbs">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
     <div class="hidden">{% csrf_token %}</div>
     <div class="rtl:left-0 rtl:right-auto hidden"></div>
 
@@ -129,7 +137,10 @@
     <aside class="hidden md:flex flex-col w-[280px] h-full material-sidebar p-6 z-50">
         <!-- Logo -->
         <div class="h-12 flex items-center px-2 mb-10">
-            <a href="{% url 'accounts:home' %}" class="text-4xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">۳۶</a>
+            <a href="{% url 'accounts:home' %}" class="flex items-center gap-3">
+                <img src="{% static 'img/36cowork/36-coworking-space.webp' %}" alt="فضای کار اشتراکی ۳۶" class="w-10 h-10 rounded-xl object-cover border border-white/10 shadow-lg">
+                <span class="sr-only">۳۶</span>
+            </a>
         </div>
 
         <!-- Navigation -->
@@ -229,8 +240,11 @@
     <main class="flex-1 flex flex-col h-full overflow-hidden relative">
 
         <!-- Mobile Header -->
-        <header class="md:hidden h-16 shrink-0 flex items-center justify-between px-4 z-40 material-glass sticky top-0">
-            <a href="{% url 'accounts:home' %}" class="text-2xl font-black tracking-tighter text-white">۳۶</a>
+        <header class="md:hidden h-16 shrink-0 flex items-center justify-between px-4 z-40 material-glass glass-header sticky top-0">
+            <a href="{% url 'accounts:home' %}" class="flex items-center gap-2">
+                <img src="{% static 'img/36cowork/36-coworking-space.webp' %}" alt="فضای کار اشتراکی ۳۶" class="w-9 h-9 rounded-lg object-cover border border-white/10 shadow">
+                <span class="sr-only">۳۶</span>
+            </a>
             <div class="flex-1 justify-center flex"></div>
 
             {% if user.is_authenticated %}
@@ -253,7 +267,7 @@
         </div>
 
         <!-- Mobile Bottom Tab Bar -->
-        <nav class="md:hidden fixed bottom-6 left-4 right-4 h-16 material-glass-heavy rounded-[2rem] z-50 flex justify-between items-center px-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/15">
+        <nav class="md:hidden fixed bottom-6 left-4 right-4 h-16 material-glass-heavy glass-rail rounded-[2rem] z-50 flex justify-between items-center px-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/15">
             <!-- Menu -->
             <a href="{% url 'cafe:menu' %}" class="flex flex-col items-center gap-1 transition-colors {% if request.resolver_match.url_name == 'menu' %}text-accent{% else %}text-white/50{% endif %}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -315,6 +329,59 @@
                 }
             }
         });
+    </script>
+
+    <script>
+        (function() {
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const supportsHover = window.matchMedia('(hover: hover)').matches;
+
+            const reveal = (el) => el.classList.add('is-visible');
+
+            const staggerTargets = document.querySelectorAll('.fade-up-stagger');
+            staggerTargets.forEach((el) => {
+                Array.from(el.children).forEach((child, index) => {
+                    child.style.setProperty('--stagger-index', index);
+                });
+            });
+
+            if (prefersReduced) {
+                document.querySelectorAll('.fade-in-once, .fade-up-stagger').forEach(reveal);
+            } else {
+                const io = new IntersectionObserver((entries, observer) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            reveal(entry.target);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15 });
+
+                document.querySelectorAll('.fade-in-once, .fade-up-stagger').forEach((el) => io.observe(el));
+            }
+
+            if (!prefersReduced && supportsHover) {
+                const magneticEls = document.querySelectorAll('.btn-apple-primary, .btn-apple-secondary, .btn-apple-glass, .btn-primary, .btn-secondary');
+                magneticEls.forEach((el) => {
+                    el.classList.add('magnetic');
+                    el.addEventListener('mousemove', (event) => {
+                        const rect = el.getBoundingClientRect();
+                        const relX = event.clientX - rect.left - rect.width / 2;
+                        const relY = event.clientY - rect.top - rect.height / 2;
+                        const max = 6;
+                        const strength = 0.08;
+                        const x = Math.max(-max, Math.min(max, relX * strength));
+                        const y = Math.max(-max, Math.min(max, relY * strength));
+                        el.style.setProperty('--magnet-x', `${x}px`);
+                        el.style.setProperty('--magnet-y', `${y}px`);
+                    });
+                    el.addEventListener('mouseleave', () => {
+                        el.style.setProperty('--magnet-x', '0px');
+                        el.style.setProperty('--magnet-y', '0px');
+                    });
+                });
+            }
+        })();
     </script>
 
 </body>

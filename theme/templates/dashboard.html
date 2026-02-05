@@ -13,7 +13,7 @@
             <p class="text-white/50 font-medium text-sm md:text-base">نگاهی کلی به وضعیت کافه و فضای کار</p>
         </div>
         <div class="flex items-center gap-3">
-            <div class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs md:text-sm font-mono ltr text-white/70">{{ now|date:"Y/m/d" }}</div>
+            <div class="px-4 py-2 rounded-full glass-chip text-xs md:text-sm font-mono ltr text-white/70">{{ now|date:"Y/m/d" }}</div>
             <button onclick="location.reload()" class="btn-apple-glass w-10 h-10 p-0 rounded-full flex items-center justify-center hover:rotate-180 transition-transform duration-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
             </button>
@@ -21,9 +21,9 @@
     </div>
 
     <!-- 1. Top Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 fade-in-once">
         <!-- Cafe Rev -->
-        <div class="material-glass p-6 rounded-[1.5rem] relative overflow-hidden group hover:bg-white/10 transition-colors duration-300">
+        <div class="material-glass glass-sheen hover-lift p-6 rounded-[1.5rem] relative overflow-hidden group hover:bg-white/10 transition-colors duration-300">
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 blur-[50px] -z-10 group-hover:bg-primary/30 transition-all"></div>
             <div class="text-label mb-2 text-white/60">درآمد کل کافه</div>
             <div class="text-3xl font-black text-white mb-2 tracking-tight format-price">{{ cafe_total }}</div>
@@ -34,7 +34,7 @@
         </div>
 
         <!-- Cowork Rev -->
-        <div class="material-glass p-6 rounded-[1.5rem] relative overflow-hidden group hover:bg-white/10 transition-colors duration-300">
+        <div class="material-glass glass-sheen hover-lift p-6 rounded-[1.5rem] relative overflow-hidden group hover:bg-white/10 transition-colors duration-300">
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-secondary/20 blur-[50px] -z-10 group-hover:bg-secondary/30 transition-all"></div>
             <div class="text-label mb-2 text-white/60">درآمد فضای کار</div>
             <div class="text-3xl font-black text-white mb-2 tracking-tight format-price">{{ cowork_total }}</div>
@@ -42,7 +42,7 @@
         </div>
 
         <!-- Occupancy -->
-        <div class="material-glass p-6 rounded-[1.5rem] relative overflow-hidden hover:bg-white/10 transition-colors duration-300">
+        <div class="material-glass glass-sheen hover-lift p-6 rounded-[1.5rem] relative overflow-hidden hover:bg-white/10 transition-colors duration-300">
             <div class="text-label mb-2 text-white/60">نرخ اشغال فضا</div>
             <div class="flex items-end gap-2 mb-3">
                 <div class="text-3xl font-black text-white tracking-tight">{{ occupancy_rate }}<span class="text-lg align-top opacity-50 font-normal">%</span></div>
@@ -53,7 +53,7 @@
         </div>
 
         <!-- Active Bookings -->
-        <div class="material-glass p-6 rounded-[1.5rem] relative overflow-hidden hover:bg-white/10 transition-colors duration-300">
+        <div class="material-glass glass-sheen hover-lift p-6 rounded-[1.5rem] relative overflow-hidden hover:bg-white/10 transition-colors duration-300">
             <div class="text-label mb-2 text-white/60">رزروهای فعال</div>
             <div class="text-3xl font-black text-white mb-2 tracking-tight">{{ active_bookings }}</div>
             <div class="text-xs text-white/40 font-medium">از مجموع {{ total_spaces }} فضا</div>
@@ -61,13 +61,13 @@
     </div>
 
     <!-- 2. Detailed Tables Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-in-once">
 
         <!-- Top Items -->
-        <div class="material-glass rounded-[2rem] overflow-hidden flex flex-col h-full border border-white/10 shadow-lg">
-            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md">
+        <div class="material-glass glass-sheen hover-lift rounded-[2rem] overflow-hidden flex flex-col h-full border border-white/10 shadow-lg">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center glass-header">
                 <h3 class="font-bold text-lg text-white tracking-tight">پرفروش‌ترین‌های کافه</h3>
-                <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/5 text-[10px] font-bold text-white/60 tracking-wider">TOP 5</span>
+                <span class="px-2.5 py-1 rounded-full glass-chip text-[10px] font-bold text-white/70 tracking-wider">TOP 5</span>
             </div>
             <div class="p-0 overflow-x-auto">
                 <table class="w-full text-sm text-right">
@@ -96,8 +96,8 @@
         </div>
 
         <!-- Top Cowork Users -->
-        <div class="material-glass rounded-[2rem] overflow-hidden flex flex-col h-full border border-white/10 shadow-lg">
-            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md">
+        <div class="material-glass glass-sheen hover-lift rounded-[2rem] overflow-hidden flex flex-col h-full border border-white/10 shadow-lg">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center glass-header">
                 <h3 class="font-bold text-lg text-white tracking-tight">مشتریان وفادار (فضای کار)</h3>
             </div>
             <div class="p-0 overflow-x-auto">
@@ -130,8 +130,8 @@
         </div>
 
         <!-- Top Cafe Buyers -->
-        <div class="material-glass rounded-[2rem] overflow-hidden flex flex-col h-full border border-white/10 shadow-lg lg:col-span-2">
-            <div class="p-6 border-b border-white/5 bg-white/5 backdrop-blur-md">
+        <div class="material-glass glass-sheen hover-lift rounded-[2rem] overflow-hidden flex flex-col h-full border border-white/10 shadow-lg lg:col-span-2">
+            <div class="p-6 border-b border-white/5 glass-header">
                 <h3 class="font-bold text-lg text-white tracking-tight">مشتریان برتر کافه</h3>
             </div>
             <div class="p-0 overflow-x-auto">

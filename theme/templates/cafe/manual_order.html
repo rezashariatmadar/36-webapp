@@ -18,7 +18,7 @@
         
         <!-- Left: Categorized Item Selection -->
         <div class="lg:col-span-2 space-y-4">
-            <div class="join join-vertical w-full material-glass border border-white/10 overflow-hidden rounded-3xl">
+            <div class="join join-vertical w-full material-glass glass-sheen hover-lift border border-white/10 overflow-hidden rounded-3xl fade-in-once">
                 {% for category in categories %}
                     {% if category.items.all %}
                     <div class="collapse collapse-arrow join-item border-b border-white/10">
@@ -27,7 +27,7 @@
                             <span class="w-2 h-6 bg-accent rounded-full"></span>
                             {{ category.name }}
                         </div>
-                        <div class="collapse-content bg-white/5"> 
+                        <div class="collapse-content glass-inset"> 
                             <div class="grid grid-cols-1 gap-3 py-4">
                                 {% for item in category.items.all %}
                                     {% if item.is_available %}
@@ -65,7 +65,7 @@
 
         <!-- Right: Customer Info & Submit -->
         <div class="space-y-6">
-            <div class="material-glass border border-white/10 sticky top-24 rounded-3xl overflow-hidden">
+            <div class="material-glass glass-sheen hover-lift border border-white/10 sticky top-24 rounded-3xl overflow-hidden fade-in-once">
                 <div class="p-6">
                     <h2 class="text-xl font-black mb-4 text-white">جزئیات سفارش</h2>
                     

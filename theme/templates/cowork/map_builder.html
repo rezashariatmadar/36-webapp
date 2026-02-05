@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="flex flex-col h-screen" x-data="mapBuilder()">
-    <div class="p-4 bg-black/50 backdrop-blur-md border-b border-white/10 flex justify-between items-center z-50">
+    <div class="p-4 glass-header border-b border-white/10 flex justify-between items-center z-50">
         <h1 class="text-xl font-bold">نقشه ساز (Map Builder)</h1>
         <div class="text-sm opacity-60">نقطه‌ها را بکشید و رها کنید. تغییرات خودکار ذخیره می‌شوند.</div>
     </div>
@@ -16,7 +16,7 @@
                 <div
                     draggable="true"
                     @dragstart="startDrag($event, space)"
-                    class="p-3 mb-2 bg-white/5 rounded-lg cursor-move hover:bg-white/10 transition-colors border border-white/5 group"
+                    class="p-3 mb-2 glass-inset rounded-lg cursor-move hover:bg-white/10 transition-colors group"
                 >
                     <div class="font-bold text-sm" x-text="space.name"></div>
                     <div class="text-[10px] text-white/50" x-text="space.zone_label"></div>
