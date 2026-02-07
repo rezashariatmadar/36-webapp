@@ -10,6 +10,7 @@
     <link rel="shortcut icon" type="image/webp" href="{% static 'img/36cowork/36-coworking-space.webp' %}">
     <link rel="apple-touch-icon" href="{% static 'img/36cowork/36-coworking-space.webp' %}">
     {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'js/reactbits-islands.css' %}">
     
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -19,6 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <script defer src="{% static 'js/reactbits-islands.js' %}?v=20260207"></script>
     
     <style>
         html, body {
@@ -51,73 +53,76 @@
     </style>
 
     <script>
-        $(document).ready(function() {
-            function formatPrices() {
-                $('.format-price').each(function() {
-                    const $el = $(this);
-                    const val = $el.text().replace(/[^0-9]/g, '');
-                    if (val) {
-                        $el.text(new Intl.NumberFormat('fa-IR').format(val) + ' تومان');
-                    }
-                });
-            }
-            
-            function initDatePicker() {
-                $('.jalali-date').each(function() {
-                    const $input = $(this);
-                    if ($input.data('datepicker-initialized')) return;
-                    
-                    $input.persianDatepicker({
-                        format: 'YYYY-MM-DD',
-                        autoClose: true,
-                        initialValue: false,
-                        observer: true,
-                        altField: $input,
-                        altFormat: 'YYYY-MM-DD',
-                        persianDigit: false,
-                        calendar: {
-                            persian: {
-                                leapYearMode: 'astronomical'
-                            }
-                        },
-                        onSelect: function(unix) {
-                            const formattedDate = new persianDate(unix).format('YYYY-MM-DD');
-                            $input.val(formattedDate);
-                            if (window.htmx) {
-                                htmx.trigger($input[0], 'change');
-                            }
+        if (typeof window.jQuery === 'function') {
+            const $ = window.jQuery;
+            $(document).ready(function() {
+                function formatPrices() {
+                    $('.format-price').each(function() {
+                        const $el = $(this);
+                        const val = $el.text().replace(/[^0-9]/g, '');
+                        if (val) {
+                            $el.text(new Intl.NumberFormat('fa-IR').format(val) + ' تومان');
                         }
                     });
-                    $input.data('datepicker-initialized', true);
-                });
-            }
+                }
+                
+                function initDatePicker() {
+                    $('.jalali-date').each(function() {
+                        const $input = $(this);
+                        if ($input.data('datepicker-initialized')) return;
+                        if (typeof $input.persianDatepicker !== 'function') return;
+                        
+                        $input.persianDatepicker({
+                            format: 'YYYY-MM-DD',
+                            autoClose: true,
+                            initialValue: false,
+                            observer: true,
+                            altField: $input,
+                            altFormat: 'YYYY-MM-DD',
+                            persianDigit: false,
+                            calendar: {
+                                persian: {
+                                    leapYearMode: 'astronomical'
+                                }
+                            },
+                            onSelect: function(unix) {
+                                const formattedDate = new persianDate(unix).format('YYYY-MM-DD');
+                                $input.val(formattedDate);
+                                if (window.htmx) {
+                                    htmx.trigger($input[0], 'change');
+                                }
+                            }
+                        });
+                        $input.data('datepicker-initialized', true);
+                    });
+                }
 
-            initDatePicker();
-            formatPrices();
-
-            document.addEventListener('htmx:afterSwap', function() {
                 initDatePicker();
                 formatPrices();
+
+                document.addEventListener('htmx:afterSwap', function() {
+                    initDatePicker();
+                    formatPrices();
+                });
             });
-        });
+        }
 
         document.addEventListener('htmx:responseError', function(event) {
             console.error('HTMX Response Error:', event.detail.xhr.status, event.detail.xhr.responseText);
         });
 
-        // Enable View Transitions for HTMX Swaps
+        // Enable HTMX view-transitions only for explicitly opted-in targets.
         document.addEventListener('htmx:beforeSwap', function(event) {
             if (!document.startViewTransition) return;
+            if (!event.detail || typeof event.detail.resume !== 'function') return;
 
-            // Only transition if it's a main content swap (optional refinement)
-            // For now, apply to all swaps for that fluid feel
+            const target = event.detail.target;
+            if (!(target instanceof HTMLElement) || !target.hasAttribute('data-view-transition-swap')) {
+                return;
+            }
 
             event.preventDefault();
-            const swap = () => {
-                event.detail.resume();
-            };
-
-            const transition = document.startViewTransition(swap);
+            document.startViewTransition(() => event.detail.resume());
         });
     </script>
 </head>
@@ -125,6 +130,7 @@
     
     <!-- Premium Mesh Gradient Background -->
     <div class="mesh-gradient mesh-gradient--liquid"></div>
+    <div data-rb-island="squares-bg" aria-hidden="true"></div>
     <div class="ambient-orbs">
         <span></span>
         <span></span>
@@ -152,7 +158,7 @@
                         <a href="{{ item.url }}"
                            class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-bold text-sm
                                   {% if item.is_active %}
-                                    bg-primary text-white shadow-[0_0_20px_rgba(10,132,255,0.3)]
+                                    bg-primary text-white shadow-[0_0_20px_rgba(16,3,112,0.4)]
                                   {% else %}
                                     text-white/60 hover:text-white hover:bg-white/5
                                   {% endif %}">
@@ -175,6 +181,17 @@
                     </a>
                 </li>
             </ul>
+            <div class="mt-4 px-4">
+                <div
+                    data-rb-island="glass-icons"
+                    data-items='[
+                      {"label":"منو","href":"{% url "cafe:menu" %}","color":"blue","icon":"menu"},
+                      {"label":"رزرو","href":"{% url "cowork:space_list" %}","color":"wine","icon":"desk"},
+                      {"label":"اینستا","href":"https://instagram.com/36.coworkingspace","color":"blend","icon":"instagram"},
+                      {"label":"تماس","href":"tel:09001655040","color":"blue","icon":"phone"}
+                    ]'
+                ></div>
+            </div>
         </nav>
 
         <!-- User Profile -->
@@ -267,7 +284,18 @@
         </div>
 
         <!-- Mobile Bottom Tab Bar -->
-        <nav class="md:hidden fixed bottom-6 left-4 right-4 h-16 material-glass-heavy glass-rail rounded-[2rem] z-50 flex justify-between items-center px-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/15">
+        <div
+            data-rb-island="gooey-nav"
+            data-items='[
+              {"label":"منو","href":"{% url "cafe:menu" %}","icon":"menu"},
+              {"label":"سبد","href":"{% url "cafe:cart_detail" %}","icon":"cart","badgeId":"cart-badge-mobile"},
+              {"label":"فضا","href":"{% url "cowork:space_list" %}","icon":"desk"}
+            ]'
+            data-cart-count="{{ cart_count|default:0 }}"
+            data-active-index="{% if request.resolver_match.url_name == 'menu' %}0{% elif request.resolver_match.url_name == 'cart_detail' %}1{% elif 'cowork' in request.path %}2{% else %}0{% endif %}"
+            class="md:hidden fixed bottom-6 left-4 right-4 h-16 material-glass-heavy glass-rail rounded-[2rem] z-50 flex items-center px-3 shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/15"
+        ></div>
+        <nav data-rb-fallback="gooey-nav" class="md:hidden fixed bottom-6 left-4 right-4 h-16 material-glass-heavy glass-rail rounded-[2rem] z-50 flex justify-between items-center px-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/15">
             <!-- Menu -->
             <a href="{% url 'cafe:menu' %}" class="flex flex-col items-center gap-1 transition-colors {% if request.resolver_match.url_name == 'menu' %}text-accent{% else %}text-white/50{% endif %}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -277,7 +305,7 @@
 
             <!-- Cart (Floating Action) -->
             <a href="{% url 'cafe:cart_detail' %}" class="flex flex-col items-center justify-center">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-[0_0_15px_rgba(10,132,255,0.4)] relative">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-[0_0_15px_rgba(16,3,112,0.5)] relative">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
@@ -386,3 +414,4 @@
 
 </body>
 </html>
+

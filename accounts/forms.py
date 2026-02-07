@@ -9,20 +9,20 @@ class UserRegistrationForm(DigitNormalizationMixin, forms.ModelForm):
     
     password = forms.CharField(
         label=_("Password"), 
-        widget=forms.PasswordInput(attrs={'placeholder': _('Password'), 'class': 'input-standard'})
+        widget=forms.PasswordInput(attrs={'placeholder': _('Password'), 'class': 'input-standard', 'autocomplete': 'new-password'})
     )
     confirm_password = forms.CharField(
         label=_("Confirm Password"), 
-        widget=forms.PasswordInput(attrs={'placeholder': _('Confirm Password'), 'class': 'input-standard'})
+        widget=forms.PasswordInput(attrs={'placeholder': _('Confirm Password'), 'class': 'input-standard', 'autocomplete': 'new-password'})
     )
 
     class Meta:
         model = CustomUser
         fields = ('phone_number', 'national_id', 'full_name')
         widgets = {
-            'phone_number': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': '09xxxxxxxxx'}),
-            'national_id': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': 'کد ملی ۱۰ رقمی'}),
-            'full_name': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': 'نام و نام خانوادگی'}),
+            'phone_number': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': '09xxxxxxxxx', 'autocomplete': 'tel'}),
+            'national_id': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': 'کد ملی ۱۰ رقمی', 'autocomplete': 'off'}),
+            'full_name': forms.TextInput(attrs={'class': 'input-standard', 'placeholder': 'نام و نام خانوادگی', 'autocomplete': 'name'}),
         }
 
     def clean_confirm_password(self):
@@ -68,9 +68,9 @@ class CustomAuthenticationForm(DigitNormalizationMixin, AuthenticationForm):
     
     username = forms.CharField(
         label=_("Phone Number"), 
-        widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': '09xxxxxxxxx', 'class': 'input-standard'})
+        widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': '09xxxxxxxxx', 'class': 'input-standard', 'autocomplete': 'username'})
     )
     password = forms.CharField(
         label=_("Password"), 
-        widget=forms.PasswordInput(attrs={'placeholder': '******', 'class': 'input-standard'})
+        widget=forms.PasswordInput(attrs={'placeholder': '******', 'class': 'input-standard', 'autocomplete': 'current-password'})
     )
