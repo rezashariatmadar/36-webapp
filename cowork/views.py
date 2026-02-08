@@ -1,15 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db.models import Exists, OuterRef
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from .models import Space, Booking, PricingPlan
+
 from .forms import BookingForm
-from django.db.models import Q, Exists, OuterRef
-from decimal import Decimal
-from django.contrib.admin.views.decorators import staff_member_required
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
+from .models import Booking, Space
 
 def space_list(request):
     # Refresh statuses based on current time
@@ -53,36 +49,26 @@ def space_list(request):
             'spaces': [s for s in all_top_level_spaces if s.zone == code]
         })
         
+    has_spaces = any(zone["spaces"] for zone in zones_with_spaces)
+
     if request.htmx:
-        return render(request, 'cowork/partials/zone_list.html', {
-            'zones_with_spaces': zones_with_spaces
-        })
+        return render(
+            request,
+            'cowork/partials/zone_list.html',
+            {
+                'zones_with_spaces': zones_with_spaces,
+                'has_spaces': has_spaces,
+            },
+        )
 
-    map_spaces = Space.objects.filter(is_active=True, x_pos__gt=0).select_related('pricing_plan')
-        
-    return render(request, 'cowork/space_list.html', {
-        'zones_with_spaces': zones_with_spaces,
-        'map_spaces': map_spaces,
-    })
-
-@staff_member_required
-def map_builder(request):
-    spaces = Space.objects.filter(is_active=True).order_by('zone', 'name')
-    return render(request, 'cowork/map_builder.html', {'spaces': spaces})
-
-@staff_member_required
-def update_space_coordinates(request, space_id):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            space = Space.objects.get(id=space_id)
-            space.x_pos = float(data.get('x'))
-            space.y_pos = float(data.get('y'))
-            space.save()
-            return JsonResponse({'status': 'success'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-    return JsonResponse({'status': 'invalid method'}, status=405)
+    return render(
+        request,
+        'cowork/space_list.html',
+        {
+            'zones_with_spaces': zones_with_spaces,
+            'has_spaces': has_spaces,
+        },
+    )
 
 @login_required
 def book_space(request, space_id):

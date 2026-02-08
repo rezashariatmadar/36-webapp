@@ -9,9 +9,11 @@ class BaseUITests(TestCase):
         """Verify that the base template contains the new Premium Mesh foundations."""
         response = self.client.get(reverse('accounts:home'))
         self.assertEqual(response.status_code, 200)
-        
-        # Check for the HTML structure
-        self.assertContains(response, '<div class="mesh-gradient"></div>')
+        self.assertContains(response, 'mesh-gradient')
+        self.assertContains(response, 'mesh-gradient--liquid')
+        self.assertContains(response, 'data-rb-island="squares-bg"')
+        self.assertContains(response, 'data-rb-island="glass-icons"')
+        self.assertContains(response, 'data-rb-island="gooey-nav"')
 
     def test_auth_portals(self):
         """Verify that Login and Register pages use the premium material layout."""
@@ -26,3 +28,16 @@ class BaseUITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'material-glass')
         self.assertContains(response, 'btn-apple-primary')
+
+    def test_home_pixel_gallery_mount(self):
+        """Verify that the home page includes the pixel gallery mount."""
+        response = self.client.get(reverse('accounts:home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-rb-island="pixel-gallery"')
+
+    def test_spa_shell_mount(self):
+        """Verify that the new React SPA shell is served at /app/."""
+        response = self.client.get('/app/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="app-root"')
+        self.assertContains(response, 'js/spa-app.js')

@@ -109,10 +109,12 @@ def admin_dashboard(request):
 
 def menu_view(request):
     categories = MenuCategory.objects.prefetch_related('items').all()
+    has_menu_items = MenuItem.objects.filter(is_available=True).exists()
     cart = _get_cart(request)
     cart_items_count = sum(cart.values()) if isinstance(cart, dict) else 0
     return render(request, 'cafe/menu.html', {
         'categories': categories,
+        'has_menu_items': has_menu_items,
         'cart_count': cart_items_count,
         'cart_data': cart
     })
@@ -308,6 +310,7 @@ def reorder_order(request, order_id):
 
 from accounts.utils import admin_required, barista_required, customer_required, normalize_digits
 from rest_framework import serializers, viewsets, permissions
+from rest_framework.response import Response
 
 # --- API Serializers ---
 
@@ -412,9 +415,11 @@ def manual_order_entry(request):
         return redirect('cafe:barista_dashboard')
         
     categories = MenuCategory.objects.prefetch_related('items').all()
+    has_menu_items = MenuItem.objects.filter(is_available=True).exists()
     initial_phone = request.GET.get('phone_number', '')
     return render(request, 'cafe/manual_order.html', {
         'categories': categories,
+        'has_menu_items': has_menu_items,
         'initial_phone': initial_phone
     })
 

@@ -19,6 +19,7 @@ class CafeUITests(TestCase):
         self.assertContains(response, 'btn-primary')
         # Check for new size 'btn-sm'
         self.assertContains(response, 'btn-sm')
+        self.assertContains(response, 'data-rb-island="pixel-card"')
 
     def test_cart_badge_appears(self):
         # Initially badges are hidden (cart empty)
@@ -39,3 +40,10 @@ class CafeUITests(TestCase):
         content = response.content.decode('utf-8')
         badge_tag = content.split('id="cart-badge-desktop"')[1].split('>')[0]
         self.assertNotIn('hidden', badge_tag)
+
+
+class CafeEmptyStateTests(TestCase):
+    def test_menu_empty_state_is_visible_when_no_items_exist(self):
+        response = self.client.get(reverse('cafe:menu'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'منو هنوز ثبت نشده است')

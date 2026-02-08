@@ -167,11 +167,21 @@ LOGGING = {
     },
 }
 
+_default_script_src = (
+    "'self' https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com"
+)
+_default_connect_src = "'self'"
+# Current templates rely on inline scripts and Alpine expression evaluation.
+# Keep stricter defaults in non-debug environments.
+if DEBUG:
+    _default_script_src += " 'unsafe-inline' 'unsafe-eval'"
+    _default_connect_src += " http://localhost:5173 ws://localhost:5173"
+
 CONTENT_SECURITY_POLICY = os.getenv(
     'DJANGO_CSP',
-    "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com; "
+    f"default-src 'self'; script-src {_default_script_src}; "
     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css; "
-    "img-src 'self' data: blob:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self';"
+    f"img-src 'self' data: blob:; font-src 'self' https://cdn.jsdelivr.net; connect-src {_default_connect_src};"
 )
 
 # Default primary key field type

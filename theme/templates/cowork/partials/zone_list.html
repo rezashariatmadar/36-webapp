@@ -1,4 +1,4 @@
-<!-- Zone Hierarchical View (Client Side) -->
+{% if has_spaces %}
 <div class="join join-vertical w-full glass-panel shadow-2xl rounded-3xl border border-white/10 animate-in fade-in duration-500 text-white">
     {% for zone in zones_with_spaces %}
         {% if zone.spaces %}
@@ -47,7 +47,7 @@
                         <!-- VIP Rooms (Book Whole Room - No Seats) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-top-4 duration-500">
                             {% for room in zone.spaces %}
-                                <div class="card glass-panel glass-sheen hover-lift shadow-2xl rounded-3xl hover:bg-white/5 transition-all group overflow-hidden border border-white/10">
+                                <div class="card glass-panel glass-sheen hover-lift shadow-2xl rounded-3xl hover:bg-white/5 transition-all group overflow-hidden border border-white/10" data-rb-island="spotlight-card">
                                     <div class="h-2 
                                         {% if room.status == 'AVAILABLE' %}bg-accent/40 group-hover:bg-accent
                                         {% elif room.status == 'OCCUPIED' %}bg-error/40 group-hover:bg-error
@@ -94,7 +94,7 @@
                         <!-- Regular Grid for other zones (e.g. Desks, Long Table) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-top-4 duration-500">
                             {% for space in zone.spaces %}
-                                <div class="card glass-panel glass-sheen hover-lift shadow-2xl rounded-3xl hover:bg-white/5 transition-all group overflow-hidden border border-white/10">
+                                <div class="card glass-panel glass-sheen hover-lift shadow-2xl rounded-3xl hover:bg-white/5 transition-all group overflow-hidden border border-white/10" data-rb-island="spotlight-card">
                                     <div class="h-2 
                                         {% if space.status == 'AVAILABLE' %}bg-accent/40 group-hover:bg-accent
                                         {% elif space.status == 'OCCUPIED' %}bg-error/40 group-hover:bg-error
@@ -163,3 +163,6 @@
             {% endif %}
         {% endfor %}
     </div>
+{% else %}
+    {% include "components/empty_state.html" with title="فضایی برای نمایش وجود ندارد" description="هنوز هیچ فضای فعالی برای رزرو ثبت نشده است." icon_emoji="🪑" primary_cta_text="بازگشت به خانه" primary_cta_url="/" %}
+{% endif %}
