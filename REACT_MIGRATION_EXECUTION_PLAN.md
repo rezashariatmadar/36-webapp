@@ -271,6 +271,13 @@ Exit criteria:
   - added `theme.context_processors.legacy_runtime_flags` and switched base-template HTMX/runtime guards to context flags instead of broad legacy-path checks
   - restricted HTMX script + `hx-headers` runtime to legacy routes with active `hx-*` behavior (`/legacy/cafe/menu|cart|dashboard` and `/legacy/cowork/` + `/legacy/cowork/book/*`)
   - expanded route cutover tests to assert legacy auth pages (`/legacy/login/`) do not load HTMX runtime
+  - removed cowork HTMX polling/preview runtime:
+    - `theme/templates/cowork/space_list.html` no longer uses periodic `hx-get` refresh
+    - `theme/templates/cowork/book_space.html` no longer issues `hx-get` preview requests
+    - `cowork/views.py` no longer serves HTMX partial branches
+    - `theme/templates/cowork/partials/booking_preview.html` removed
+  - tightened cutover assertions so `/legacy/cowork/` does not include HTMX runtime (`config/test_spa_cutover.py`)
+  - updated cowork regression coverage for HX-header requests to render full templates (`cowork/test_cowork_logic.py`)
   - removed unused legacy partial templates:
     - `theme/templates/cafe/partials/cart_badge.html`
     - `theme/templates/cowork/partials/space_items.html`
@@ -288,6 +295,7 @@ Exit criteria:
   - post dependency/runtime isolation batch verification: `118 passed, 91 warnings`
   - post jQuery/datepicker removal verification: `119 passed, 92 warnings`
   - post selective HTMX runtime-gating verification: `119 passed, 92 warnings`
+  - post cowork HTMX removal verification: `119 passed, 92 warnings`
 
 ## 12. Handoff Snapshot
 

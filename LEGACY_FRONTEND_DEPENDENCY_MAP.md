@@ -14,7 +14,7 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 | Dependency | Type | Current Status | Why It Exists | Primary Locations | Decommission Trigger |
 | --- | --- | --- | --- | --- | --- |
 | Alpine.js | CDN script | decommissioned | Previously used for dropdown/modal micro-state | `theme/templates/base.html`, `theme/templates/cowork/space_list.html` | Completed in this increment. |
-| HTMX | CDN script | active (legacy-only selective runtime) | Legacy template partial updates (cart/booking/staff polling) | `theme/templates/cafe/*`, `theme/templates/cowork/*`, `cafe/views.py`, `cowork/views.py` | Remove after template routes are fully retired or isolated under `/legacy/*` only. |
+| HTMX | CDN script | active (legacy-only selective runtime) | Legacy template partial updates for cafe cart/menu/staff flows | `theme/templates/cafe/*`, `cafe/views.py` | Remove after template routes are fully retired or isolated under `/legacy/*` only. |
 | jQuery | CDN script | decommissioned | Previously used for legacy booking datepicker initialization | `theme/templates/cowork/book_space.html` | Completed in this increment. |
 | Persian Datepicker stack | CDN script/css | decommissioned | Previously used for legacy booking date input picker | `theme/templates/cowork/book_space.html` | Completed in this increment. |
 | React Bits Islands bundle | local static bundle | decommissioned (runtime removed) | Transitional visual islands previously used in template pages | `theme/static_src/src/reactbits/*` | Completed in this increment. |
@@ -28,6 +28,7 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 - Progress note: `hx-headers` body attribute and HTMX-specific event listeners in base template are now bound only on `/legacy/*`.
 - Progress note: HTMX runtime include and `hx-headers` are now further restricted to legacy routes with active `hx-*` interactions (cafe menu/cart/dashboard, cowork list/booking), while legacy auth pages do not load HTMX.
 - Progress note: server-side HTMX partial rendering in `cafe/views.py` and `cowork/views.py` is now guarded by legacy path checks.
+- Progress note: legacy cowork pages no longer rely on HTMX (space list auto-refresh and booking preview were removed), and HTMX runtime gating is now cafe-only.
 - [x] Remove jQuery-dependent datepicker glue in `theme/templates/base.html`.
 - [x] Remove `django-htmx` runtime wiring from `config/settings.py`.
 - [x] Remove `django-htmx` from dependency manifests.
@@ -40,6 +41,7 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 - Progress note: `theme/templates/cowork/book_space.html` now uses a plain validated `YYYY-MM-DD` input with existing HTMX preview flow.
 - [x] Prune unused template partials and legacy static JS.
 - Progress note: removed orphaned legacy partials `theme/templates/cafe/partials/cart_badge.html` and `theme/templates/cowork/partials/space_items.html`; remaining `theme/static/js/*` assets are SPA runtime artifacts.
+- Progress note: removed deprecated cowork HTMX preview partial `theme/templates/cowork/partials/booking_preview.html`.
 
 ## Validation Commands
 

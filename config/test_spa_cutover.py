@@ -45,6 +45,11 @@ class SPARouteCutoverTests(TestCase):
         self.assertNotContains(legacy_login, "unpkg.com/htmx.org@2.0.4")
         self.assertNotContains(legacy_login, "hx-headers=")
 
+        legacy_cowork = self.client.get("/legacy/cowork/")
+        self.assertEqual(legacy_cowork.status_code, 200)
+        self.assertNotContains(legacy_cowork, "unpkg.com/htmx.org@2.0.4")
+        self.assertNotContains(legacy_cowork, "hx-headers=")
+
         self.assertEqual(reverse("cafe:menu"), "/legacy/cafe/menu/")
         self.assertEqual(reverse("cowork:space_list"), "/legacy/cowork/")
 
@@ -72,6 +77,11 @@ class SPARouteCutoverTests(TestCase):
         self.assertEqual(legacy_login.status_code, 200)
         self.assertNotContains(legacy_login, "unpkg.com/htmx.org@2.0.4")
         self.assertNotContains(legacy_login, "hx-headers=")
+
+        legacy_cowork = self.client.get("/legacy/cowork/")
+        self.assertEqual(legacy_cowork.status_code, 200)
+        self.assertNotContains(legacy_cowork, "unpkg.com/htmx.org@2.0.4")
+        self.assertNotContains(legacy_cowork, "hx-headers=")
 
         legacy_cafe = self.client.get("/legacy/cafe/menu/")
         self.assertEqual(legacy_cafe.status_code, 200)

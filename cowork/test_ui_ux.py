@@ -36,6 +36,9 @@ class CoworkUXTests(TestCase):
         self.assertNotContains(response, "persian-datepicker")
         self.assertNotContains(response, "persian-date")
         self.assertContains(response, 'placeholder="YYYY-MM-DD"')
+        self.assertNotContains(response, "hx-get=")
+        self.assertNotContains(response, "hx-trigger=")
+        self.assertNotContains(response, "unpkg.com/htmx.org@2.0.4")
 
 
 class CoworkEmptyStateTests(TestCase):

@@ -81,7 +81,7 @@ class CoworkLogicTests(TestCase):
             space = SpaceFactory(zone=zone)
             self.assertFalse(space.is_nested, f"Zone {zone} should not be nested")
 
-    def test_space_list_nonlegacy_htmx_renders_full_template(self):
+    def test_space_list_nonlegacy_hx_header_renders_full_template(self):
         from .views import space_list
 
         request = self.factory.get("/cowork/", HTTP_HX_REQUEST="true")
@@ -93,7 +93,7 @@ class CoworkLogicTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode(), "cowork/space_list.html")
 
-    def test_space_list_legacy_htmx_renders_partial_template(self):
+    def test_space_list_legacy_hx_header_renders_full_template(self):
         from .views import space_list
 
         request = self.factory.get("/legacy/cowork/", HTTP_HX_REQUEST="true")
@@ -103,9 +103,9 @@ class CoworkLogicTests(TestCase):
             response = space_list(request)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode(), "cowork/partials/zone_list.html")
+        self.assertEqual(response.content.decode(), "cowork/space_list.html")
 
-    def test_book_space_nonlegacy_htmx_renders_full_template(self):
+    def test_book_space_nonlegacy_hx_header_renders_full_template(self):
         from .views import book_space
 
         request = self.factory.get(
@@ -122,7 +122,7 @@ class CoworkLogicTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode(), "cowork/book_space.html")
 
-    def test_book_space_legacy_htmx_renders_preview_partial(self):
+    def test_book_space_legacy_hx_header_renders_full_template(self):
         from .views import book_space
 
         request = self.factory.get(
@@ -137,4 +137,4 @@ class CoworkLogicTests(TestCase):
             response = book_space(request, self.space.id)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode(), "cowork/partials/booking_preview.html")
+        self.assertEqual(response.content.decode(), "cowork/book_space.html")

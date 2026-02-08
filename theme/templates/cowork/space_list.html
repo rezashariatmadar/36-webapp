@@ -13,11 +13,7 @@
     </div>
 
     {% if has_spaces %}
-        <div id="zone-list-container"
-             class="w-full"
-             hx-get="{% url 'cowork:space_list' %}"
-             hx-trigger="every 30s"
-             hx-swap="innerHTML">
+        <div id="zone-list-container" class="w-full">
             {% include "cowork/partials/zone_list.html" %}
         </div>
     {% else %}

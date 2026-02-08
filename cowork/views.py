@@ -8,11 +8,6 @@ from .forms import BookingForm
 from .models import Booking, Space
 
 
-def _is_legacy_htmx(request):
-    is_htmx = request.headers.get('HX-Request', '').lower() == 'true'
-    return bool(is_htmx and request.path.startswith('/legacy/'))
-
-
 def space_list(request):
     # Refresh statuses based on current time
     now = timezone.now().date()
@@ -57,16 +52,6 @@ def space_list(request):
         
     has_spaces = any(zone["spaces"] for zone in zones_with_spaces)
 
-    if _is_legacy_htmx(request):
-        return render(
-            request,
-            'cowork/partials/zone_list.html',
-            {
-                'zones_with_spaces': zones_with_spaces,
-                'has_spaces': has_spaces,
-            },
-        )
-
     return render(
         request,
         'cowork/space_list.html',
@@ -104,54 +89,6 @@ def book_space(request, space_id):
                 messages.error(request, str(e))
     else:
         form = BookingForm(space=space)
-
-    # Handle HTMX dynamic preview
-    if _is_legacy_htmx(request):
-        # Update form instance with current data to calculate end_time
-        booking_type = request.GET.get('booking_type')
-        start_time_str = request.GET.get('start_time')
-        
-        preview_booking = Booking(space=space, booking_type=booking_type)
-        if start_time_str:
-            try:
-                # Try parsing as Jalali first (from UI)
-                import jdatetime
-                preview_booking.start_time = jdatetime.datetime.strptime(start_time_str, '%Y-%m-%d').togregorian().date()
-            except (ValueError, TypeError):
-                # Fallback to Gregorian
-                try:
-                    from datetime import datetime
-                    preview_booking.start_time = datetime.strptime(start_time_str, '%Y-%m-%d').date()
-                except (ValueError, TypeError):
-                    pass
-        
-        # We'll use the form logic to get the end_time
-        temp_form = BookingForm(data=request.GET, space=space)
-        calculated_end = None
-        calculated_end_jalali = None
-        
-        if temp_form.is_valid():
-            calculated_end = temp_form.cleaned_data.get('end_time')
-        else:
-            # If not valid, still try to trigger calculation logic
-            temp_form.full_clean()
-            calculated_end = temp_form.cleaned_data.get('end_time')
-            
-        # Update preview booking with the calculated end time for accurate price
-        if calculated_end:
-            preview_booking.end_time = calculated_end
-            # calculated_end is already a jdatetime.date from the jforms.jDateField
-            calculated_end_jalali = calculated_end.strftime("%Y/%m/%d")
-        
-        price = preview_booking.calculate_price()
-
-        return render(request, 'cowork/partials/booking_preview.html', {
-            'space': space,
-            'form': temp_form,
-            'price': price,
-            'calculated_end': calculated_end,
-            'calculated_end_jalali': calculated_end_jalali
-        })
 
     return render(request, 'cowork/book_space.html', {
         'space': space, 
