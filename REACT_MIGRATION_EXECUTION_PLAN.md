@@ -46,7 +46,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Server-side HTMX partial responses in `cafe` and `cowork` views are scoped to `/legacy/*` requests only.
 - `django-htmx` app/middleware wiring removed from runtime settings; legacy HTMX detection now uses request headers.
 - `django-htmx` dependency has been removed from project manifests (`pyproject.toml`, `uv.lock`).
-- React Bits runtime assets and mount containers in `base.html` are now scoped to `/legacy/*` only, with non-legacy fallback UI markup.
+- React Bits runtime assets and mount containers have been removed from template runtime (`base.html` and legacy UI fragments now use static markup).
 
 ### In Progress
 
@@ -257,6 +257,13 @@ Exit criteria:
   - added non-legacy static fallback UI for desktop quick-access and mobile bottom nav in `theme/templates/base.html`
   - expanded cutover assertions for legacy-only React Bits runtime includes (`config/test_spa_cutover.py`)
   - updated UI regression coverage for legacy-only React Bits mounts (`theme/test_ui.py`)
+  - removed React Bits CSS/JS includes and legacy mount containers from `theme/templates/base.html`
+  - removed legacy `data-rb-island` attributes from:
+    - `theme/templates/home.html`
+    - `theme/templates/cafe/menu.html`
+    - `theme/templates/cowork/partials/zone_list.html`
+  - removed React Bits static artifacts from `theme/static/js/` and removed React Bits build scripts from `theme/static_src/package.json`
+  - updated UI assertions in `cafe/test_ui.py` and `cowork/test_ui_ux.py` for static card markup
   - added regression tests for HTMX isolation:
     - `cafe/test_cafe_logic.py` (customer + staff HTMX response branches)
     - `cowork/test_cowork_logic.py` (space list + booking preview HTMX branches)

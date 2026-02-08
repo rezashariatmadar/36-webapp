@@ -37,7 +37,7 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {% for item in category.items.all %}
-                            <div class="card card-side glass-panel glass-sheen hover-lift shadow-xl border border-white/10 hover:bg-white/5 transition-all duration-300 p-4 items-center group rounded-2xl" data-rb-island="pixel-card">
+                            <div class="card card-side glass-panel glass-sheen hover-lift shadow-xl border border-white/10 hover:bg-white/5 transition-all duration-300 p-4 items-center group rounded-2xl">
                                 {% if item.image %}
                                     <figure class="w-24 h-24 shrink-0 rounded-xl overflow-hidden ml-4 glass-inset">
                                         <img src="{{ item.image.url }}" loading="lazy" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />

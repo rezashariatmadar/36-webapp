@@ -19,7 +19,7 @@ class CafeUITests(TestCase):
         self.assertContains(response, 'btn-primary')
         # Check for new size 'btn-sm'
         self.assertContains(response, 'btn-sm')
-        self.assertContains(response, 'data-rb-island="pixel-card"')
+        self.assertContains(response, 'card card-side glass-panel')
 
     def test_cart_badge_appears(self):
         # Initially badges are hidden (cart empty)

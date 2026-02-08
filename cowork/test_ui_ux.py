@@ -22,7 +22,7 @@ class CoworkUXTests(TestCase):
         self.assertContains(response, 'collapse-title')
         # Since we switched to client-side, the space name SHOULD be in the response
         self.assertContains(response, "Table 1")
-        self.assertContains(response, 'data-rb-island="spotlight-card"')
+        self.assertContains(response, 'card glass-panel glass-sheen hover-lift')
         self.assertNotContains(response, "floorplan.png")
         self.assertNotContains(response, "view = 'map'")
 
