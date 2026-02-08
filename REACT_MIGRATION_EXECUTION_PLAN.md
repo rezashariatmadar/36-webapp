@@ -37,16 +37,17 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Feature-flagged root cutover routing implemented via `DJANGO_SPA_PRIMARY`.
 - Legacy route fallback path added under `/legacy/*` for safe rollback operations.
 - Expanded regression coverage for migration APIs and cutover behavior; full suite currently green.
+- Alpine.js template directives and CDN dependency removed from runtime templates.
 
 ### In Progress
 
-- Legacy dependency decommission preparation.
+- Legacy dependency decommission execution (HTMX/jQuery/template pruning).
 - Expanded SPA navigation and role-aware surfaces.
 
 ### Not Started
 
 - Root (`/`) cutover to SPA.
-- Decommission of legacy template/HTMX/Alpine/jQuery paths.
+- Decommission of legacy template/HTMX/jQuery paths.
 
 ## 4. Migration Phases
 
@@ -169,7 +170,7 @@ Exit criteria:
 - [x] Playwright smoke set captured for `/app` customer+staff routes.
 - [x] Playwright smoke set captured for `/app/account`.
 - [x] Feature-flagged route cutover tests pass.
-- [ ] Legacy-template dependency map completed.
+- [x] Legacy-template dependency map completed.
 - [ ] Final cutover sign-off approved.
 
 ## 10. Ownership and Update Policy
@@ -222,10 +223,16 @@ Exit criteria:
   - cafe customer+staff edge cases
   - cowork validation and auth checks
   - cutover redirects + SPA catchall
+- Decommission increment:
+  - removed Alpine.js script include from `theme/templates/base.html`
+  - replaced Alpine-based user dropdown behavior with vanilla JS in `theme/templates/base.html`
+  - removed unused Alpine modal wrapper from `theme/templates/cowork/space_list.html`
+  - added legacy dependency tracker: `LEGACY_FRONTEND_DEPENDENCY_MAP.md`
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`
   - re-verified full suite (post-regression expansion): `109 passed, 74 warnings`
+  - post-decommission full suite re-verified: `109 passed, 74 warnings`
 
 ## 12. Handoff Snapshot
 
@@ -274,6 +281,7 @@ Use this section first if chat history/context is truncated.
 ### Source of Truth Files
 
 - Migration tracker: `REACT_MIGRATION_EXECUTION_PLAN.md`
+- Legacy dependency map: `LEGACY_FRONTEND_DEPENDENCY_MAP.md`
 - Cutover wiring: `config/settings.py`, `config/urls.py`, `config/legacy_urls.py`
 - API regression tests:
   - `accounts/test_spa_api.py`
@@ -292,7 +300,6 @@ Use this section first if chat history/context is truncated.
 
 ### Next Implementation Focus (Ordered)
 
-- Complete legacy-template dependency map (what can be deleted vs must remain).
-- Decommission unused HTMX/Alpine/jQuery/template fragments behind the migration.
+- Decommission unused HTMX/jQuery/template fragments behind the migration.
 - Run full regression + smoke checks after each decommission batch.
 - Move `DJANGO_SPA_PRIMARY` from opt-in to default-on only after decommission sign-off.
