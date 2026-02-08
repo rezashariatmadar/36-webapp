@@ -32,6 +32,7 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 - Progress note: legacy cafe customer pages (`menu`, `cart`) no longer use HTMX controls; HTMX runtime gating is now limited to legacy barista dashboard only.
 - Progress note: legacy barista dashboard no longer uses HTMX actions/polling and now relies on standard POST flows plus timed page refresh.
 - Progress note: all tracked legacy frontend runtime dependencies (Alpine, HTMX, jQuery/datepicker, React Bits islands) are now decommissioned.
+- Progress note: legacy cafe/cowork routes are now hard-redirected to SPA (`/legacy/cafe/*` -> `/app/cafe`, `/legacy/cowork/*` -> `/app/cowork`), and `config/legacy_urls_default.py` has been removed.
 - [x] Remove jQuery-dependent datepicker glue in `theme/templates/base.html`.
 - [x] Remove `django-htmx` runtime wiring from `config/settings.py`.
 - [x] Remove `django-htmx` from dependency manifests.
@@ -55,7 +56,6 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 
 ## Notes
 
-- Decommission work must not break `/legacy/*` fallback while `DJANGO_SPA_PRIMARY` remains optional.
+- Decommission work must not break `/legacy/*` transitional account fallback routes (`/legacy/login|register|profile`).
 - If a dependency is only used under `/legacy/*`, mark it as `active (legacy-only)` in future updates.
-- `/legacy/*` routes are now available in both default mode and SPA-primary mode to simplify phased isolation.
-- Default-mode legacy mirror uses unique namespaces via `config/legacy_urls_default.py` to avoid URL namespace conflicts.
+- SPA-first routing is now always enabled; legacy cafe/cowork paths hard-redirect to SPA while legacy account pages remain temporarily reachable under `/legacy/*`.

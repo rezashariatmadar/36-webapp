@@ -1,8 +1,8 @@
 import importlib
 
-from django.test import TestCase, override_settings
-from django.urls import clear_url_caches, reverse
 from django.contrib.auth import get_user_model
+from django.test import TestCase
+from django.urls import clear_url_caches
 
 import config.urls as project_urls
 
@@ -15,60 +15,13 @@ class SPARouteCutoverTests(TestCase):
     def tearDown(self):
         self._reload_urlconf()
 
-    @override_settings(SPA_PRIMARY_ROUTES=False)
-    def test_default_mode_keeps_legacy_root(self):
-        self._reload_urlconf()
-        response = self.client.get("/")
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "grid sm:grid-cols-2 lg:grid-cols-3 gap-6")
-        self.assertNotContains(response, "unpkg.com/htmx.org@2.0.4")
-        self.assertNotContains(response, "hx-headers=")
-        self.assertNotContains(response, "reactbits-islands.js")
-        self.assertNotContains(response, "reactbits-islands.css")
-
-        cafe_redirect = self.client.get("/cafe/menu/")
-        self.assertEqual(cafe_redirect.status_code, 302)
-        self.assertEqual(cafe_redirect.url, "/legacy/cafe/menu/")
-
-        cowork_redirect = self.client.get("/cowork/")
-        self.assertEqual(cowork_redirect.status_code, 302)
-        self.assertEqual(cowork_redirect.url, "/legacy/cowork/")
-
-        legacy_cafe = self.client.get("/legacy/cafe/menu/")
-        self.assertEqual(legacy_cafe.status_code, 200)
-        self.assertNotContains(legacy_cafe, "unpkg.com/htmx.org@2.0.4")
-        self.assertNotContains(legacy_cafe, "hx-headers=")
-        self.assertNotContains(legacy_cafe, "reactbits-islands.js")
-        self.assertNotContains(legacy_cafe, "reactbits-islands.css")
-
-        legacy_login = self.client.get("/legacy/login/")
-        self.assertEqual(legacy_login.status_code, 200)
-        self.assertNotContains(legacy_login, "unpkg.com/htmx.org@2.0.4")
-        self.assertNotContains(legacy_login, "hx-headers=")
-
-        legacy_cowork = self.client.get("/legacy/cowork/")
-        self.assertEqual(legacy_cowork.status_code, 200)
-        self.assertNotContains(legacy_cowork, "unpkg.com/htmx.org@2.0.4")
-        self.assertNotContains(legacy_cowork, "hx-headers=")
-
-        user_model = get_user_model()
-        staff_user = user_model.objects.create_user(phone_number="09120000001", password="Testpass123!", is_staff=True)
-        self.client.force_login(staff_user)
-        legacy_dashboard = self.client.get("/legacy/cafe/dashboard/")
-        self.assertEqual(legacy_dashboard.status_code, 200)
-        self.assertNotContains(legacy_dashboard, "unpkg.com/htmx.org@2.0.4")
-        self.assertNotContains(legacy_dashboard, "hx-headers=")
-
-        self.assertEqual(reverse("cafe:menu"), "/legacy/cafe/menu/")
-        self.assertEqual(reverse("cowork:space_list"), "/legacy/cowork/")
-
-    @override_settings(SPA_PRIMARY_ROUTES=True)
-    def test_spa_primary_mode_routes_and_legacy_fallback(self):
+    def test_spa_primary_routes_and_legacy_redirects(self):
         self._reload_urlconf()
 
         root_response = self.client.get("/")
         self.assertEqual(root_response.status_code, 200)
         self.assertContains(root_response, 'id="app-root"')
+        self.assertNotContains(root_response, "unpkg.com/htmx.org@2.0.4")
 
         login_redirect = self.client.get("/login/")
         self.assertEqual(login_redirect.status_code, 302)
@@ -82,32 +35,30 @@ class SPARouteCutoverTests(TestCase):
         self.assertEqual(cowork_redirect.status_code, 302)
         self.assertEqual(cowork_redirect.url, "/app/cowork")
 
+        legacy_cafe_redirect = self.client.get("/legacy/cafe/menu/")
+        self.assertEqual(legacy_cafe_redirect.status_code, 302)
+        self.assertEqual(legacy_cafe_redirect.url, "/app/cafe")
+
+        legacy_cowork_redirect = self.client.get("/legacy/cowork/")
+        self.assertEqual(legacy_cowork_redirect.status_code, 302)
+        self.assertEqual(legacy_cowork_redirect.url, "/app/cowork")
+
         legacy_login = self.client.get("/legacy/login/")
         self.assertEqual(legacy_login.status_code, 200)
         self.assertNotContains(legacy_login, "unpkg.com/htmx.org@2.0.4")
         self.assertNotContains(legacy_login, "hx-headers=")
 
-        legacy_cowork = self.client.get("/legacy/cowork/")
-        self.assertEqual(legacy_cowork.status_code, 200)
-        self.assertNotContains(legacy_cowork, "unpkg.com/htmx.org@2.0.4")
-        self.assertNotContains(legacy_cowork, "hx-headers=")
-
-        legacy_cafe = self.client.get("/legacy/cafe/menu/")
-        self.assertEqual(legacy_cafe.status_code, 200)
-        self.assertNotContains(legacy_cafe, "unpkg.com/htmx.org@2.0.4")
-        self.assertNotContains(legacy_cafe, "hx-headers=")
-        self.assertNotContains(legacy_cafe, "reactbits-islands.js")
-
         user_model = get_user_model()
-        staff_user = user_model.objects.create_user(phone_number="09120000002", password="Testpass123!", is_staff=True)
+        staff_user = user_model.objects.create_user(phone_number="09120000003", password="Testpass123!", is_staff=True)
         self.client.force_login(staff_user)
-        legacy_dashboard = self.client.get("/legacy/cafe/dashboard/")
-        self.assertEqual(legacy_dashboard.status_code, 200)
-        self.assertNotContains(legacy_dashboard, "unpkg.com/htmx.org@2.0.4")
-        self.assertNotContains(legacy_dashboard, "hx-headers=")
+        legacy_dashboard_redirect = self.client.get("/legacy/cafe/dashboard/")
+        self.assertEqual(legacy_dashboard_redirect.status_code, 302)
+        self.assertEqual(legacy_dashboard_redirect.url, "/app/cafe")
+
+    def test_spa_catchall_excludes_system_routes(self):
+        self._reload_urlconf()
 
         catchall_spa = self.client.get("/random-non-system-path/")
         self.assertEqual(catchall_spa.status_code, 200)
         self.assertContains(catchall_spa, 'id="app-root"')
         self.assertNotContains(catchall_spa, "unpkg.com/htmx.org@2.0.4")
-        self.assertNotContains(catchall_spa, "reactbits-islands.js")

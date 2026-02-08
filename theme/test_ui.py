@@ -15,13 +15,10 @@ class BaseUITests(TestCase):
         self.assertNotContains(response, 'data-rb-island="glass-icons"')
         self.assertNotContains(response, 'data-rb-island="gooey-nav"')
 
-    def test_legacy_pages_do_not_mount_react_bits_islands(self):
+    def test_legacy_cafe_routes_redirect_to_spa(self):
         response = self.client.get('/legacy/cafe/menu/')
-        self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'data-rb-island="squares-bg"')
-        self.assertNotContains(response, 'data-rb-island="glass-icons"')
-        self.assertNotContains(response, 'data-rb-island="gooey-nav"')
-        self.assertNotContains(response, 'reactbits-islands.js')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/app/cafe')
 
     def test_auth_portals(self):
         """Verify that Login and Register pages use the premium material layout."""

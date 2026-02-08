@@ -34,9 +34,9 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Regression tests added for new auth/cafe/cowork APIs and SPA shell mount.
 - Session auth/account APIs expanded with login, logout, register, and profile contracts.
 - React account route is implemented at `/app/account` with SPA-native auth/profile UI.
-- Feature-flagged root cutover routing implemented via `DJANGO_SPA_PRIMARY`.
+- Root cutover routing now serves SPA-first paths by default.
 - Legacy route fallback path added under `/legacy/*` for safe rollback operations.
-- Legacy route namespace (`/legacy/*`) now available in both default mode and SPA-primary mode.
+- Legacy route namespace (`/legacy/*`) retained only for transitional account-path compatibility.
 - Expanded regression coverage for migration APIs and cutover behavior; full suite currently green.
 - Alpine.js template directives and CDN dependency removed from runtime templates.
 - jQuery/Persian datepicker assets removed from global base template and scoped to legacy booking form only.
@@ -54,8 +54,8 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 
 ### Not Started
 
-- Root (`/`) cutover to SPA.
-- Decommission of legacy template/HTMX/jQuery paths.
+- Final decommission of legacy account template pages under `/legacy/*`.
+- Hard removal of remaining transitional redirects once account parity and stakeholder sign-off are complete.
 
 ## 4. Migration Phases
 
@@ -140,9 +140,9 @@ Exit criteria:
 
 ## 7. Rollback Strategy
 
-- Keep template routes and existing views operational until cutover sign-off.
-- Introduce new APIs/routes additively; avoid destructive route rewrites mid-phase.
-- If regressions occur, route users back to template endpoints while preserving migrated code for patching.
+- Keep legacy account routes operational under `/legacy/*` during transition.
+- Use checkpoint refs before destructive route removals (commit + backup branch + tag).
+- If regressions occur after route removals, roll back to checkpoint refs and re-apply fixes in a new forward patch.
 
 ## 8. Risks and Mitigations
 
@@ -168,7 +168,7 @@ Exit criteria:
 - [x] Add browser smoke artifacts for migrated flows in `output/playwright/`.
 - [x] Add account auth/profile APIs (`/api/auth/login|logout|register|profile`).
 - [x] Add SPA account route and account UX (`/app/account`).
-- [x] Prepare and implement root-route cutover with redirect map (feature-flagged).
+- [x] Prepare and implement root-route cutover with redirect map.
 - [x] Decommission legacy frontend dependencies.
 
 ### Verification Checklist
@@ -286,9 +286,14 @@ Exit criteria:
     - `theme/templates/cafe/partials/order_list.html` no longer uses `hx-post` mutations
     - `cafe/views.py` no longer has HTMX-specific branches for dashboard/order mutations
     - removed temporary HTMX runtime context-processor wiring from `config/settings.py` and deleted `theme/context_processors.py`
-  - set SPA cutover flag default to on in runtime settings:
-    - `SPA_PRIMARY_ROUTES` now defaults to `True` when `DJANGO_SPA_PRIMARY` is not explicitly set
-    - rollback path remains available via `DJANGO_SPA_PRIMARY=false`
+- finalized SPA-first routing as always-on in URL configuration:
+  - root and non-system routes resolve to SPA shell
+  - compatibility redirects preserve `/login|/register|/profile`, `/cafe/*`, `/cowork/*`
+  - obsolete `DJANGO_SPA_PRIMARY` / `SPA_PRIMARY_ROUTES` toggle removed from runtime settings
+- removed legacy cafe/cowork public surface from routing:
+  - `/legacy/cafe/*` now redirects to `/app/cafe`
+  - `/legacy/cowork/*` now redirects to `/app/cowork`
+  - removed unused `config/legacy_urls_default.py`
   - expanded cutover assertions so `/legacy/cafe/menu/` and `/legacy/cafe/dashboard/` both remain HTMX-free (`config/test_spa_cutover.py`)
   - updated cafe logic coverage for legacy HX-header cart mutations to redirect full-page (`cafe/test_cafe_logic.py`)
   - removed unused legacy partial templates:
@@ -311,6 +316,7 @@ Exit criteria:
   - post cowork HTMX removal verification: `119 passed, 92 warnings`
   - post cafe customer HTMX removal verification: `119 passed, 92 warnings`
   - post full HTMX decommission verification: `119 passed, 92 warnings`
+  - post legacy cafe/cowork hard-disable verification: `119 passed, 91 warnings`
 
 ## 12. Handoff Snapshot
 
@@ -320,19 +326,20 @@ Exit criteria:
   - customer flows (`/app/cafe`, `/app/cowork`)
   - staff flows (`/app/staff`)
   - account flows (`/app/account`)
-- Root cutover is default-on and still controllable via feature flag override.
+- Root cutover is now always-on SPA-first routing.
 
-### Flag and Route Behavior
+### Route Behavior
 
-- Default mode (`DJANGO_SPA_PRIMARY=true` or unset):
+- Runtime mode:
   - root and non-system routes resolve to SPA shell.
-  - legacy pages remain reachable under `/legacy/*`.
+  - `/legacy/cafe/*` and `/legacy/cowork/*` redirect to SPA.
+  - only legacy account pages remain reachable under `/legacy/*` for transitional compatibility.
   - compatibility redirects:
     - `/login|/register|/profile` -> `/app/account`
     - `/cafe/*` -> `/app/cafe`
     - `/cowork/*` -> `/app/cowork`
-- Rollback mode (`DJANGO_SPA_PRIMARY=false`):
-  - legacy routes remain primary.
+- Rollback strategy:
+  - use checkpoint refs (branch/tag/commit) to restore pre-removal state if needed.
 
 ### Last Verified Commands
 
@@ -343,8 +350,9 @@ Exit criteria:
 
 ### Rollback Reference
 
-- Checkpoint commit: `9f4f7f6`
-- Checkpoint tag: `rollback/checkpoint-2026-02-08-react-migration`
+- Checkpoint commit: `d50872f`
+- Checkpoint branch: `backup/legacy-ui-pre-removal`
+- Checkpoint tag: `checkpoint/pre-legacy-removal-2026-02-08`
 
 ## 13. Context Recovery and Resume Checklist
 
@@ -354,14 +362,13 @@ Use this section first if chat history/context is truncated.
 
 - Backend + SPA migration changes are applied and test-verified.
 - Full suite currently passes (`119 passed`).
-- Cutover remains feature-flagged (`DJANGO_SPA_PRIMARY`) and defaults to on unless explicitly disabled.
+- SPA-first cutover is active and enforced in URL routing.
 
 ### Source of Truth Files
 
 - Migration tracker: `REACT_MIGRATION_EXECUTION_PLAN.md`
 - Legacy dependency map: `LEGACY_FRONTEND_DEPENDENCY_MAP.md`
-- Cutover wiring: `config/settings.py`, `config/urls.py`, `config/legacy_urls.py`
-- Default-mode legacy mirror: `config/legacy_urls_default.py`
+- Cutover wiring: `config/urls.py`, `config/legacy_urls.py`
 - API regression tests:
   - `accounts/test_spa_api.py`
   - `cafe/tests/test_spa_api.py`
@@ -379,6 +386,6 @@ Use this section first if chat history/context is truncated.
 
 ### Next Implementation Focus (Ordered)
 
-- Decommission unused HTMX/jQuery/template fragments behind the migration.
+- Decommission remaining legacy account templates/routes under `/legacy/*`.
+- Remove transitional redirects once product/account parity sign-off is complete.
 - Run full regression + smoke checks after each decommission batch.
-- Move `DJANGO_SPA_PRIMARY` from opt-in to default-on only after decommission sign-off.
