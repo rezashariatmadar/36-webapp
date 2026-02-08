@@ -1,35 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.contrib.auth.views import LogoutView
 from django.contrib import messages
 from django.contrib.auth.models import Group
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .forms import UserRegistrationForm, CustomAuthenticationForm, ProfileForm
 from .models import CustomUser
-from .utils import admin_required, rate_limit
+from .utils import admin_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import serializers
 
 VALID_ROLES = ('Admin', 'Barista', 'Customer')
-
-@login_required
-def profile_view(request):
-    if request.method == 'POST':
-        if not rate_limit(request, scope="profile_update", limit=5, window_seconds=300):
-            messages.error(request, "Too many profile updates. Please wait a few minutes.")
-            return redirect('accounts:profile')
-        form = ProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Profile updated successfully.")
-            return redirect('accounts:profile')
-    else:
-        form = ProfileForm(instance=request.user)
-    return render(request, 'accounts/profile.html', {'form': form})
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -131,30 +111,6 @@ def change_user_role(request, user_id, new_role):
         messages.error(request, f"Error updating role: {e}")
         
     return redirect('accounts:user_list')
-
-class RegisterView(CreateView):
-    template_name = 'registration/register.html'
-    form_class = UserRegistrationForm
-    success_url = reverse_lazy('accounts:login')
-
-    def form_valid(self, form):
-        if not rate_limit(self.request, scope="register", limit=5, window_seconds=900):
-            messages.error(self.request, "Too many sign-up attempts. Please try again later.")
-            return redirect('accounts:register')
-        response = super().form_valid(form)
-        customer_group, created = Group.objects.get_or_create(name='Customer')
-        self.object.groups.add(customer_group)
-        return response
-
-class CustomLoginView(LoginView):
-    authentication_form = CustomAuthenticationForm
-    template_name = 'registration/login.html'
-
-    def post(self, request, *args, **kwargs):
-        if not rate_limit(request, scope="login", limit=10, window_seconds=300):
-            messages.error(request, "Too many login attempts. Please wait a few minutes.")
-            return redirect('accounts:login')
-        return super().post(request, *args, **kwargs)
 
 def home_view(request):
     return render(request, 'home.html')

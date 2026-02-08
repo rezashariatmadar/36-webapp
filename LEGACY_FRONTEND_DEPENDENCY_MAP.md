@@ -34,6 +34,7 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 - Progress note: all tracked legacy frontend runtime dependencies (Alpine, HTMX, jQuery/datepicker, React Bits islands) are now decommissioned.
 - Progress note: legacy cafe/cowork routes are now hard-redirected to SPA (`/legacy/cafe/*` -> `/app/cafe`, `/legacy/cowork/*` -> `/app/cowork`), and `config/legacy_urls_default.py` has been removed.
 - Progress note: legacy account auth/profile entry routes now redirect to SPA account (`/legacy/login|register|profile` -> `/app/account`).
+- Progress note: dead legacy account auth/profile templates and template-backed views have been removed; account entry routes are redirect-only.
 - [x] Remove jQuery-dependent datepicker glue in `theme/templates/base.html`.
 - [x] Remove `django-htmx` runtime wiring from `config/settings.py`.
 - [x] Remove `django-htmx` from dependency manifests.
@@ -47,6 +48,10 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 - [x] Prune unused template partials and legacy static JS.
 - Progress note: removed orphaned legacy partials `theme/templates/cafe/partials/cart_badge.html` and `theme/templates/cowork/partials/space_items.html`; remaining `theme/static/js/*` assets are SPA runtime artifacts.
 - Progress note: removed deprecated cowork HTMX preview partial `theme/templates/cowork/partials/booking_preview.html`.
+- Progress note: removed deprecated account templates:
+  - `theme/templates/registration/login.html`
+  - `theme/templates/registration/register.html`
+  - `theme/templates/accounts/profile.html`
 
 ## Validation Commands
 
@@ -58,5 +63,6 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 ## Notes
 
 - Decommission work must keep transitional auth redirects stable (`/legacy/login|register|profile` -> `/app/account`) until full legacy account cleanup is complete.
+- Remaining legacy account dependency surface is now primarily named-route compatibility (`accounts:login` for `LOGIN_URL`) and legacy admin/logout paths.
 - If a dependency is only used under `/legacy/*`, mark it as `active (legacy-only)` in future updates.
 - SPA-first routing is now always enabled; legacy cafe/cowork paths and legacy account auth/profile entry points now hard-redirect to SPA.

@@ -61,16 +61,3 @@ class ProfileForm(DigitNormalizationMixin, forms.ModelForm):
                 raise forms.ValidationError(_("Invalid birth date format. Use YYYY/MM/DD."))
         return value
 
-from django.contrib.auth.forms import AuthenticationForm
-
-class CustomAuthenticationForm(DigitNormalizationMixin, AuthenticationForm):
-    normalize_fields = ['username']
-    
-    username = forms.CharField(
-        label=_("Phone Number"), 
-        widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': '09xxxxxxxxx', 'class': 'input-standard', 'autocomplete': 'username'})
-    )
-    password = forms.CharField(
-        label=_("Password"), 
-        widget=forms.PasswordInput(attrs={'placeholder': '******', 'class': 'input-standard', 'autocomplete': 'current-password'})
-    )

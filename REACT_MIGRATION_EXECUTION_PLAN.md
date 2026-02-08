@@ -37,6 +37,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Root cutover routing now serves SPA-first paths by default.
 - Legacy route fallback path added under `/legacy/*` for safe rollback operations.
 - Legacy account auth/profile paths under `/legacy/*` now redirect to `/app/account`.
+- Legacy account template auth/profile implementation has been removed (routes are redirect-only for compatibility).
 - Expanded regression coverage for migration APIs and cutover behavior; full suite currently green.
 - Alpine.js template directives and CDN dependency removed from runtime templates.
 - jQuery/Persian datepicker assets removed from global base template and scoped to legacy booking form only.
@@ -54,8 +55,8 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 
 ### Not Started
 
-- Removal of unused legacy account templates/views that are now redirect-only.
 - Hard removal of remaining transitional legacy admin routes after staff/admin parity sign-off.
+- Cleanup of legacy account route names once LOGIN_URL/logout dependencies migrate fully to SPA-native URLs.
 
 ## 4. Migration Phases
 
@@ -307,6 +308,10 @@ Exit criteria:
   - `accounts:login|register|profile` now redirect to `/app/account`
   - `/legacy/login|register|profile` now redirect to `/app/account`
   - updated route regression assertions in `accounts/test_regression.py`, `theme/test_ui.py`, and `config/test_spa_cutover.py`
+- removed dead legacy account auth/profile implementation:
+  - deleted legacy templates: `theme/templates/registration/login.html`, `theme/templates/registration/register.html`, `theme/templates/accounts/profile.html`
+  - removed unused template-backed view classes/functions from `accounts/views.py`
+  - removed unused `CustomAuthenticationForm` from `accounts/forms.py`
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`
@@ -322,6 +327,7 @@ Exit criteria:
   - post full HTMX decommission verification: `119 passed, 92 warnings`
   - post legacy cafe/cowork hard-disable verification: `119 passed, 91 warnings`
   - post legacy account route redirect verification: `119 passed, 91 warnings`
+  - post legacy account template cleanup verification: `119 passed, 91 warnings`
 
 ## 12. Handoff Snapshot
 
@@ -392,6 +398,6 @@ Use this section first if chat history/context is truncated.
 
 ### Next Implementation Focus (Ordered)
 
-- Remove dead legacy account template/views and stale auth form assets now that account entry is SPA-only.
 - Decommission remaining legacy admin/logout route dependencies under `/legacy/*` after parity sign-off.
+- Migrate `LOGIN_URL`/logout named-route dependencies to SPA-native URLs and remove redirect-only aliases.
 - Run full regression + smoke checks after each decommission batch.
