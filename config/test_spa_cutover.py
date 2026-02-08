@@ -40,6 +40,11 @@ class SPARouteCutoverTests(TestCase):
         self.assertNotContains(legacy_cafe, "reactbits-islands.js")
         self.assertNotContains(legacy_cafe, "reactbits-islands.css")
 
+        legacy_login = self.client.get("/legacy/login/")
+        self.assertEqual(legacy_login.status_code, 200)
+        self.assertNotContains(legacy_login, "unpkg.com/htmx.org@2.0.4")
+        self.assertNotContains(legacy_login, "hx-headers=")
+
         self.assertEqual(reverse("cafe:menu"), "/legacy/cafe/menu/")
         self.assertEqual(reverse("cowork:space_list"), "/legacy/cowork/")
 
@@ -65,10 +70,13 @@ class SPARouteCutoverTests(TestCase):
 
         legacy_login = self.client.get("/legacy/login/")
         self.assertEqual(legacy_login.status_code, 200)
+        self.assertNotContains(legacy_login, "unpkg.com/htmx.org@2.0.4")
+        self.assertNotContains(legacy_login, "hx-headers=")
 
         legacy_cafe = self.client.get("/legacy/cafe/menu/")
         self.assertEqual(legacy_cafe.status_code, 200)
         self.assertContains(legacy_cafe, "unpkg.com/htmx.org@2.0.4")
+        self.assertContains(legacy_cafe, "hx-headers=")
         self.assertNotContains(legacy_cafe, "reactbits-islands.js")
 
         catchall_spa = self.client.get("/random-non-system-path/")

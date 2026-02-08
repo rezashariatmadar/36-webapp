@@ -10,7 +10,7 @@
     <link rel="shortcut icon" type="image/webp" href="{% static 'img/36cowork/36-coworking-space.webp' %}">
     <link rel="apple-touch-icon" href="{% static 'img/36cowork/36-coworking-space.webp' %}">
     {% tailwind_css %}
-    {% if request.path|slice:":8" == "/legacy/" %}
+    {% if load_legacy_htmx %}
     <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
     {% endif %}
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -47,7 +47,7 @@
 
     <script>
         (function() {
-            const isLegacyRoute = {% if request.path|slice:":8" == "/legacy/" %}true{% else %}false{% endif %};
+            const isLegacyRoute = {% if load_legacy_htmx %}true{% else %}false{% endif %};
             const formatPrices = (scope = document) => {
                 const nodes = scope.querySelectorAll('.format-price');
                 nodes.forEach((node) => {
@@ -70,7 +70,7 @@
             }
         })();
 
-        {% if request.path|slice:":8" == "/legacy/" %}
+        {% if load_legacy_htmx %}
             document.addEventListener('htmx:responseError', function(event) {
                 console.error('HTMX Response Error:', event.detail.xhr.status, event.detail.xhr.responseText);
             });
@@ -91,7 +91,7 @@
         {% endif %}
     </script>
 </head>
-<body class="h-screen w-screen overflow-hidden bg-black text-white antialiased flex flex-col md:flex-row scrim-wrapper"{% if request.path|slice:":8" == "/legacy/" %} hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'{% endif %}>
+<body class="h-screen w-screen overflow-hidden bg-black text-white antialiased flex flex-col md:flex-row scrim-wrapper"{% if load_legacy_htmx %} hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'{% endif %}>
     
     <!-- Premium Mesh Gradient Background -->
     <div class="mesh-gradient mesh-gradient--liquid"></div>
@@ -276,7 +276,7 @@
     {% endif %}
 
     <script>
-        {% if request.path|slice:":8" == "/legacy/" %}
+        {% if load_legacy_htmx %}
         document.addEventListener('htmx:afterSwap', function(event) {
             // Update desktop badge
             if (event.detail.target.id === 'cart-badge-desktop') {

@@ -268,6 +268,9 @@ Exit criteria:
   - switched legacy booking date input to plain validated `YYYY-MM-DD` text entry while keeping HTMX preview behavior
   - tightened CSP allowances by removing `code.jquery.com` and Persian datepicker stylesheet URL in `config/settings.py`
   - added legacy booking page regression assertion for removal of jQuery/Persian datepicker assets (`cowork/test_ui_ux.py`)
+  - added `theme.context_processors.legacy_runtime_flags` and switched base-template HTMX/runtime guards to context flags instead of broad legacy-path checks
+  - restricted HTMX script + `hx-headers` runtime to legacy routes with active `hx-*` behavior (`/legacy/cafe/menu|cart|dashboard` and `/legacy/cowork/` + `/legacy/cowork/book/*`)
+  - expanded route cutover tests to assert legacy auth pages (`/legacy/login/`) do not load HTMX runtime
   - updated UI assertions in `cafe/test_ui.py` and `cowork/test_ui_ux.py` for static card markup
   - added regression tests for HTMX isolation:
     - `cafe/test_cafe_logic.py` (customer + staff HTMX response branches)
@@ -281,6 +284,7 @@ Exit criteria:
   - post HTMX server-side isolation verification: `117 passed, 91 warnings`
   - post dependency/runtime isolation batch verification: `118 passed, 91 warnings`
   - post jQuery/datepicker removal verification: `119 passed, 92 warnings`
+  - post selective HTMX runtime-gating verification: `119 passed, 92 warnings`
 
 ## 12. Handoff Snapshot
 
