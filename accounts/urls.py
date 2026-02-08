@@ -1,5 +1,4 @@
 from django.urls import path
-from django.views.generic import RedirectView
 from .views import (
     LogoutView, home_view,
     admin_user_list, toggle_user_status, change_user_role, UserListAPI
@@ -9,10 +8,7 @@ app_name = 'accounts'
 
 urlpatterns = [
     path('', home_view, name='home'),
-    path('register/', RedirectView.as_view(url='/app/account', permanent=False), name='register'),
-    path('login/', RedirectView.as_view(url='/app/account', permanent=False), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('profile/', RedirectView.as_view(url='/app/account', permanent=False), name='profile'),
     
     # Admin Views
     path('admin/users/', admin_user_list, name='user_list'),

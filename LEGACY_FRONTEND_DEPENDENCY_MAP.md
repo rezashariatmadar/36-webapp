@@ -65,5 +65,6 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 - Decommission work must keep transitional auth redirects stable (`/legacy/login|register|profile` -> `/app/account`) until full legacy account cleanup is complete.
 - Remaining legacy account dependency surface is now primarily legacy admin/logout paths and redirect-only compatibility aliases.
 - Base template auth/profile entry links now point directly to SPA account route (`/app/account`) instead of legacy named auth routes.
+- Legacy named route aliases for account auth/profile (`accounts:login|register|profile`) have been removed from `accounts.urls`; compatibility redirects remain at `/legacy/login|register|profile`.
 - If a dependency is only used under `/legacy/*`, mark it as `active (legacy-only)` in future updates.
 - SPA-first routing is now always enabled; legacy cafe/cowork paths and legacy account auth/profile entry points now hard-redirect to SPA.

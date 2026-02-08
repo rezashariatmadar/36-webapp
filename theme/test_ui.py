@@ -18,11 +18,11 @@ class BaseUITests(TestCase):
         self.assertEqual(response.url, '/app/cafe')
 
     def test_auth_portals_redirect_to_spa_account(self):
-        response = self.client.get(reverse('accounts:login'))
+        response = self.client.get('/login/')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/app/account')
 
-        response = self.client.get(reverse('accounts:register'))
+        response = self.client.get('/register/')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/app/account')
 
