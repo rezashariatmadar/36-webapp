@@ -145,22 +145,7 @@ def add_to_cart(request, item_id):
 
     _save_cart(request, cart)
     
-    if _is_legacy_htmx(request):
-        # Prefer HX headers for reliable targeting (referer can be empty).
-        hx_target = request.headers.get('HX-Target', '')
-        hx_current_url = request.headers.get('HX-Current-URL', '') or request.META.get('HTTP_REFERER', '')
-        if hx_target == 'cart-list-container' or 'cart' in hx_current_url:
-            return cart_detail(request)
-            
-        quantity = cart[item_id_str]
-        return render(request, 'cafe/partials/item_quantity_control.html', {
-            'item': item,
-            'quantity': quantity,
-            'cart_count': sum(cart.values()),
-            'is_htmx': True,
-        })
-        
-    next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or 'cafe:menu'
+    next_url = request.POST.get('next') or request.GET.get('next') or request.META.get('HTTP_REFERER') or 'cafe:menu'
     return redirect(next_url)
 
 def remove_from_cart(request, item_id):
@@ -173,22 +158,7 @@ def remove_from_cart(request, item_id):
             del cart[item_id_str]
         _save_cart(request, cart)
     
-    if _is_legacy_htmx(request):
-        hx_target = request.headers.get('HX-Target', '')
-        hx_current_url = request.headers.get('HX-Current-URL', '') or request.META.get('HTTP_REFERER', '')
-        if hx_target == 'cart-list-container' or 'cart' in hx_current_url:
-            return cart_detail(request)
-            
-        item = get_object_or_404(MenuItem, id=item_id)
-        quantity = cart.get(item_id_str, 0)
-        return render(request, 'cafe/partials/item_quantity_control.html', {
-            'item': item,
-            'quantity': quantity,
-            'cart_count': sum(cart.values()),
-            'is_htmx': True,
-        })
-
-    next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or 'cafe:cart_detail'
+    next_url = request.POST.get('next') or request.GET.get('next') or request.META.get('HTTP_REFERER') or 'cafe:cart_detail'
     return redirect(next_url)
 
 def cart_detail(request):
@@ -214,9 +184,6 @@ def cart_detail(request):
             continue
             
     context = {'items': items, 'total': total, 'cart_count': sum(cart.values())}
-    if _is_legacy_htmx(request):
-        return render(request, 'cafe/partials/cart_list.html', context)
-        
     return render(request, 'cafe/cart.html', context)
 
 @login_required

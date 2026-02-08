@@ -2,6 +2,7 @@ import importlib
 
 from django.test import TestCase, override_settings
 from django.urls import clear_url_caches, reverse
+from django.contrib.auth import get_user_model
 
 import config.urls as project_urls
 
@@ -35,8 +36,8 @@ class SPARouteCutoverTests(TestCase):
 
         legacy_cafe = self.client.get("/legacy/cafe/menu/")
         self.assertEqual(legacy_cafe.status_code, 200)
-        self.assertContains(legacy_cafe, "unpkg.com/htmx.org@2.0.4")
-        self.assertContains(legacy_cafe, "hx-headers=")
+        self.assertNotContains(legacy_cafe, "unpkg.com/htmx.org@2.0.4")
+        self.assertNotContains(legacy_cafe, "hx-headers=")
         self.assertNotContains(legacy_cafe, "reactbits-islands.js")
         self.assertNotContains(legacy_cafe, "reactbits-islands.css")
 
@@ -49,6 +50,14 @@ class SPARouteCutoverTests(TestCase):
         self.assertEqual(legacy_cowork.status_code, 200)
         self.assertNotContains(legacy_cowork, "unpkg.com/htmx.org@2.0.4")
         self.assertNotContains(legacy_cowork, "hx-headers=")
+
+        user_model = get_user_model()
+        staff_user = user_model.objects.create_user(phone_number="09120000001", password="Testpass123!", is_staff=True)
+        self.client.force_login(staff_user)
+        legacy_dashboard = self.client.get("/legacy/cafe/dashboard/")
+        self.assertEqual(legacy_dashboard.status_code, 200)
+        self.assertContains(legacy_dashboard, "unpkg.com/htmx.org@2.0.4")
+        self.assertContains(legacy_dashboard, "hx-headers=")
 
         self.assertEqual(reverse("cafe:menu"), "/legacy/cafe/menu/")
         self.assertEqual(reverse("cowork:space_list"), "/legacy/cowork/")
@@ -85,9 +94,17 @@ class SPARouteCutoverTests(TestCase):
 
         legacy_cafe = self.client.get("/legacy/cafe/menu/")
         self.assertEqual(legacy_cafe.status_code, 200)
-        self.assertContains(legacy_cafe, "unpkg.com/htmx.org@2.0.4")
-        self.assertContains(legacy_cafe, "hx-headers=")
+        self.assertNotContains(legacy_cafe, "unpkg.com/htmx.org@2.0.4")
+        self.assertNotContains(legacy_cafe, "hx-headers=")
         self.assertNotContains(legacy_cafe, "reactbits-islands.js")
+
+        user_model = get_user_model()
+        staff_user = user_model.objects.create_user(phone_number="09120000002", password="Testpass123!", is_staff=True)
+        self.client.force_login(staff_user)
+        legacy_dashboard = self.client.get("/legacy/cafe/dashboard/")
+        self.assertEqual(legacy_dashboard.status_code, 200)
+        self.assertContains(legacy_dashboard, "unpkg.com/htmx.org@2.0.4")
+        self.assertContains(legacy_dashboard, "hx-headers=")
 
         catchall_spa = self.client.get("/random-non-system-path/")
         self.assertEqual(catchall_spa.status_code, 200)

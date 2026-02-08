@@ -99,19 +99,17 @@ class CafeLogicTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("cafe:menu"))
 
-    def test_add_to_cart_legacy_htmx_renders_partial(self):
+    def test_add_to_cart_legacy_hx_header_redirects(self):
         from .views import add_to_cart
 
         url = f"/legacy/cafe/cart/add/{self.item.id}/"
         request = self._get_request_with_session(url, method="post", htmx=True)
         request.user = self.user
 
-        with patch("cafe.views.render") as mock_render:
-            mock_render.side_effect = lambda _request, template_name, context=None: HttpResponse(template_name)
-            response = add_to_cart(request, self.item.id)
+        response = add_to_cart(request, self.item.id)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode(), "cafe/partials/item_quantity_control.html")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("cafe:menu"))
 
     def test_update_order_status_nonlegacy_htmx_redirects(self):
         from .views import update_order_status

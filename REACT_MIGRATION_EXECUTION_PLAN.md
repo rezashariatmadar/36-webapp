@@ -278,6 +278,13 @@ Exit criteria:
     - `theme/templates/cowork/partials/booking_preview.html` removed
   - tightened cutover assertions so `/legacy/cowork/` does not include HTMX runtime (`config/test_spa_cutover.py`)
   - updated cowork regression coverage for HX-header requests to render full templates (`cowork/test_cowork_logic.py`)
+  - removed cafe customer HTMX runtime path:
+    - `theme/templates/cafe/partials/item_quantity_control.html` now uses standard POST forms for `add_to_cart`/`remove_from_cart`
+    - `theme/templates/cafe/partials/cart_list.html` now uses standard POST forms for quantity changes
+    - `cafe/views.py` no longer returns customer HTMX partial branches for cart mutations/detail
+    - `theme/context_processors.legacy_runtime_flags` now loads HTMX runtime only on `/legacy/cafe/dashboard/`
+  - expanded cutover assertions so `/legacy/cafe/menu/` does not include HTMX runtime and `/legacy/cafe/dashboard/` does (`config/test_spa_cutover.py`)
+  - updated cafe logic coverage for legacy HX-header cart mutations to redirect full-page (`cafe/test_cafe_logic.py`)
   - removed unused legacy partial templates:
     - `theme/templates/cafe/partials/cart_badge.html`
     - `theme/templates/cowork/partials/space_items.html`
@@ -296,6 +303,7 @@ Exit criteria:
   - post jQuery/datepicker removal verification: `119 passed, 92 warnings`
   - post selective HTMX runtime-gating verification: `119 passed, 92 warnings`
   - post cowork HTMX removal verification: `119 passed, 92 warnings`
+  - post cafe customer HTMX removal verification: `119 passed, 92 warnings`
 
 ## 12. Handoff Snapshot
 
