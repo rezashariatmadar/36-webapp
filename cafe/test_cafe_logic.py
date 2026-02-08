@@ -17,10 +17,11 @@ class CafeLogicTests(TestCase):
         self.item = MenuItemFactory(price=10000)
 
     def _get_request_with_session(self, url, method="get", htmx=False, data=None):
+        request_kwargs = {"HTTP_HX_REQUEST": "true"} if htmx else {}
         if method.lower() == "post":
-            request = self.factory.post(url, data=data or {})
+            request = self.factory.post(url, data=data or {}, **request_kwargs)
         else:
-            request = self.factory.get(url, data=data or {})
+            request = self.factory.get(url, data=data or {}, **request_kwargs)
         
         # Add session support
         middleware = SessionMiddleware(lambda r: None)
@@ -31,9 +32,6 @@ class CafeLogicTests(TestCase):
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
         
-        # Add HTMX support (mock)
-        request.htmx = htmx
-
         return request
 
     def test_add_to_cart(self):

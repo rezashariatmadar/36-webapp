@@ -9,7 +9,8 @@ from .models import Booking, Space
 
 
 def _is_legacy_htmx(request):
-    return bool(getattr(request, "htmx", False) and request.path.startswith('/legacy/'))
+    is_htmx = request.headers.get('HX-Request', '').lower() == 'true'
+    return bool(is_htmx and request.path.startswith('/legacy/'))
 
 
 def space_list(request):

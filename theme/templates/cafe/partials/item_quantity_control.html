@@ -1,6 +1,6 @@
 <div id="item-control-{{ item.id }}" class="flex items-center justify-between gap-4 transition-all duration-300 w-full mt-4 glass-inset p-2 rounded-2xl">
     {# Signal the NAVBAR cart badge to update its count #}
-    {% if request.htmx %}
+    {% if is_htmx %}
     <span hx-swap-oob="true" id="cart-badge-desktop" class="badge badge-accent badge-xs font-black absolute -top-1 -right-1 {% if not cart_count %}hidden{% endif %}">
         {{ cart_count|default:0 }}
     </span>

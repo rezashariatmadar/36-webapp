@@ -84,8 +84,7 @@ class CoworkLogicTests(TestCase):
     def test_space_list_nonlegacy_htmx_renders_full_template(self):
         from .views import space_list
 
-        request = self.factory.get("/cowork/")
-        request.htmx = True
+        request = self.factory.get("/cowork/", HTTP_HX_REQUEST="true")
 
         with patch("cowork.views.render") as mock_render:
             mock_render.side_effect = lambda _request, template_name, context=None: HttpResponse(template_name)
@@ -97,8 +96,7 @@ class CoworkLogicTests(TestCase):
     def test_space_list_legacy_htmx_renders_partial_template(self):
         from .views import space_list
 
-        request = self.factory.get("/legacy/cowork/")
-        request.htmx = True
+        request = self.factory.get("/legacy/cowork/", HTTP_HX_REQUEST="true")
 
         with patch("cowork.views.render") as mock_render:
             mock_render.side_effect = lambda _request, template_name, context=None: HttpResponse(template_name)
@@ -113,8 +111,8 @@ class CoworkLogicTests(TestCase):
         request = self.factory.get(
             f"/cowork/book/{self.space.id}/",
             data={"booking_type": Booking.BookingType.HOURLY, "start_time": "2026-03-01"},
+            HTTP_HX_REQUEST="true",
         )
-        request.htmx = True
         request.user = self.user
 
         with patch("cowork.views.render") as mock_render:
@@ -130,8 +128,8 @@ class CoworkLogicTests(TestCase):
         request = self.factory.get(
             f"/legacy/cowork/book/{self.space.id}/",
             data={"booking_type": Booking.BookingType.DAILY, "start_time": "2026-03-01"},
+            HTTP_HX_REQUEST="true",
         )
-        request.htmx = True
         request.user = self.user
 
         with patch("cowork.views.render") as mock_render:

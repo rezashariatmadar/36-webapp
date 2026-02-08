@@ -24,7 +24,8 @@ MAX_PER_ITEM = 20
 
 
 def _is_legacy_htmx(request):
-    return bool(getattr(request, "htmx", False) and request.path.startswith('/legacy/'))
+    is_htmx = request.headers.get('HX-Request', '').lower() == 'true'
+    return bool(is_htmx and request.path.startswith('/legacy/'))
 
 def is_staff_member(user):
     return user.is_authenticated and (user.is_staff or user.groups.filter(name__in=['Barista', 'Admin']).exists())
@@ -155,7 +156,8 @@ def add_to_cart(request, item_id):
         return render(request, 'cafe/partials/item_quantity_control.html', {
             'item': item,
             'quantity': quantity,
-            'cart_count': sum(cart.values())
+            'cart_count': sum(cart.values()),
+            'is_htmx': True,
         })
         
     next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or 'cafe:menu'
@@ -182,7 +184,8 @@ def remove_from_cart(request, item_id):
         return render(request, 'cafe/partials/item_quantity_control.html', {
             'item': item,
             'quantity': quantity,
-            'cart_count': sum(cart.values())
+            'cart_count': sum(cart.values()),
+            'is_htmx': True,
         })
 
     next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or 'cafe:cart_detail'
