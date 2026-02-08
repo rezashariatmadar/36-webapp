@@ -43,6 +43,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Default-mode `/cafe/*` and `/cowork/*` now redirect into `/legacy/*` ownership.
 - HTMX script loading is scoped to `/legacy/*` template responses only.
 - HTMX body headers/event listeners in base template are scoped to `/legacy/*` only.
+- Server-side HTMX partial responses in `cafe` and `cowork` views are scoped to `/legacy/*` requests only.
 
 ### In Progress
 
@@ -244,12 +245,17 @@ Exit criteria:
   - extended cutover tests to assert HTMX script is absent on non-legacy pages and present on `/legacy/*` pages
   - scoped `hx-headers` and HTMX-specific listeners in `theme/templates/base.html` to `/legacy/*`
   - extended cutover tests to assert `hx-headers` is absent on non-legacy pages and present on `/legacy/*`
+  - added server-side HTMX path guards in `cafe/views.py` and `cowork/views.py` so partial responses only render for `/legacy/*` requests
+  - added regression tests for HTMX isolation:
+    - `cafe/test_cafe_logic.py` (customer + staff HTMX response branches)
+    - `cowork/test_cowork_logic.py` (space list + booking preview HTMX branches)
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`
   - re-verified full suite (post-regression expansion): `109 passed, 74 warnings`
   - post-decommission full suite re-verified: `109 passed, 74 warnings`
   - route-isolation increment full suite: `109 passed, 74 warnings`
+  - post HTMX server-side isolation verification: `117 passed, 91 warnings`
 
 ## 12. Handoff Snapshot
 

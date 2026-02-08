@@ -22,6 +22,10 @@ CART_SCHEMA_VERSION = 1
 MAX_CART_ITEMS = 50
 MAX_PER_ITEM = 20
 
+
+def _is_legacy_htmx(request):
+    return bool(getattr(request, "htmx", False) and request.path.startswith('/legacy/'))
+
 def is_staff_member(user):
     return user.is_authenticated and (user.is_staff or user.groups.filter(name__in=['Barista', 'Admin']).exists())
 
@@ -140,7 +144,7 @@ def add_to_cart(request, item_id):
 
     _save_cart(request, cart)
     
-    if request.htmx:
+    if _is_legacy_htmx(request):
         # Prefer HX headers for reliable targeting (referer can be empty).
         hx_target = request.headers.get('HX-Target', '')
         hx_current_url = request.headers.get('HX-Current-URL', '') or request.META.get('HTTP_REFERER', '')
@@ -167,7 +171,7 @@ def remove_from_cart(request, item_id):
             del cart[item_id_str]
         _save_cart(request, cart)
     
-    if request.htmx:
+    if _is_legacy_htmx(request):
         hx_target = request.headers.get('HX-Target', '')
         hx_current_url = request.headers.get('HX-Current-URL', '') or request.META.get('HTTP_REFERER', '')
         if hx_target == 'cart-list-container' or 'cart' in hx_current_url:
@@ -207,7 +211,7 @@ def cart_detail(request):
             continue
             
     context = {'items': items, 'total': total, 'cart_count': sum(cart.values())}
-    if request.htmx:
+    if _is_legacy_htmx(request):
         return render(request, 'cafe/partials/cart_list.html', context)
         
     return render(request, 'cafe/cart.html', context)
@@ -507,7 +511,7 @@ def customer_lookup(request):
 def barista_dashboard(request):
     active_orders = CafeOrder.objects.filter(~Q(status__in=[CafeOrder.Status.DELIVERED, CafeOrder.Status.CANCELLED])).prefetch_related('items__menu_item').order_by('created_at')
     
-    if request.htmx:
+    if _is_legacy_htmx(request):
         return render(request, 'cafe/partials/order_list.html', {'orders': active_orders})
         
     return render(request, 'cafe/barista_dashboard.html', {'orders': active_orders})
@@ -528,7 +532,7 @@ def update_order_status(request, order_id, new_status):
         extra={"order_id": order_id, "from": previous, "to": new_status, "actor": request.user.id, "ip": request.META.get("REMOTE_ADDR")}
     )
     
-    if request.htmx:
+    if _is_legacy_htmx(request):
         return barista_dashboard(request)
         
     return redirect('cafe:barista_dashboard')
@@ -550,7 +554,7 @@ def toggle_order_payment(request, order_id):
         extra={"order_id": order_id, "from": previous, "to": order.is_paid, "actor": request.user.id, "ip": request.META.get("REMOTE_ADDR")}
     )
     
-    if request.htmx:
+    if _is_legacy_htmx(request):
         return barista_dashboard(request)
         
     return redirect('cafe:barista_dashboard')

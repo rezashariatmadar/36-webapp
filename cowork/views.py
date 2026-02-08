@@ -7,6 +7,11 @@ from django.utils import timezone
 from .forms import BookingForm
 from .models import Booking, Space
 
+
+def _is_legacy_htmx(request):
+    return bool(getattr(request, "htmx", False) and request.path.startswith('/legacy/'))
+
+
 def space_list(request):
     # Refresh statuses based on current time
     now = timezone.now().date()
@@ -51,7 +56,7 @@ def space_list(request):
         
     has_spaces = any(zone["spaces"] for zone in zones_with_spaces)
 
-    if request.htmx:
+    if _is_legacy_htmx(request):
         return render(
             request,
             'cowork/partials/zone_list.html',
@@ -100,7 +105,7 @@ def book_space(request, space_id):
         form = BookingForm(space=space)
 
     # Handle HTMX dynamic preview
-    if request.htmx:
+    if _is_legacy_htmx(request):
         # Update form instance with current data to calculate end_time
         booking_type = request.GET.get('booking_type')
         start_time_str = request.GET.get('start_time')

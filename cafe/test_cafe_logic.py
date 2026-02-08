@@ -2,6 +2,8 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.http import HttpResponse
+from unittest.mock import patch
 from .factories import MenuItemFactory, MenuCategoryFactory
 from .models import MenuItem, CafeOrder, OrderItem, MenuCategory
 from accounts.factories import UserFactory
@@ -10,11 +12,15 @@ class CafeLogicTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.user = UserFactory()
+        self.staff_user = UserFactory(is_staff=True)
         # MenuItemFactory creates a MenuCategory via SubFactory
         self.item = MenuItemFactory(price=10000)
 
-    def _get_request_with_session(self, url):
-        request = self.factory.get(url)
+    def _get_request_with_session(self, url, method="get", htmx=False, data=None):
+        if method.lower() == "post":
+            request = self.factory.post(url, data=data or {})
+        else:
+            request = self.factory.get(url, data=data or {})
         
         # Add session support
         middleware = SessionMiddleware(lambda r: None)
@@ -26,7 +32,7 @@ class CafeLogicTests(TestCase):
         setattr(request, '_messages', messages)
         
         # Add HTMX support (mock)
-        request.htmx = False
+        request.htmx = htmx
 
         return request
 
@@ -82,3 +88,67 @@ class CafeLogicTests(TestCase):
         
         order.refresh_from_db()
         self.assertEqual(order.total_price, 25000)
+
+    def test_add_to_cart_nonlegacy_htmx_redirects(self):
+        from .views import add_to_cart
+
+        url = f"/cafe/cart/add/{self.item.id}/"
+        request = self._get_request_with_session(url, method="post", htmx=True)
+        request.user = self.user
+
+        response = add_to_cart(request, self.item.id)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("cafe:menu"))
+
+    def test_add_to_cart_legacy_htmx_renders_partial(self):
+        from .views import add_to_cart
+
+        url = f"/legacy/cafe/cart/add/{self.item.id}/"
+        request = self._get_request_with_session(url, method="post", htmx=True)
+        request.user = self.user
+
+        with patch("cafe.views.render") as mock_render:
+            mock_render.side_effect = lambda _request, template_name, context=None: HttpResponse(template_name)
+            response = add_to_cart(request, self.item.id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode(), "cafe/partials/item_quantity_control.html")
+
+    def test_update_order_status_nonlegacy_htmx_redirects(self):
+        from .views import update_order_status
+
+        order = CafeOrder.objects.create(user=self.user)
+        request = self._get_request_with_session(
+            f"/cafe/order/{order.id}/status/{CafeOrder.Status.PREPARING}/",
+            method="post",
+            htmx=True,
+        )
+        request.user = self.staff_user
+
+        response = update_order_status(request, order.id, CafeOrder.Status.PREPARING)
+        order.refresh_from_db()
+
+        self.assertEqual(order.status, CafeOrder.Status.PREPARING)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("cafe:barista_dashboard"))
+
+    def test_update_order_status_legacy_htmx_renders_partial_dashboard(self):
+        from .views import update_order_status
+
+        order = CafeOrder.objects.create(user=self.user)
+        request = self._get_request_with_session(
+            f"/legacy/cafe/order/{order.id}/status/{CafeOrder.Status.PREPARING}/",
+            method="post",
+            htmx=True,
+        )
+        request.user = self.staff_user
+
+        with patch("cafe.views.render") as mock_render:
+            mock_render.side_effect = lambda _request, template_name, context=None: HttpResponse(template_name)
+            response = update_order_status(request, order.id, CafeOrder.Status.PREPARING)
+
+        order.refresh_from_db()
+        self.assertEqual(order.status, CafeOrder.Status.PREPARING)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode(), "cafe/partials/order_list.html")

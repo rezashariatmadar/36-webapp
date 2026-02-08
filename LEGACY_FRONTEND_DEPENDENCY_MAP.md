@@ -22,11 +22,12 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 ## Phase-Ordered Decommission Checklist
 
 - [x] Remove Alpine.js runtime dependency from templates.
-- [ ] Isolate HTMX-dependent routes to `/legacy/*` only.
+- [x] Isolate HTMX-dependent routes to `/legacy/*` only.
 - Progress note: default-mode `/cafe/*` and `/cowork/*` now redirect to `/legacy/*`, and primary reverse names resolve to `/legacy/*` for these apps.
 - Progress note: HTMX CDN script is now loaded only when `request.path` is under `/legacy/*`, with cutover regression assertions.
 - Progress note: `hx-headers` body attribute and HTMX-specific event listeners in base template are now bound only on `/legacy/*`.
-- [ ] Remove jQuery-dependent datepicker glue in `theme/templates/base.html`.
+- Progress note: server-side HTMX partial rendering in `cafe/views.py` and `cowork/views.py` is now guarded by legacy path checks.
+- [x] Remove jQuery-dependent datepicker glue in `theme/templates/base.html`.
 - [ ] Remove `django-htmx` from `config/settings.py` and dependency manifests.
 - [ ] Remove React Bits islands bundle from legacy base template.
 - [ ] Prune unused template partials and legacy static JS.
