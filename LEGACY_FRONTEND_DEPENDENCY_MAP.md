@@ -31,6 +31,7 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 - Progress note: legacy cowork pages no longer rely on HTMX (space list auto-refresh and booking preview were removed), and HTMX runtime gating is now cafe-only.
 - Progress note: legacy cafe customer pages (`menu`, `cart`) no longer use HTMX controls; HTMX runtime gating is now limited to legacy barista dashboard only.
 - Progress note: legacy barista dashboard no longer uses HTMX actions/polling and now relies on standard POST flows plus timed page refresh.
+- Progress note: all tracked legacy frontend runtime dependencies (Alpine, HTMX, jQuery/datepicker, React Bits islands) are now decommissioned.
 - [x] Remove jQuery-dependent datepicker glue in `theme/templates/base.html`.
 - [x] Remove `django-htmx` runtime wiring from `config/settings.py`.
 - [x] Remove `django-htmx` from dependency manifests.

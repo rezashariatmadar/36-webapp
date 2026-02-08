@@ -286,6 +286,9 @@ Exit criteria:
     - `theme/templates/cafe/partials/order_list.html` no longer uses `hx-post` mutations
     - `cafe/views.py` no longer has HTMX-specific branches for dashboard/order mutations
     - removed temporary HTMX runtime context-processor wiring from `config/settings.py` and deleted `theme/context_processors.py`
+  - set SPA cutover flag default to on in runtime settings:
+    - `SPA_PRIMARY_ROUTES` now defaults to `True` when `DJANGO_SPA_PRIMARY` is not explicitly set
+    - rollback path remains available via `DJANGO_SPA_PRIMARY=false`
   - expanded cutover assertions so `/legacy/cafe/menu/` and `/legacy/cafe/dashboard/` both remain HTMX-free (`config/test_spa_cutover.py`)
   - updated cafe logic coverage for legacy HX-header cart mutations to redirect full-page (`cafe/test_cafe_logic.py`)
   - removed unused legacy partial templates:
@@ -317,19 +320,19 @@ Exit criteria:
   - customer flows (`/app/cafe`, `/app/cowork`)
   - staff flows (`/app/staff`)
   - account flows (`/app/account`)
-- Root cutover is implemented but controlled by feature flag.
+- Root cutover is default-on and still controllable via feature flag override.
 
 ### Flag and Route Behavior
 
-- Default mode (`DJANGO_SPA_PRIMARY=false`):
-  - legacy routes remain primary.
-- Cutover mode (`DJANGO_SPA_PRIMARY=true`):
+- Default mode (`DJANGO_SPA_PRIMARY=true` or unset):
   - root and non-system routes resolve to SPA shell.
   - legacy pages remain reachable under `/legacy/*`.
   - compatibility redirects:
     - `/login|/register|/profile` -> `/app/account`
     - `/cafe/*` -> `/app/cafe`
     - `/cowork/*` -> `/app/cowork`
+- Rollback mode (`DJANGO_SPA_PRIMARY=false`):
+  - legacy routes remain primary.
 
 ### Last Verified Commands
 
@@ -350,8 +353,8 @@ Use this section first if chat history/context is truncated.
 ### Current Baseline (Trusted)
 
 - Backend + SPA migration changes are applied and test-verified.
-- Full suite currently passes (`109 passed`).
-- Cutover remains feature-flagged (`DJANGO_SPA_PRIMARY`) and is not forced on by default.
+- Full suite currently passes (`119 passed`).
+- Cutover remains feature-flagged (`DJANGO_SPA_PRIMARY`) and defaults to on unless explicitly disabled.
 
 ### Source of Truth Files
 
