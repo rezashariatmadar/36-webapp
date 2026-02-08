@@ -5,6 +5,7 @@ from rest_framework.test import APIClient
 from accounts.factories import UserFactory
 from cafe.factories import MenuCategoryFactory, MenuItemFactory
 from cafe.models import CafeOrder, OrderItem
+from cafe.views import MAX_CART_ITEMS
 
 
 class CafeSPAApiTests(TestCase):
@@ -36,6 +37,37 @@ class CafeSPAApiTests(TestCase):
         )
         self.assertEqual(remove_response.status_code, 200)
         self.assertEqual(remove_response.data["cart_count"], 0)
+
+    def test_cart_item_delta_validation(self):
+        response = self.client.post(
+            "/api/cafe/cart/items/",
+            {"menu_item_id": self.item.id, "delta": 2},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_cart_rejects_unavailable_item(self):
+        self.item.is_available = False
+        self.item.save(update_fields=["is_available"])
+        response = self.client.post(
+            "/api/cafe/cart/items/",
+            {"menu_item_id": self.item.id, "delta": 1},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 409)
+
+    def test_cart_limit_reached(self):
+        session = self.client.session
+        session["cart"] = {str(self.item.id): MAX_CART_ITEMS}
+        session["cart_v"] = 1
+        session.save()
+
+        response = self.client.post(
+            "/api/cafe/cart/items/",
+            {"menu_item_id": self.item.id, "delta": 1},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
 
     def test_checkout_requires_authentication(self):
         self.client.post("/api/cafe/cart/items/", {"menu_item_id": self.item.id, "delta": 1}, format="json")
@@ -100,6 +132,15 @@ class CafeStaffSPAApiTests(TestCase):
         self.assertEqual(self.order.status, CafeOrder.Status.PREPARING)
         self.assertTrue(self.order.is_paid)
 
+    def test_staff_status_rejects_invalid_value(self):
+        self.client.force_authenticate(user=self.staff)
+        response = self.client.post(
+            f"/api/cafe/staff/orders/{self.order.id}/status/",
+            {"status": "NOT_A_REAL_STATUS"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+
     def test_staff_menu_toggle_and_customer_lookup(self):
         self.client.force_authenticate(user=self.staff)
 
@@ -115,3 +156,30 @@ class CafeStaffSPAApiTests(TestCase):
         lookup_response = self.client.get("/api/cafe/staff/customer-lookup/", {"q": "0912555"})
         self.assertEqual(lookup_response.status_code, 200)
         self.assertEqual(len(lookup_response.data["customers"]), 1)
+
+    def test_staff_customer_lookup_by_name_and_empty_query(self):
+        self.customer.full_name = "Customer SearchName"
+        self.customer.save(update_fields=["full_name"])
+        self.client.force_authenticate(user=self.staff)
+
+        by_name = self.client.get("/api/cafe/staff/customer-lookup/", {"q": "SearchName"})
+        self.assertEqual(by_name.status_code, 200)
+        self.assertEqual(len(by_name.data["customers"]), 1)
+
+        empty_query = self.client.get("/api/cafe/staff/customer-lookup/")
+        self.assertEqual(empty_query.status_code, 200)
+        self.assertEqual(empty_query.data["customers"], [])
+
+    def test_staff_endpoints_require_staff_permission(self):
+        regular_user = UserFactory()
+        self.client.force_authenticate(user=regular_user)
+
+        menu_response = self.client.get("/api/cafe/staff/menu-items/")
+        self.assertEqual(menu_response.status_code, 403)
+
+        toggle_response = self.client.post(
+            f"/api/cafe/staff/menu-items/{self.item.id}/toggle-availability/",
+            {},
+            format="json",
+        )
+        self.assertEqual(toggle_response.status_code, 403)

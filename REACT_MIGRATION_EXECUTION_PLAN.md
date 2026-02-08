@@ -34,10 +34,13 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Regression tests added for new auth/cafe/cowork APIs and SPA shell mount.
 - Session auth/account APIs expanded with login, logout, register, and profile contracts.
 - React account route is implemented at `/app/account` with SPA-native auth/profile UI.
+- Feature-flagged root cutover routing implemented via `DJANGO_SPA_PRIMARY`.
+- Legacy route fallback path added under `/legacy/*` for safe rollback operations.
+- Expanded regression coverage for migration APIs and cutover behavior; full suite currently green.
 
 ### In Progress
 
-- Root-route cutover and legacy decommission preparation.
+- Legacy dependency decommission preparation.
 - Expanded SPA navigation and role-aware surfaces.
 
 ### Not Started
@@ -156,7 +159,7 @@ Exit criteria:
 - [x] Add browser smoke artifacts for migrated flows in `output/playwright/`.
 - [x] Add account auth/profile APIs (`/api/auth/login|logout|register|profile`).
 - [x] Add SPA account route and account UX (`/app/account`).
-- [ ] Prepare root-route cutover plan with redirect map.
+- [x] Prepare and implement root-route cutover with redirect map (feature-flagged).
 - [ ] Decommission legacy frontend dependencies.
 
 ### Verification Checklist
@@ -165,6 +168,7 @@ Exit criteria:
 - [x] `npm run build` passes.
 - [x] Playwright smoke set captured for `/app` customer+staff routes.
 - [x] Playwright smoke set captured for `/app/account`.
+- [x] Feature-flagged route cutover tests pass.
 - [ ] Legacy-template dependency map completed.
 - [ ] Final cutover sign-off approved.
 
@@ -206,3 +210,89 @@ Exit criteria:
 - Captured account smoke screenshots:
   - `output/playwright/app-account.png`
   - `output/playwright/app-account-anon.png`
+- Added feature-flagged root route cutover controls:
+  - setting: `DJANGO_SPA_PRIMARY` / `SPA_PRIMARY_ROUTES`
+  - when enabled: root and non-system routes resolve to SPA shell
+  - legacy views preserved under `/legacy/*`
+  - compatibility redirects for `/login`, `/register`, `/profile`, `/cafe/*`, `/cowork/*`
+- Added cutover regression tests:
+  - `config/test_spa_cutover.py`
+- Expanded migration regression suite across:
+  - account auth/profile branches
+  - cafe customer+staff edge cases
+  - cowork validation and auth checks
+  - cutover redirects + SPA catchall
+- Latest validation results:
+  - targeted migration tests: `34 passed`
+  - full test suite: `109 passed`
+  - re-verified full suite (post-regression expansion): `109 passed, 74 warnings`
+
+## 12. Handoff Snapshot
+
+### Current Status
+
+- Migration is stable at API + SPA layers for:
+  - customer flows (`/app/cafe`, `/app/cowork`)
+  - staff flows (`/app/staff`)
+  - account flows (`/app/account`)
+- Root cutover is implemented but controlled by feature flag.
+
+### Flag and Route Behavior
+
+- Default mode (`DJANGO_SPA_PRIMARY=false`):
+  - legacy routes remain primary.
+- Cutover mode (`DJANGO_SPA_PRIMARY=true`):
+  - root and non-system routes resolve to SPA shell.
+  - legacy pages remain reachable under `/legacy/*`.
+  - compatibility redirects:
+    - `/login|/register|/profile` -> `/app/account`
+    - `/cafe/*` -> `/app/cafe`
+    - `/cowork/*` -> `/app/cowork`
+
+### Last Verified Commands
+
+- `uv run pytest accounts/test_spa_api.py cafe/tests/test_spa_api.py cowork/test_spa_api.py config/test_spa_cutover.py -q`
+- `uv run pytest -q`
+- `cd theme/static_src && npm run build`
+- `uv run python manage.py check`
+
+### Rollback Reference
+
+- Checkpoint commit: `9f4f7f6`
+- Checkpoint tag: `rollback/checkpoint-2026-02-08-react-migration`
+
+## 13. Context Recovery and Resume Checklist
+
+Use this section first if chat history/context is truncated.
+
+### Current Baseline (Trusted)
+
+- Backend + SPA migration changes are applied and test-verified.
+- Full suite currently passes (`109 passed`).
+- Cutover remains feature-flagged (`DJANGO_SPA_PRIMARY`) and is not forced on by default.
+
+### Source of Truth Files
+
+- Migration tracker: `REACT_MIGRATION_EXECUTION_PLAN.md`
+- Cutover wiring: `config/settings.py`, `config/urls.py`, `config/legacy_urls.py`
+- API regression tests:
+  - `accounts/test_spa_api.py`
+  - `cafe/tests/test_spa_api.py`
+  - `cowork/test_spa_api.py`
+  - `config/test_spa_cutover.py`
+
+### Resume Commands
+
+- Backend tests:
+  - `uv run pytest -q`
+- Focused migration suite:
+  - `uv run pytest accounts/test_spa_api.py cafe/tests/test_spa_api.py cowork/test_spa_api.py config/test_spa_cutover.py -q`
+- Frontend production bundle:
+  - `cd theme/static_src && npm run build`
+
+### Next Implementation Focus (Ordered)
+
+- Complete legacy-template dependency map (what can be deleted vs must remain).
+- Decommission unused HTMX/Alpine/jQuery/template fragments behind the migration.
+- Run full regression + smoke checks after each decommission batch.
+- Move `DJANGO_SPA_PRIMARY` from opt-in to default-on only after decommission sign-off.

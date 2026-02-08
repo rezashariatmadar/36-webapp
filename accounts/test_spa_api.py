@@ -63,6 +63,27 @@ class SessionAccountAPITests(TestCase):
         self.assertEqual(logout_response.status_code, 200)
         self.assertFalse(logout_response.data["authenticated"])
 
+    def test_login_validation_and_invalid_credentials(self):
+        missing_fields = self.client.post("/api/auth/login/", {"phone_number": ""}, format="json")
+        self.assertEqual(missing_fields.status_code, 400)
+
+        invalid_credentials = self.client.post(
+            "/api/auth/login/",
+            {"phone_number": "09127770000", "password": "wrong-password"},
+            format="json",
+        )
+        self.assertEqual(invalid_credentials.status_code, 400)
+
+    def test_login_with_inactive_user_returns_invalid_credentials_shape(self):
+        self.user.is_active = False
+        self.user.save(update_fields=["is_active"])
+        response = self.client.post(
+            "/api/auth/login/",
+            {"phone_number": "09127770000", "password": "Pass12345!"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+
     def test_profile_patch_updates_authenticated_user(self):
         self.client.force_authenticate(user=self.user)
         patch_response = self.client.patch(
@@ -77,4 +98,39 @@ class SessionAccountAPITests(TestCase):
 
     def test_profile_requires_authentication(self):
         response = self.client.get("/api/auth/profile/")
+        self.assertIn(response.status_code, [401, 403])
+
+    def test_profile_get_for_authenticated_user(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get("/api/auth/profile/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["authenticated"])
+        self.assertEqual(response.data["user"]["phone_number"], self.user.phone_number)
+
+    def test_profile_patch_validation_error(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            "/api/auth/profile/",
+            {"full_name": "Updated Name", "birth_date": "invalid-date"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("errors", response.data)
+
+    def test_register_validation_error(self):
+        response = self.client.post(
+            "/api/auth/register/",
+            {
+                "phone_number": "09123334444",
+                "password": "Pass12345!",
+                "confirm_password": "different",
+                "full_name": "Mismatch User",
+                "national_id": "",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_logout_requires_authentication(self):
+        response = self.client.post("/api/auth/logout/", {}, format="json")
         self.assertIn(response.status_code, [401, 403])
