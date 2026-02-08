@@ -188,6 +188,6 @@ CONTENT_SECURITY_POLICY = os.getenv(
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TAILWIND_APP_NAME = 'theme'
 AUTH_USER_MODEL = 'accounts.CustomUser'
-LOGIN_URL = 'accounts:login'
+LOGIN_URL = '/app/account'
 LOGIN_REDIRECT_URL = 'accounts:home'
 LOGOUT_REDIRECT_URL = 'accounts:home'

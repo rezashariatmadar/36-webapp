@@ -35,7 +35,7 @@ class CorePagesRegressionTests(TestCase):
         response = self.client.get(reverse('accounts:user_list'))
         self.assertEqual(response.status_code, 302)
         # Should redirect to login because of admin_required (which usually uses login_required)
-        self.assertIn(reverse('accounts:login'), response.url)
+        self.assertIn('/app/account', response.url)
 
     def test_barista_dashboard_redirects_for_anonymous(self):
         response = self.client.get(reverse('cafe:barista_dashboard'))

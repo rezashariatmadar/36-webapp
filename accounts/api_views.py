@@ -16,14 +16,14 @@ def _session_payload(request):
         return {
             "authenticated": False,
             "csrf_token": csrf_token,
-            "login_url": reverse("accounts:login"),
+            "login_url": "/app/account",
         }
 
     user = request.user
     return {
         "authenticated": True,
         "csrf_token": csrf_token,
-        "login_url": reverse("accounts:login"),
+        "login_url": "/app/account",
         "logout_url": reverse("accounts:logout"),
         "user": {
             "id": user.id,

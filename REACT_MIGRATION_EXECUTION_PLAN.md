@@ -56,7 +56,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 ### Not Started
 
 - Hard removal of remaining transitional legacy admin routes after staff/admin parity sign-off.
-- Cleanup of legacy account route names once LOGIN_URL/logout dependencies migrate fully to SPA-native URLs.
+- Cleanup of redirect-only legacy account aliases once external deep-link compatibility requirements are closed.
 
 ## 4. Migration Phases
 
@@ -312,6 +312,10 @@ Exit criteria:
   - deleted legacy templates: `theme/templates/registration/login.html`, `theme/templates/registration/register.html`, `theme/templates/accounts/profile.html`
   - removed unused template-backed view classes/functions from `accounts/views.py`
   - removed unused `CustomAuthenticationForm` from `accounts/forms.py`
+- migrated auth-required redirect targets to SPA account:
+  - `LOGIN_URL` now points directly to `/app/account`
+  - session payload `login_url` now returns `/app/account`
+  - updated auth redirect regression checks in `accounts/test_regression.py` and `accounts/test_rbac.py`
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`
@@ -328,6 +332,7 @@ Exit criteria:
   - post legacy cafe/cowork hard-disable verification: `119 passed, 91 warnings`
   - post legacy account route redirect verification: `119 passed, 91 warnings`
   - post legacy account template cleanup verification: `119 passed, 91 warnings`
+  - post SPA-native auth redirect target verification: `119 passed, 91 warnings`
 
 ## 12. Handoff Snapshot
 
@@ -399,5 +404,5 @@ Use this section first if chat history/context is truncated.
 ### Next Implementation Focus (Ordered)
 
 - Decommission remaining legacy admin/logout route dependencies under `/legacy/*` after parity sign-off.
-- Migrate `LOGIN_URL`/logout named-route dependencies to SPA-native URLs and remove redirect-only aliases.
+- Remove redirect-only alias routes (`/login|/register|/profile`) when deep-link compatibility is no longer needed.
 - Run full regression + smoke checks after each decommission batch.
