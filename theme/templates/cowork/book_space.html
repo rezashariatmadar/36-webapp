@@ -3,62 +3,6 @@
 
 {% block title %}تکمیل رزرو - ۳۶{% endblock %}
 
-{% block extra_head %}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-    (function() {
-        const initDatePicker = () => {
-            if (typeof window.jQuery !== 'function' || typeof window.persianDate === 'undefined') return;
-            const $ = window.jQuery;
-
-            $('.jalali-date').each(function() {
-                const $input = $(this);
-                if ($input.data('datepicker-initialized')) return;
-                if (typeof $input.persianDatepicker !== 'function') return;
-
-                $input.persianDatepicker({
-                    format: 'YYYY-MM-DD',
-                    autoClose: true,
-                    initialValue: false,
-                    observer: true,
-                    altField: $input,
-                    altFormat: 'YYYY-MM-DD',
-                    persianDigit: false,
-                    calendar: {
-                        persian: {
-                            leapYearMode: 'astronomical'
-                        }
-                    },
-                    onSelect: function(unix) {
-                        const formattedDate = new persianDate(unix).format('YYYY-MM-DD');
-                        $input.val(formattedDate);
-                        if (window.htmx) {
-                            htmx.trigger($input[0], 'change');
-                        }
-                    }
-                });
-
-                $input.data('datepicker-initialized', true);
-            });
-        };
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initDatePicker, { once: true });
-        } else {
-            initDatePicker();
-        }
-
-        document.addEventListener('htmx:afterSwap', initDatePicker);
-    })();
-</script>
-{% endblock %}
-
 {% block content %}
 <div class="max-w-md mx-auto text-white">
     <div class="mb-8 text-center fade-in-once">
@@ -107,7 +51,8 @@
                         <span class="label-text font-bold text-white/80">تاریخ شروع</span>
                     </label>
                     <input type="text" name="start_time" autocomplete="off"
-                           class="jalali-date input input-bordered w-full text-left ltr bg-white/5 border-white/10 text-white focus:bg-white/10 focus:border-accent transition-all rounded-2xl" 
+                           class="input input-bordered w-full text-left ltr bg-white/5 border-white/10 text-white focus:bg-white/10 focus:border-accent transition-all rounded-2xl"
+                           pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" inputmode="numeric" placeholder="YYYY-MM-DD"
                            required value="{{ form.start_time.value|default:'' }}"
                            hx-get="{% url 'cowork:book_space' space.id %}"
                            hx-trigger="change"

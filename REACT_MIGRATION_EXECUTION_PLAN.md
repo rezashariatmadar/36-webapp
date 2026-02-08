@@ -47,6 +47,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - `django-htmx` app/middleware wiring removed from runtime settings; legacy HTMX detection now uses request headers.
 - `django-htmx` dependency has been removed from project manifests (`pyproject.toml`, `uv.lock`).
 - React Bits runtime assets and mount containers have been removed from template runtime (`base.html` and legacy UI fragments now use static markup).
+- jQuery/Persian datepicker runtime assets have been removed from legacy booking template flow (`theme/templates/cowork/book_space.html`).
 
 ### In Progress
 
@@ -263,6 +264,10 @@ Exit criteria:
     - `theme/templates/cafe/menu.html`
     - `theme/templates/cowork/partials/zone_list.html`
   - removed React Bits static artifacts from `theme/static/js/` and removed React Bits build scripts from `theme/static_src/package.json`
+  - removed jQuery + Persian datepicker includes and init script from `theme/templates/cowork/book_space.html`
+  - switched legacy booking date input to plain validated `YYYY-MM-DD` text entry while keeping HTMX preview behavior
+  - tightened CSP allowances by removing `code.jquery.com` and Persian datepicker stylesheet URL in `config/settings.py`
+  - added legacy booking page regression assertion for removal of jQuery/Persian datepicker assets (`cowork/test_ui_ux.py`)
   - updated UI assertions in `cafe/test_ui.py` and `cowork/test_ui_ux.py` for static card markup
   - added regression tests for HTMX isolation:
     - `cafe/test_cafe_logic.py` (customer + staff HTMX response branches)
@@ -275,6 +280,7 @@ Exit criteria:
   - route-isolation increment full suite: `109 passed, 74 warnings`
   - post HTMX server-side isolation verification: `117 passed, 91 warnings`
   - post dependency/runtime isolation batch verification: `118 passed, 91 warnings`
+  - post jQuery/datepicker removal verification: `119 passed, 92 warnings`
 
 ## 12. Handoff Snapshot
 

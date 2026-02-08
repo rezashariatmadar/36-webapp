@@ -13,7 +13,7 @@ class BookingForm(DigitNormalizationMixin, forms.ModelForm):
     # Use django-jalali form fields for automatic validation and conversion
     start_time = jforms.jDateField(
         label=_("Start Date"),
-        widget=forms.TextInput(attrs={'class': 'jalali-date input-standard', 'autocomplete': 'off'})
+        widget=forms.TextInput(attrs={'class': 'input-standard', 'autocomplete': 'off'})
     )
     end_time = jforms.jDateField(
         label=_("End Date"),

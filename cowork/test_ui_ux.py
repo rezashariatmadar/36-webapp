@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from cowork.models import Space, PricingPlan
+from accounts.factories import UserFactory
 
 class CoworkUXTests(TestCase):
     def setUp(self):
@@ -25,6 +26,16 @@ class CoworkUXTests(TestCase):
         self.assertContains(response, 'card glass-panel glass-sheen hover-lift')
         self.assertNotContains(response, "floorplan.png")
         self.assertNotContains(response, "view = 'map'")
+
+    def test_book_space_page_has_no_jquery_or_persian_datepicker_assets(self):
+        user = UserFactory()
+        self.client.force_login(user)
+        response = self.client.get(reverse('cowork:book_space', args=[self.space.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "code.jquery.com")
+        self.assertNotContains(response, "persian-datepicker")
+        self.assertNotContains(response, "persian-date")
+        self.assertContains(response, 'placeholder="YYYY-MM-DD"')
 
 
 class CoworkEmptyStateTests(TestCase):

@@ -166,7 +166,7 @@ LOGGING = {
 }
 
 _default_script_src = (
-    "'self' https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com"
+    "'self' https://cdn.jsdelivr.net https://unpkg.com"
 )
 _default_connect_src = "'self'"
 # Current templates rely on inline scripts and Alpine expression evaluation.
@@ -178,7 +178,7 @@ if DEBUG:
 CONTENT_SECURITY_POLICY = os.getenv(
     'DJANGO_CSP',
     f"default-src 'self'; script-src {_default_script_src}; "
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css; "
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
     f"img-src 'self' data: blob:; font-src 'self' https://cdn.jsdelivr.net; connect-src {_default_connect_src};"
 )
 
