@@ -12,7 +12,9 @@
     {% tailwind_css %}
     <link rel="stylesheet" href="{% static 'js/reactbits-islands.css' %}">
     
+    {% if request.path|slice:":8" == "/legacy/" %}
     <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+    {% endif %}
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <script defer src="{% static 'js/reactbits-islands.js' %}?v=20260207"></script>
     {% block extra_head %}{% endblock %}
@@ -48,6 +50,7 @@
 
     <script>
         (function() {
+            const isLegacyRoute = {% if request.path|slice:":8" == "/legacy/" %}true{% else %}false{% endif %};
             const formatPrices = (scope = document) => {
                 const nodes = scope.querySelectorAll('.format-price');
                 nodes.forEach((node) => {
@@ -63,31 +66,35 @@
                 formatPrices();
             }
 
-            document.addEventListener('htmx:afterSwap', function(event) {
-                formatPrices(event.detail?.target || document);
-            });
+            if (isLegacyRoute) {
+                document.addEventListener('htmx:afterSwap', function(event) {
+                    formatPrices(event.detail?.target || document);
+                });
+            }
         })();
 
-        document.addEventListener('htmx:responseError', function(event) {
-            console.error('HTMX Response Error:', event.detail.xhr.status, event.detail.xhr.responseText);
-        });
+        {% if request.path|slice:":8" == "/legacy/" %}
+            document.addEventListener('htmx:responseError', function(event) {
+                console.error('HTMX Response Error:', event.detail.xhr.status, event.detail.xhr.responseText);
+            });
 
-        // Enable HTMX view-transitions only for explicitly opted-in targets.
-        document.addEventListener('htmx:beforeSwap', function(event) {
-            if (!document.startViewTransition) return;
-            if (!event.detail || typeof event.detail.resume !== 'function') return;
+            // Enable HTMX view-transitions only for explicitly opted-in targets.
+            document.addEventListener('htmx:beforeSwap', function(event) {
+                if (!document.startViewTransition) return;
+                if (!event.detail || typeof event.detail.resume !== 'function') return;
 
-            const target = event.detail.target;
-            if (!(target instanceof HTMLElement) || !target.hasAttribute('data-view-transition-swap')) {
-                return;
-            }
+                const target = event.detail.target;
+                if (!(target instanceof HTMLElement) || !target.hasAttribute('data-view-transition-swap')) {
+                    return;
+                }
 
-            event.preventDefault();
-            document.startViewTransition(() => event.detail.resume());
-        });
+                event.preventDefault();
+                document.startViewTransition(() => event.detail.resume());
+            });
+        {% endif %}
     </script>
 </head>
-<body class="h-screen w-screen overflow-hidden bg-black text-white antialiased flex flex-col md:flex-row scrim-wrapper" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<body class="h-screen w-screen overflow-hidden bg-black text-white antialiased flex flex-col md:flex-row scrim-wrapper"{% if request.path|slice:":8" == "/legacy/" %} hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'{% endif %}>
     
     <!-- Premium Mesh Gradient Background -->
     <div class="mesh-gradient mesh-gradient--liquid"></div>
@@ -289,6 +296,7 @@
     {% endif %}
 
     <script>
+        {% if request.path|slice:":8" == "/legacy/" %}
         document.addEventListener('htmx:afterSwap', function(event) {
             // Update desktop badge
             if (event.detail.target.id === 'cart-badge-desktop') {
@@ -310,6 +318,7 @@
                 }
             }
         });
+        {% endif %}
     </script>
 
     <script>

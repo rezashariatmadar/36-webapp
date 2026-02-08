@@ -41,6 +41,8 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Alpine.js template directives and CDN dependency removed from runtime templates.
 - jQuery/Persian datepicker assets removed from global base template and scoped to legacy booking form only.
 - Default-mode `/cafe/*` and `/cowork/*` now redirect into `/legacy/*` ownership.
+- HTMX script loading is scoped to `/legacy/*` template responses only.
+- HTMX body headers/event listeners in base template are scoped to `/legacy/*` only.
 
 ### In Progress
 
@@ -238,6 +240,10 @@ Exit criteria:
   - added namespace-safe default legacy URL mirror module: `config/legacy_urls_default.py`
   - shifted default-mode `/cafe/*` and `/cowork/*` entry paths to redirects targeting `/legacy/*` routes
   - updated cutover tests to verify default-mode legacy redirects and `/legacy/*` reverse resolution
+  - scoped HTMX CDN include in `theme/templates/base.html` to legacy routes only
+  - extended cutover tests to assert HTMX script is absent on non-legacy pages and present on `/legacy/*` pages
+  - scoped `hx-headers` and HTMX-specific listeners in `theme/templates/base.html` to `/legacy/*`
+  - extended cutover tests to assert `hx-headers` is absent on non-legacy pages and present on `/legacy/*`
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`

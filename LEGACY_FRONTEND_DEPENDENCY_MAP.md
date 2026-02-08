@@ -14,7 +14,7 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 | Dependency | Type | Current Status | Why It Exists | Primary Locations | Decommission Trigger |
 | --- | --- | --- | --- | --- | --- |
 | Alpine.js | CDN script | decommissioned | Previously used for dropdown/modal micro-state | `theme/templates/base.html`, `theme/templates/cowork/space_list.html` | Completed in this increment. |
-| HTMX | CDN script + Django middleware | active | Legacy template partial updates (cart/booking/staff polling) | `theme/templates/cafe/*`, `theme/templates/cowork/*`, `cafe/views.py`, `cowork/views.py`, `config/settings.py` | Remove after template routes are fully retired or isolated under `/legacy/*` only. |
+| HTMX | CDN script + Django middleware | active (legacy-only runtime) | Legacy template partial updates (cart/booking/staff polling) | `theme/templates/cafe/*`, `theme/templates/cowork/*`, `cafe/views.py`, `cowork/views.py`, `config/settings.py` | Remove after template routes are fully retired or isolated under `/legacy/*` only. |
 | jQuery | CDN script | active (legacy-only) | Required only by legacy Jalali datepicker on booking form | `theme/templates/cowork/book_space.html` | Replace booking datepicker with SPA/native alternative. |
 | Persian Datepicker stack | CDN script/css | active (legacy-only) | Jalali date input on legacy booking form | `theme/templates/cowork/book_space.html` | Remove when booking UI is React-only. |
 | React Bits Islands bundle | local static bundle | active (legacy-support) | Transitional visual islands in template pages | `theme/static_src/src/reactbits/*`, `theme/templates/base.html` | Remove after all legacy template pages are decommissioned. |
@@ -24,6 +24,8 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 - [x] Remove Alpine.js runtime dependency from templates.
 - [ ] Isolate HTMX-dependent routes to `/legacy/*` only.
 - Progress note: default-mode `/cafe/*` and `/cowork/*` now redirect to `/legacy/*`, and primary reverse names resolve to `/legacy/*` for these apps.
+- Progress note: HTMX CDN script is now loaded only when `request.path` is under `/legacy/*`, with cutover regression assertions.
+- Progress note: `hx-headers` body attribute and HTMX-specific event listeners in base template are now bound only on `/legacy/*`.
 - [ ] Remove jQuery-dependent datepicker glue in `theme/templates/base.html`.
 - [ ] Remove `django-htmx` from `config/settings.py` and dependency manifests.
 - [ ] Remove React Bits islands bundle from legacy base template.
