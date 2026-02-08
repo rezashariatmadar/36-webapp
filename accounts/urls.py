@@ -1,13 +1,14 @@
 from django.urls import path
+from django.views.generic import RedirectView
 from .views import (
-    LogoutView, home_view,
+    LogoutView,
     admin_user_list, toggle_user_status, change_user_role, UserListAPI
 )
 
 app_name = 'accounts'
 
 urlpatterns = [
-    path('', home_view, name='home'),
+    path('', RedirectView.as_view(url='/app', permanent=False), name='home'),
     path('logout/', LogoutView.as_view(), name='logout'),
     
     # Admin Views

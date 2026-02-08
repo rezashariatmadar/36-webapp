@@ -5,9 +5,7 @@ class ScrimWrapperTests(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_scrim_wrapper_present(self):
-        """Verify that the scrim-wrapper class is applied to the body."""
-        response = self.client.get(reverse('accounts:home'))
+    def test_spa_shell_body_classes_present(self):
+        response = self.client.get('/app/')
         self.assertEqual(response.status_code, 200)
-        # Check for the class presence
-        self.assertContains(response, 'scrim-wrapper')
+        self.assertContains(response, 'min-h-screen bg-base-100 text-base-content')

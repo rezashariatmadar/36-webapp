@@ -322,6 +322,11 @@ Exit criteria:
   - removed `accounts:login|register|profile` URL patterns
   - preserved `/legacy/login|register|profile` compatibility via explicit redirects in `config/urls.py`
   - updated route regressions to assert canonical `/login|/register|/profile` behavior
+- migrated legacy account home and post-auth redirects to SPA defaults:
+  - `accounts:home` now redirects to `/app`
+  - `LOGIN_REDIRECT_URL` and `LOGOUT_REDIRECT_URL` now point directly to `/app`
+  - updated template nav logo/home links in `theme/templates/base.html` to `/app`
+  - converted legacy home-template assertions to SPA shell assertions in route/UI regression tests
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`
@@ -341,6 +346,7 @@ Exit criteria:
   - post SPA-native auth redirect target verification: `119 passed, 91 warnings`
   - post template nav SPA-account link verification: `119 passed, 91 warnings`
   - post redirect-alias route removal verification: `119 passed, 91 warnings`
+  - post legacy home redirect + SPA shell assertion verification: `119 passed, 91 warnings`
 
 ## 12. Handoff Snapshot
 
@@ -414,4 +420,5 @@ Use this section first if chat history/context is truncated.
 - Decommission remaining legacy admin/logout route dependencies under `/legacy/*` after parity sign-off.
 - Remove redirect-only alias routes (`/login|/register|/profile`) when deep-link compatibility is no longer needed.
 - Remove `/legacy/login|register|profile` compatibility redirects when deep-link support is no longer required.
+- Remove redirect-only `accounts:home` alias after legacy namespace include retirement.
 - Run full regression + smoke checks after each decommission batch.

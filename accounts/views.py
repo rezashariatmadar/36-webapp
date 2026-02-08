@@ -112,5 +112,3 @@ def change_user_role(request, user_id, new_role):
         
     return redirect('accounts:user_list')
 
-def home_view(request):
-    return render(request, 'home.html')

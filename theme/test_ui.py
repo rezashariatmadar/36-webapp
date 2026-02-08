@@ -5,12 +5,10 @@ class BaseUITests(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_legacy_home_still_renders_template(self):
+    def test_legacy_home_redirects_to_spa(self):
         response = self.client.get(reverse('accounts:home'))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'mesh-gradient')
-        self.assertContains(response, 'mesh-gradient--liquid')
-        self.assertNotContains(response, 'data-rb-island="squares-bg"')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/app')
 
     def test_legacy_cafe_routes_redirect_to_spa(self):
         response = self.client.get('/legacy/cafe/menu/')
