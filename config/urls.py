@@ -28,8 +28,10 @@ if settings.SPA_PRIMARY_ROUTES:
 else:
     urlpatterns += [
         path('', include('accounts.urls')),
-        path('cafe/', include('cafe.urls')),
-        path('cowork/', include('cowork.urls')),
+        path('cafe/', RedirectView.as_view(url='/legacy/cafe/menu/', permanent=False), name='legacy_cafe_entry_redirect'),
+        re_path(r'^cafe/(?P<path>.*)$', RedirectView.as_view(url='/legacy/cafe/%(path)s', permanent=False), name='legacy_cafe_passthrough_redirect'),
+        path('cowork/', RedirectView.as_view(url='/legacy/cowork/', permanent=False), name='legacy_cowork_entry_redirect'),
+        re_path(r'^cowork/(?P<path>.*)$', RedirectView.as_view(url='/legacy/cowork/%(path)s', permanent=False), name='legacy_cowork_passthrough_redirect'),
         path('legacy/', include('config.legacy_urls_default')),
     ]
 

@@ -1,7 +1,7 @@
 import importlib
 
 from django.test import TestCase, override_settings
-from django.urls import clear_url_caches
+from django.urls import clear_url_caches, reverse
 
 import config.urls as project_urls
 
@@ -21,8 +21,19 @@ class SPARouteCutoverTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-rb-island="pixel-gallery"')
 
+        cafe_redirect = self.client.get("/cafe/menu/")
+        self.assertEqual(cafe_redirect.status_code, 302)
+        self.assertEqual(cafe_redirect.url, "/legacy/cafe/menu/")
+
+        cowork_redirect = self.client.get("/cowork/")
+        self.assertEqual(cowork_redirect.status_code, 302)
+        self.assertEqual(cowork_redirect.url, "/legacy/cowork/")
+
         legacy_cafe = self.client.get("/legacy/cafe/menu/")
         self.assertEqual(legacy_cafe.status_code, 200)
+
+        self.assertEqual(reverse("cafe:menu"), "/legacy/cafe/menu/")
+        self.assertEqual(reverse("cowork:space_list"), "/legacy/cowork/")
 
     @override_settings(SPA_PRIMARY_ROUTES=True)
     def test_spa_primary_mode_routes_and_legacy_fallback(self):

@@ -40,6 +40,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Expanded regression coverage for migration APIs and cutover behavior; full suite currently green.
 - Alpine.js template directives and CDN dependency removed from runtime templates.
 - jQuery/Persian datepicker assets removed from global base template and scoped to legacy booking form only.
+- Default-mode `/cafe/*` and `/cowork/*` now redirect into `/legacy/*` ownership.
 
 ### In Progress
 
@@ -235,6 +236,8 @@ Exit criteria:
   - moved jQuery + Persian datepicker includes from `theme/templates/base.html` to `theme/templates/cowork/book_space.html`
   - converted global price formatting helper in `theme/templates/base.html` to vanilla JS
   - added namespace-safe default legacy URL mirror module: `config/legacy_urls_default.py`
+  - shifted default-mode `/cafe/*` and `/cowork/*` entry paths to redirects targeting `/legacy/*` routes
+  - updated cutover tests to verify default-mode legacy redirects and `/legacy/*` reverse resolution
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`
