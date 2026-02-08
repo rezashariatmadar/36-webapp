@@ -45,6 +45,8 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - HTMX body headers/event listeners in base template are scoped to `/legacy/*` only.
 - Server-side HTMX partial responses in `cafe` and `cowork` views are scoped to `/legacy/*` requests only.
 - `django-htmx` app/middleware wiring removed from runtime settings; legacy HTMX detection now uses request headers.
+- `django-htmx` dependency has been removed from project manifests (`pyproject.toml`, `uv.lock`).
+- React Bits runtime assets and mount containers in `base.html` are now scoped to `/legacy/*` only, with non-legacy fallback UI markup.
 
 ### In Progress
 
@@ -249,7 +251,12 @@ Exit criteria:
   - added server-side HTMX path guards in `cafe/views.py` and `cowork/views.py` so partial responses only render for `/legacy/*` requests
   - switched HTMX request detection from `request.htmx` middleware property to `HX-Request` header checks
   - removed `django_htmx` from runtime `INSTALLED_APPS` and `MIDDLEWARE` in `config/settings.py`
+  - removed `django-htmx` from dependency manifests (`pyproject.toml`, `uv.lock`)
   - updated `item_quantity_control` partial to use explicit `is_htmx` context flag for OOB badge rendering
+  - scoped React Bits CSS/JS includes and mount containers in `theme/templates/base.html` to `/legacy/*` only
+  - added non-legacy static fallback UI for desktop quick-access and mobile bottom nav in `theme/templates/base.html`
+  - expanded cutover assertions for legacy-only React Bits runtime includes (`config/test_spa_cutover.py`)
+  - updated UI regression coverage for legacy-only React Bits mounts (`theme/test_ui.py`)
   - added regression tests for HTMX isolation:
     - `cafe/test_cafe_logic.py` (customer + staff HTMX response branches)
     - `cowork/test_cowork_logic.py` (space list + booking preview HTMX branches)
@@ -260,6 +267,7 @@ Exit criteria:
   - post-decommission full suite re-verified: `109 passed, 74 warnings`
   - route-isolation increment full suite: `109 passed, 74 warnings`
   - post HTMX server-side isolation verification: `117 passed, 91 warnings`
+  - post dependency/runtime isolation batch verification: `118 passed, 91 warnings`
 
 ## 12. Handoff Snapshot
 

@@ -22,6 +22,8 @@ class SPARouteCutoverTests(TestCase):
         self.assertContains(response, 'data-rb-island="pixel-gallery"')
         self.assertNotContains(response, "unpkg.com/htmx.org@2.0.4")
         self.assertNotContains(response, "hx-headers=")
+        self.assertNotContains(response, "reactbits-islands.js")
+        self.assertNotContains(response, "reactbits-islands.css")
 
         cafe_redirect = self.client.get("/cafe/menu/")
         self.assertEqual(cafe_redirect.status_code, 302)
@@ -35,6 +37,8 @@ class SPARouteCutoverTests(TestCase):
         self.assertEqual(legacy_cafe.status_code, 200)
         self.assertContains(legacy_cafe, "unpkg.com/htmx.org@2.0.4")
         self.assertContains(legacy_cafe, "hx-headers=")
+        self.assertContains(legacy_cafe, "reactbits-islands.js")
+        self.assertContains(legacy_cafe, "reactbits-islands.css")
 
         self.assertEqual(reverse("cafe:menu"), "/legacy/cafe/menu/")
         self.assertEqual(reverse("cowork:space_list"), "/legacy/cowork/")
@@ -65,8 +69,10 @@ class SPARouteCutoverTests(TestCase):
         legacy_cafe = self.client.get("/legacy/cafe/menu/")
         self.assertEqual(legacy_cafe.status_code, 200)
         self.assertContains(legacy_cafe, "unpkg.com/htmx.org@2.0.4")
+        self.assertContains(legacy_cafe, "reactbits-islands.js")
 
         catchall_spa = self.client.get("/random-non-system-path/")
         self.assertEqual(catchall_spa.status_code, 200)
         self.assertContains(catchall_spa, 'id="app-root"')
         self.assertNotContains(catchall_spa, "unpkg.com/htmx.org@2.0.4")
+        self.assertNotContains(catchall_spa, "reactbits-islands.js")

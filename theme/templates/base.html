@@ -10,13 +10,12 @@
     <link rel="shortcut icon" type="image/webp" href="{% static 'img/36cowork/36-coworking-space.webp' %}">
     <link rel="apple-touch-icon" href="{% static 'img/36cowork/36-coworking-space.webp' %}">
     {% tailwind_css %}
-    <link rel="stylesheet" href="{% static 'js/reactbits-islands.css' %}">
-    
     {% if request.path|slice:":8" == "/legacy/" %}
+    <link rel="stylesheet" href="{% static 'js/reactbits-islands.css' %}">
+    <script defer src="{% static 'js/reactbits-islands.js' %}?v=20260207"></script>
     <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
     {% endif %}
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <script defer src="{% static 'js/reactbits-islands.js' %}?v=20260207"></script>
     {% block extra_head %}{% endblock %}
     
     <style>
@@ -98,7 +97,9 @@
     
     <!-- Premium Mesh Gradient Background -->
     <div class="mesh-gradient mesh-gradient--liquid"></div>
+    {% if request.path|slice:":8" == "/legacy/" %}
     <div data-rb-island="squares-bg" aria-hidden="true"></div>
+    {% endif %}
     <div class="ambient-orbs">
         <span></span>
         <span></span>
@@ -150,6 +151,7 @@
                 </li>
             </ul>
             <div class="mt-4 px-4">
+                {% if request.path|slice:":8" == "/legacy/" %}
                 <div
                     data-rb-island="glass-icons"
                     data-items='[
@@ -159,6 +161,12 @@
                       {"label":"تماس","href":"tel:09001655040","color":"blue","icon":"phone"}
                     ]'
                 ></div>
+                {% else %}
+                <div class="grid grid-cols-2 gap-2">
+                    <a href="{% url 'cafe:menu' %}" class="btn btn-ghost btn-sm rounded-lg text-white/70 hover:text-white">Menu</a>
+                    <a href="{% url 'cowork:space_list' %}" class="btn btn-ghost btn-sm rounded-lg text-white/70 hover:text-white">Book</a>
+                </div>
+                {% endif %}
             </div>
         </nav>
 
@@ -244,6 +252,7 @@
         </div>
 
         <!-- Mobile Bottom Tab Bar -->
+        {% if request.path|slice:":8" == "/legacy/" %}
         <div
             data-rb-island="gooey-nav"
             data-items='[
@@ -255,6 +264,7 @@
             data-active-index="{% if request.resolver_match.url_name == 'menu' %}0{% elif request.resolver_match.url_name == 'cart_detail' %}1{% elif 'cowork' in request.path %}2{% else %}0{% endif %}"
             class="md:hidden fixed bottom-6 left-4 right-4 h-16 material-glass-heavy glass-rail rounded-[2rem] z-50 flex items-center px-3 shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/15"
         ></div>
+        {% endif %}
         <nav data-rb-fallback="gooey-nav" class="md:hidden fixed bottom-6 left-4 right-4 h-16 material-glass-heavy glass-rail rounded-[2rem] z-50 flex justify-between items-center px-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/15">
             <!-- Menu -->
             <a href="{% url 'cafe:menu' %}" class="flex flex-col items-center gap-1 transition-colors {% if request.resolver_match.url_name == 'menu' %}text-accent{% else %}text-white/50{% endif %}">

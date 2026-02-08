@@ -17,7 +17,7 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 | HTMX | CDN script | active (legacy-only runtime) | Legacy template partial updates (cart/booking/staff polling) | `theme/templates/cafe/*`, `theme/templates/cowork/*`, `cafe/views.py`, `cowork/views.py` | Remove after template routes are fully retired or isolated under `/legacy/*` only. |
 | jQuery | CDN script | active (legacy-only) | Required only by legacy Jalali datepicker on booking form | `theme/templates/cowork/book_space.html` | Replace booking datepicker with SPA/native alternative. |
 | Persian Datepicker stack | CDN script/css | active (legacy-only) | Jalali date input on legacy booking form | `theme/templates/cowork/book_space.html` | Remove when booking UI is React-only. |
-| React Bits Islands bundle | local static bundle | active (legacy-support) | Transitional visual islands in template pages | `theme/static_src/src/reactbits/*`, `theme/templates/base.html` | Remove after all legacy template pages are decommissioned. |
+| React Bits Islands bundle | local static bundle | active (legacy-only runtime) | Transitional visual islands in legacy template pages | `theme/static_src/src/reactbits/*`, `theme/templates/base.html`, `theme/templates/home.html` | Remove after all legacy template pages are decommissioned. |
 
 ## Phase-Ordered Decommission Checklist
 
@@ -29,7 +29,9 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 - Progress note: server-side HTMX partial rendering in `cafe/views.py` and `cowork/views.py` is now guarded by legacy path checks.
 - [x] Remove jQuery-dependent datepicker glue in `theme/templates/base.html`.
 - [x] Remove `django-htmx` runtime wiring from `config/settings.py`.
-- [ ] Remove `django-htmx` from dependency manifests.
+- [x] Remove `django-htmx` from dependency manifests.
+- [x] Scope React Bits runtime includes in `theme/templates/base.html` to `/legacy/*`.
+- Progress note: non-legacy pages now use static quick-access/mobile-nav fallbacks while keeping React Bits-enhanced variants on `/legacy/*`.
 - [ ] Remove React Bits islands bundle from legacy base template.
 - [ ] Prune unused template partials and legacy static JS.
 
