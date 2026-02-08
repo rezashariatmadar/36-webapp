@@ -30,6 +30,7 @@ else:
         path('', include('accounts.urls')),
         path('cafe/', include('cafe.urls')),
         path('cowork/', include('cowork.urls')),
+        path('legacy/', include('config.legacy_urls_default')),
     ]
 
 if settings.DEBUG:

@@ -12,14 +12,10 @@
     {% tailwind_css %}
     <link rel="stylesheet" href="{% static 'js/reactbits-islands.css' %}">
     
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <script defer src="{% static 'js/reactbits-islands.js' %}?v=20260207"></script>
+    {% block extra_head %}{% endblock %}
     
     <style>
         html, body {
@@ -51,59 +47,26 @@
     </style>
 
     <script>
-        if (typeof window.jQuery === 'function') {
-            const $ = window.jQuery;
-            $(document).ready(function() {
-                function formatPrices() {
-                    $('.format-price').each(function() {
-                        const $el = $(this);
-                        const val = $el.text().replace(/[^0-9]/g, '');
-                        if (val) {
-                            $el.text(new Intl.NumberFormat('fa-IR').format(val) + ' تومان');
-                        }
-                    });
-                }
-                
-                function initDatePicker() {
-                    $('.jalali-date').each(function() {
-                        const $input = $(this);
-                        if ($input.data('datepicker-initialized')) return;
-                        if (typeof $input.persianDatepicker !== 'function') return;
-                        
-                        $input.persianDatepicker({
-                            format: 'YYYY-MM-DD',
-                            autoClose: true,
-                            initialValue: false,
-                            observer: true,
-                            altField: $input,
-                            altFormat: 'YYYY-MM-DD',
-                            persianDigit: false,
-                            calendar: {
-                                persian: {
-                                    leapYearMode: 'astronomical'
-                                }
-                            },
-                            onSelect: function(unix) {
-                                const formattedDate = new persianDate(unix).format('YYYY-MM-DD');
-                                $input.val(formattedDate);
-                                if (window.htmx) {
-                                    htmx.trigger($input[0], 'change');
-                                }
-                            }
-                        });
-                        $input.data('datepicker-initialized', true);
-                    });
-                }
-
-                initDatePicker();
-                formatPrices();
-
-                document.addEventListener('htmx:afterSwap', function() {
-                    initDatePicker();
-                    formatPrices();
+        (function() {
+            const formatPrices = (scope = document) => {
+                const nodes = scope.querySelectorAll('.format-price');
+                nodes.forEach((node) => {
+                    const value = node.textContent.replace(/[^0-9]/g, '');
+                    if (!value) return;
+                    node.textContent = `${new Intl.NumberFormat('fa-IR').format(value)} تومان`;
                 });
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => formatPrices(), { once: true });
+            } else {
+                formatPrices();
+            }
+
+            document.addEventListener('htmx:afterSwap', function(event) {
+                formatPrices(event.detail?.target || document);
             });
-        }
+        })();
 
         document.addEventListener('htmx:responseError', function(event) {
             console.error('HTMX Response Error:', event.detail.xhr.status, event.detail.xhr.responseText);
@@ -436,6 +399,7 @@
             });
         })();
     </script>
+    {% block extra_scripts %}{% endblock %}
 
 </body>
 </html>

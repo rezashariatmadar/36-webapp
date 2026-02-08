@@ -15,14 +15,14 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 | --- | --- | --- | --- | --- | --- |
 | Alpine.js | CDN script | decommissioned | Previously used for dropdown/modal micro-state | `theme/templates/base.html`, `theme/templates/cowork/space_list.html` | Completed in this increment. |
 | HTMX | CDN script + Django middleware | active | Legacy template partial updates (cart/booking/staff polling) | `theme/templates/cafe/*`, `theme/templates/cowork/*`, `cafe/views.py`, `cowork/views.py`, `config/settings.py` | Remove after template routes are fully retired or isolated under `/legacy/*` only. |
-| jQuery | CDN script | active | Required by current datepicker integration and shared formatter helper | `theme/templates/base.html` | Replace datepicker/format utilities with SPA or vanilla alternatives. |
-| Persian Datepicker stack | CDN script/css | active | Jalali date input on legacy booking forms | `theme/templates/base.html`, `theme/templates/cowork/book_space.html` | Remove when booking UI is React-only. |
+| jQuery | CDN script | active (legacy-only) | Required only by legacy Jalali datepicker on booking form | `theme/templates/cowork/book_space.html` | Replace booking datepicker with SPA/native alternative. |
+| Persian Datepicker stack | CDN script/css | active (legacy-only) | Jalali date input on legacy booking form | `theme/templates/cowork/book_space.html` | Remove when booking UI is React-only. |
 | React Bits Islands bundle | local static bundle | active (legacy-support) | Transitional visual islands in template pages | `theme/static_src/src/reactbits/*`, `theme/templates/base.html` | Remove after all legacy template pages are decommissioned. |
 
 ## Phase-Ordered Decommission Checklist
 
 - [x] Remove Alpine.js runtime dependency from templates.
-- [ ] Isolate HTMX-dependent routes to `/legacy/*` only.
+- [ ] Isolate HTMX-dependent routes to `/legacy/*` only (in progress: legacy mirror paths are available in both routing modes).
 - [ ] Remove jQuery-dependent datepicker glue in `theme/templates/base.html`.
 - [ ] Remove `django-htmx` from `config/settings.py` and dependency manifests.
 - [ ] Remove React Bits islands bundle from legacy base template.
@@ -39,3 +39,5 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 
 - Decommission work must not break `/legacy/*` fallback while `DJANGO_SPA_PRIMARY` remains optional.
 - If a dependency is only used under `/legacy/*`, mark it as `active (legacy-only)` in future updates.
+- `/legacy/*` routes are now available in both default mode and SPA-primary mode to simplify phased isolation.
+- Default-mode legacy mirror uses unique namespaces via `config/legacy_urls_default.py` to avoid URL namespace conflicts.

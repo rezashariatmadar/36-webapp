@@ -36,8 +36,10 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - React account route is implemented at `/app/account` with SPA-native auth/profile UI.
 - Feature-flagged root cutover routing implemented via `DJANGO_SPA_PRIMARY`.
 - Legacy route fallback path added under `/legacy/*` for safe rollback operations.
+- Legacy route namespace (`/legacy/*`) now available in both default mode and SPA-primary mode.
 - Expanded regression coverage for migration APIs and cutover behavior; full suite currently green.
 - Alpine.js template directives and CDN dependency removed from runtime templates.
+- jQuery/Persian datepicker assets removed from global base template and scoped to legacy booking form only.
 
 ### In Progress
 
@@ -228,11 +230,17 @@ Exit criteria:
   - replaced Alpine-based user dropdown behavior with vanilla JS in `theme/templates/base.html`
   - removed unused Alpine modal wrapper from `theme/templates/cowork/space_list.html`
   - added legacy dependency tracker: `LEGACY_FRONTEND_DEPENDENCY_MAP.md`
+  - enabled `/legacy/*` route availability in default mode to support phased dependency isolation
+  - added coverage for legacy route availability in default-mode cutover tests
+  - moved jQuery + Persian datepicker includes from `theme/templates/base.html` to `theme/templates/cowork/book_space.html`
+  - converted global price formatting helper in `theme/templates/base.html` to vanilla JS
+  - added namespace-safe default legacy URL mirror module: `config/legacy_urls_default.py`
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`
   - re-verified full suite (post-regression expansion): `109 passed, 74 warnings`
   - post-decommission full suite re-verified: `109 passed, 74 warnings`
+  - route-isolation increment full suite: `109 passed, 74 warnings`
 
 ## 12. Handoff Snapshot
 
@@ -283,6 +291,7 @@ Use this section first if chat history/context is truncated.
 - Migration tracker: `REACT_MIGRATION_EXECUTION_PLAN.md`
 - Legacy dependency map: `LEGACY_FRONTEND_DEPENDENCY_MAP.md`
 - Cutover wiring: `config/settings.py`, `config/urls.py`, `config/legacy_urls.py`
+- Default-mode legacy mirror: `config/legacy_urls_default.py`
 - API regression tests:
   - `accounts/test_spa_api.py`
   - `cafe/tests/test_spa_api.py`

@@ -21,6 +21,9 @@ class SPARouteCutoverTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-rb-island="pixel-gallery"')
 
+        legacy_cafe = self.client.get("/legacy/cafe/menu/")
+        self.assertEqual(legacy_cafe.status_code, 200)
+
     @override_settings(SPA_PRIMARY_ROUTES=True)
     def test_spa_primary_mode_routes_and_legacy_fallback(self):
         self._reload_urlconf()
