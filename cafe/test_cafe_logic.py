@@ -2,8 +2,6 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.http import HttpResponse
-from unittest.mock import patch
 from .factories import MenuItemFactory, MenuCategoryFactory
 from .models import MenuItem, CafeOrder, OrderItem, MenuCategory
 from accounts.factories import UserFactory
@@ -129,7 +127,7 @@ class CafeLogicTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("cafe:barista_dashboard"))
 
-    def test_update_order_status_legacy_htmx_renders_partial_dashboard(self):
+    def test_update_order_status_legacy_hx_header_redirects(self):
         from .views import update_order_status
 
         order = CafeOrder.objects.create(user=self.user)
@@ -140,11 +138,9 @@ class CafeLogicTests(TestCase):
         )
         request.user = self.staff_user
 
-        with patch("cafe.views.render") as mock_render:
-            mock_render.side_effect = lambda _request, template_name, context=None: HttpResponse(template_name)
-            response = update_order_status(request, order.id, CafeOrder.Status.PREPARING)
+        response = update_order_status(request, order.id, CafeOrder.Status.PREPARING)
 
         order.refresh_from_db()
         self.assertEqual(order.status, CafeOrder.Status.PREPARING)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode(), "cafe/partials/order_list.html")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("cafe:barista_dashboard"))

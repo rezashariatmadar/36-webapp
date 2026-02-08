@@ -41,9 +41,8 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Alpine.js template directives and CDN dependency removed from runtime templates.
 - jQuery/Persian datepicker assets removed from global base template and scoped to legacy booking form only.
 - Default-mode `/cafe/*` and `/cowork/*` now redirect into `/legacy/*` ownership.
-- HTMX script loading is scoped to `/legacy/*` template responses only.
-- HTMX body headers/event listeners in base template are scoped to `/legacy/*` only.
-- Server-side HTMX partial responses in `cafe` and `cowork` views are scoped to `/legacy/*` requests only.
+- HTMX runtime script and body `hx-headers` wiring have been removed from template runtime.
+- Server-side HTMX partial response branches have been removed from `cafe` and `cowork` views.
 - `django-htmx` app/middleware wiring removed from runtime settings; legacy HTMX detection now uses request headers.
 - `django-htmx` dependency has been removed from project manifests (`pyproject.toml`, `uv.lock`).
 - React Bits runtime assets and mount containers have been removed from template runtime (`base.html` and legacy UI fragments now use static markup).
@@ -51,7 +50,6 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 
 ### In Progress
 
-- Legacy dependency decommission execution (HTMX/jQuery/template pruning).
 - Expanded SPA navigation and role-aware surfaces.
 
 ### Not Started
@@ -171,7 +169,7 @@ Exit criteria:
 - [x] Add account auth/profile APIs (`/api/auth/login|logout|register|profile`).
 - [x] Add SPA account route and account UX (`/app/account`).
 - [x] Prepare and implement root-route cutover with redirect map (feature-flagged).
-- [ ] Decommission legacy frontend dependencies.
+- [x] Decommission legacy frontend dependencies.
 
 ### Verification Checklist
 
@@ -282,8 +280,13 @@ Exit criteria:
     - `theme/templates/cafe/partials/item_quantity_control.html` now uses standard POST forms for `add_to_cart`/`remove_from_cart`
     - `theme/templates/cafe/partials/cart_list.html` now uses standard POST forms for quantity changes
     - `cafe/views.py` no longer returns customer HTMX partial branches for cart mutations/detail
-    - `theme/context_processors.legacy_runtime_flags` now loads HTMX runtime only on `/legacy/cafe/dashboard/`
-  - expanded cutover assertions so `/legacy/cafe/menu/` does not include HTMX runtime and `/legacy/cafe/dashboard/` does (`config/test_spa_cutover.py`)
+    - `theme/context_processors.legacy_runtime_flags` updated prior to full HTMX decommission
+  - removed final legacy HTMX runtime path:
+    - `theme/templates/cafe/barista_dashboard.html` now uses standard POST actions and timed full-page refresh
+    - `theme/templates/cafe/partials/order_list.html` no longer uses `hx-post` mutations
+    - `cafe/views.py` no longer has HTMX-specific branches for dashboard/order mutations
+    - removed temporary HTMX runtime context-processor wiring from `config/settings.py` and deleted `theme/context_processors.py`
+  - expanded cutover assertions so `/legacy/cafe/menu/` and `/legacy/cafe/dashboard/` both remain HTMX-free (`config/test_spa_cutover.py`)
   - updated cafe logic coverage for legacy HX-header cart mutations to redirect full-page (`cafe/test_cafe_logic.py`)
   - removed unused legacy partial templates:
     - `theme/templates/cafe/partials/cart_badge.html`
@@ -304,6 +307,7 @@ Exit criteria:
   - post selective HTMX runtime-gating verification: `119 passed, 92 warnings`
   - post cowork HTMX removal verification: `119 passed, 92 warnings`
   - post cafe customer HTMX removal verification: `119 passed, 92 warnings`
+  - post full HTMX decommission verification: `119 passed, 92 warnings`
 
 ## 12. Handoff Snapshot
 

@@ -10,9 +10,6 @@
     <link rel="shortcut icon" type="image/webp" href="{% static 'img/36cowork/36-coworking-space.webp' %}">
     <link rel="apple-touch-icon" href="{% static 'img/36cowork/36-coworking-space.webp' %}">
     {% tailwind_css %}
-    {% if load_legacy_htmx %}
-    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
-    {% endif %}
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     {% block extra_head %}{% endblock %}
     
@@ -26,16 +23,6 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        .htmx-indicator {
-            display: none !important;
-        }
-        .htmx-request .htmx-indicator {
-            display: flex !important;
-        }
-        .htmx-request.htmx-indicator {
-            display: flex !important;
-        }
-
         /* View Transitions */
         ::view-transition-old(root),
         ::view-transition-new(root) {
@@ -47,7 +34,6 @@
 
     <script>
         (function() {
-            const isLegacyRoute = {% if load_legacy_htmx %}true{% else %}false{% endif %};
             const formatPrices = (scope = document) => {
                 const nodes = scope.querySelectorAll('.format-price');
                 nodes.forEach((node) => {
@@ -62,36 +48,10 @@
             } else {
                 formatPrices();
             }
-
-            if (isLegacyRoute) {
-                document.addEventListener('htmx:afterSwap', function(event) {
-                    formatPrices(event.detail?.target || document);
-                });
-            }
         })();
-
-        {% if load_legacy_htmx %}
-            document.addEventListener('htmx:responseError', function(event) {
-                console.error('HTMX Response Error:', event.detail.xhr.status, event.detail.xhr.responseText);
-            });
-
-            // Enable HTMX view-transitions only for explicitly opted-in targets.
-            document.addEventListener('htmx:beforeSwap', function(event) {
-                if (!document.startViewTransition) return;
-                if (!event.detail || typeof event.detail.resume !== 'function') return;
-
-                const target = event.detail.target;
-                if (!(target instanceof HTMLElement) || !target.hasAttribute('data-view-transition-swap')) {
-                    return;
-                }
-
-                event.preventDefault();
-                document.startViewTransition(() => event.detail.resume());
-            });
-        {% endif %}
     </script>
 </head>
-<body class="h-screen w-screen overflow-hidden bg-black text-white antialiased flex flex-col md:flex-row scrim-wrapper"{% if load_legacy_htmx %} hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'{% endif %}>
+<body class="h-screen w-screen overflow-hidden bg-black text-white antialiased flex flex-col md:flex-row scrim-wrapper">
     
     <!-- Premium Mesh Gradient Background -->
     <div class="mesh-gradient mesh-gradient--liquid"></div>
@@ -274,32 +234,6 @@
             {% endfor %}
         </div>
     {% endif %}
-
-    <script>
-        {% if load_legacy_htmx %}
-        document.addEventListener('htmx:afterSwap', function(event) {
-            // Update desktop badge
-            if (event.detail.target.id === 'cart-badge-desktop') {
-                const badge = document.getElementById('cart-badge-desktop');
-                const count = parseInt(badge.innerText);
-
-                // Sync to mobile badge
-                const mobileBadge = document.getElementById('cart-badge-mobile');
-                if (mobileBadge) {
-                    mobileBadge.innerText = badge.innerText;
-                    if (count > 0) mobileBadge.classList.remove('hidden');
-                    else mobileBadge.classList.add('hidden');
-                }
-
-                if (count > 0) {
-                    badge.classList.remove('hidden');
-                } else {
-                    badge.classList.add('hidden');
-                }
-            }
-        });
-        {% endif %}
-    </script>
 
     <script>
         (function() {

@@ -56,8 +56,8 @@ class SPARouteCutoverTests(TestCase):
         self.client.force_login(staff_user)
         legacy_dashboard = self.client.get("/legacy/cafe/dashboard/")
         self.assertEqual(legacy_dashboard.status_code, 200)
-        self.assertContains(legacy_dashboard, "unpkg.com/htmx.org@2.0.4")
-        self.assertContains(legacy_dashboard, "hx-headers=")
+        self.assertNotContains(legacy_dashboard, "unpkg.com/htmx.org@2.0.4")
+        self.assertNotContains(legacy_dashboard, "hx-headers=")
 
         self.assertEqual(reverse("cafe:menu"), "/legacy/cafe/menu/")
         self.assertEqual(reverse("cowork:space_list"), "/legacy/cowork/")
@@ -103,8 +103,8 @@ class SPARouteCutoverTests(TestCase):
         self.client.force_login(staff_user)
         legacy_dashboard = self.client.get("/legacy/cafe/dashboard/")
         self.assertEqual(legacy_dashboard.status_code, 200)
-        self.assertContains(legacy_dashboard, "unpkg.com/htmx.org@2.0.4")
-        self.assertContains(legacy_dashboard, "hx-headers=")
+        self.assertNotContains(legacy_dashboard, "unpkg.com/htmx.org@2.0.4")
+        self.assertNotContains(legacy_dashboard, "hx-headers=")
 
         catchall_spa = self.client.get("/random-non-system-path/")
         self.assertEqual(catchall_spa.status_code, 200)

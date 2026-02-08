@@ -22,11 +22,6 @@ CART_SCHEMA_VERSION = 1
 MAX_CART_ITEMS = 50
 MAX_PER_ITEM = 20
 
-
-def _is_legacy_htmx(request):
-    is_htmx = request.headers.get('HX-Request', '').lower() == 'true'
-    return bool(is_htmx and request.path.startswith('/legacy/'))
-
 def is_staff_member(user):
     return user.is_authenticated and (user.is_staff or user.groups.filter(name__in=['Barista', 'Admin']).exists())
 
@@ -480,10 +475,6 @@ def customer_lookup(request):
 @user_passes_test(is_staff_member)
 def barista_dashboard(request):
     active_orders = CafeOrder.objects.filter(~Q(status__in=[CafeOrder.Status.DELIVERED, CafeOrder.Status.CANCELLED])).prefetch_related('items__menu_item').order_by('created_at')
-    
-    if _is_legacy_htmx(request):
-        return render(request, 'cafe/partials/order_list.html', {'orders': active_orders})
-        
     return render(request, 'cafe/barista_dashboard.html', {'orders': active_orders})
 
 @user_passes_test(is_staff_member)
@@ -502,9 +493,6 @@ def update_order_status(request, order_id, new_status):
         extra={"order_id": order_id, "from": previous, "to": new_status, "actor": request.user.id, "ip": request.META.get("REMOTE_ADDR")}
     )
     
-    if _is_legacy_htmx(request):
-        return barista_dashboard(request)
-        
     return redirect('cafe:barista_dashboard')
 
 @user_passes_test(is_staff_member)
@@ -524,7 +512,4 @@ def toggle_order_payment(request, order_id):
         extra={"order_id": order_id, "from": previous, "to": order.is_paid, "actor": request.user.id, "ip": request.META.get("REMOTE_ADDR")}
     )
     
-    if _is_legacy_htmx(request):
-        return barista_dashboard(request)
-        
     return redirect('cafe:barista_dashboard')
