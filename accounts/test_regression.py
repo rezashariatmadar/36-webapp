@@ -8,11 +8,13 @@ class CorePagesRegressionTests(TestCase):
 
     def test_login_page_loads(self):
         response = self.client.get(reverse('accounts:login'))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/app/account')
 
     def test_register_page_loads(self):
         response = self.client.get(reverse('accounts:register'))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/app/account')
 
     def test_cafe_menu_page_loads(self):
         response = self.client.get(reverse('cafe:menu'))
@@ -27,7 +29,7 @@ class CorePagesRegressionTests(TestCase):
     def test_profile_page_redirects_for_anonymous(self):
         response = self.client.get(reverse('accounts:profile'))
         self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse('accounts:login'), response.url)
+        self.assertEqual(response.url, '/app/account')
 
     def test_user_list_page_redirects_for_anonymous(self):
         response = self.client.get(reverse('accounts:user_list'))

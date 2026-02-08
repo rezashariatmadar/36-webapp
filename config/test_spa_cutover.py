@@ -44,9 +44,16 @@ class SPARouteCutoverTests(TestCase):
         self.assertEqual(legacy_cowork_redirect.url, "/app/cowork")
 
         legacy_login = self.client.get("/legacy/login/")
-        self.assertEqual(legacy_login.status_code, 200)
-        self.assertNotContains(legacy_login, "unpkg.com/htmx.org@2.0.4")
-        self.assertNotContains(legacy_login, "hx-headers=")
+        self.assertEqual(legacy_login.status_code, 302)
+        self.assertEqual(legacy_login.url, "/app/account")
+
+        legacy_register = self.client.get("/legacy/register/")
+        self.assertEqual(legacy_register.status_code, 302)
+        self.assertEqual(legacy_register.url, "/app/account")
+
+        legacy_profile = self.client.get("/legacy/profile/")
+        self.assertEqual(legacy_profile.status_code, 302)
+        self.assertEqual(legacy_profile.url, "/app/account")
 
         user_model = get_user_model()
         staff_user = user_model.objects.create_user(phone_number="09120000003", password="Testpass123!", is_staff=True)

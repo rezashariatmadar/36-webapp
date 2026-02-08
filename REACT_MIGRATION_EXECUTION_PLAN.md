@@ -36,7 +36,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - React account route is implemented at `/app/account` with SPA-native auth/profile UI.
 - Root cutover routing now serves SPA-first paths by default.
 - Legacy route fallback path added under `/legacy/*` for safe rollback operations.
-- Legacy route namespace (`/legacy/*`) retained only for transitional account-path compatibility.
+- Legacy account auth/profile paths under `/legacy/*` now redirect to `/app/account`.
 - Expanded regression coverage for migration APIs and cutover behavior; full suite currently green.
 - Alpine.js template directives and CDN dependency removed from runtime templates.
 - jQuery/Persian datepicker assets removed from global base template and scoped to legacy booking form only.
@@ -54,8 +54,8 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 
 ### Not Started
 
-- Final decommission of legacy account template pages under `/legacy/*`.
-- Hard removal of remaining transitional redirects once account parity and stakeholder sign-off are complete.
+- Removal of unused legacy account templates/views that are now redirect-only.
+- Hard removal of remaining transitional legacy admin routes after staff/admin parity sign-off.
 
 ## 4. Migration Phases
 
@@ -303,6 +303,10 @@ Exit criteria:
   - added regression tests for HTMX isolation:
     - `cafe/test_cafe_logic.py` (customer + staff HTMX response branches)
     - `cowork/test_cowork_logic.py` (space list + booking preview HTMX branches)
+- removed legacy account template entry routes from active UI surface:
+  - `accounts:login|register|profile` now redirect to `/app/account`
+  - `/legacy/login|register|profile` now redirect to `/app/account`
+  - updated route regression assertions in `accounts/test_regression.py`, `theme/test_ui.py`, and `config/test_spa_cutover.py`
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`
@@ -317,6 +321,7 @@ Exit criteria:
   - post cafe customer HTMX removal verification: `119 passed, 92 warnings`
   - post full HTMX decommission verification: `119 passed, 92 warnings`
   - post legacy cafe/cowork hard-disable verification: `119 passed, 91 warnings`
+  - post legacy account route redirect verification: `119 passed, 91 warnings`
 
 ## 12. Handoff Snapshot
 
@@ -333,7 +338,8 @@ Exit criteria:
 - Runtime mode:
   - root and non-system routes resolve to SPA shell.
   - `/legacy/cafe/*` and `/legacy/cowork/*` redirect to SPA.
-  - only legacy account pages remain reachable under `/legacy/*` for transitional compatibility.
+  - `/legacy/login|register|profile` redirect to `/app/account`.
+  - remaining `/legacy/*` usage is limited to transitional admin/logout routes.
   - compatibility redirects:
     - `/login|/register|/profile` -> `/app/account`
     - `/cafe/*` -> `/app/cafe`
@@ -386,6 +392,6 @@ Use this section first if chat history/context is truncated.
 
 ### Next Implementation Focus (Ordered)
 
-- Decommission remaining legacy account templates/routes under `/legacy/*`.
-- Remove transitional redirects once product/account parity sign-off is complete.
+- Remove dead legacy account template/views and stale auth form assets now that account entry is SPA-only.
+- Decommission remaining legacy admin/logout route dependencies under `/legacy/*` after parity sign-off.
 - Run full regression + smoke checks after each decommission batch.
