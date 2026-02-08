@@ -271,6 +271,9 @@ Exit criteria:
   - added `theme.context_processors.legacy_runtime_flags` and switched base-template HTMX/runtime guards to context flags instead of broad legacy-path checks
   - restricted HTMX script + `hx-headers` runtime to legacy routes with active `hx-*` behavior (`/legacy/cafe/menu|cart|dashboard` and `/legacy/cowork/` + `/legacy/cowork/book/*`)
   - expanded route cutover tests to assert legacy auth pages (`/legacy/login/`) do not load HTMX runtime
+  - removed unused legacy partial templates:
+    - `theme/templates/cafe/partials/cart_badge.html`
+    - `theme/templates/cowork/partials/space_items.html`
   - updated UI assertions in `cafe/test_ui.py` and `cowork/test_ui_ux.py` for static card markup
   - added regression tests for HTMX isolation:
     - `cafe/test_cafe_logic.py` (customer + staff HTMX response branches)

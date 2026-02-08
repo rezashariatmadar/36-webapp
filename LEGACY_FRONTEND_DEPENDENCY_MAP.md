@@ -38,7 +38,8 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 - Progress note: legacy `data-rb-island` attributes were removed from `theme/templates/home.html`, `theme/templates/cafe/menu.html`, and `theme/templates/cowork/partials/zone_list.html`.
 - Progress note: generated React Bits static assets were removed from `theme/static/js/`, and React Bits build scripts were removed from `theme/static_src/package.json`.
 - Progress note: `theme/templates/cowork/book_space.html` now uses a plain validated `YYYY-MM-DD` input with existing HTMX preview flow.
-- [ ] Prune unused template partials and legacy static JS.
+- [x] Prune unused template partials and legacy static JS.
+- Progress note: removed orphaned legacy partials `theme/templates/cafe/partials/cart_badge.html` and `theme/templates/cowork/partials/space_items.html`; remaining `theme/static/js/*` assets are SPA runtime artifacts.
 
 ## Validation Commands
 
