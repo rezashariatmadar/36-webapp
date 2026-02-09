@@ -53,7 +53,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 
 ### In Progress
 
-- CSP hardening and final migration documentation cleanup.
+- None.
 
 ### Not Started
 
@@ -73,7 +73,7 @@ Exit criteria:
 - API contracts stable and tested.
 - App shell reachable and functional in prod build.
 
-## Phase 1: Customer Flows on React (In Progress)
+## Phase 1: Customer Flows on React (Done)
 
 Deliverables:
 - Cafe customer flow: menu, cart, checkout, order history, reorder.
@@ -84,7 +84,7 @@ Exit criteria:
 - Customer usage does not require HTMX interactions in migrated routes.
 - API/UX parity for main happy paths.
 
-## Phase 2: Staff and Admin Flows (In Progress)
+## Phase 2: Staff and Admin Flows (Done)
 
 Deliverables:
 - Staff active orders API with status/payment mutation APIs.
@@ -96,7 +96,7 @@ Exit criteria:
 - Barista daily operations can run from `/app` routes.
 - Permission checks enforced server-side and covered by tests.
 
-## Phase 3: Account Experience Consolidation (In Progress)
+## Phase 3: Account Experience Consolidation (Done)
 
 Deliverables:
 - Optional SPA account/profile pages using APIs.
@@ -116,7 +116,7 @@ Exit criteria:
 - `/` primarily serves SPA shell (except admin/media/static/system paths).
 - No production dependency on HTMX/Alpine/jQuery for core flows.
 
-## Phase 5: Hardening and Cleanup (In Progress)
+## Phase 5: Hardening and Cleanup (Done)
 
 Deliverables:
 - Security hardening on CSP once inline legacy scripts are removed.
@@ -142,7 +142,7 @@ Exit criteria:
 
 ## 7. Rollback Strategy
 
-- Keep legacy account routes operational under `/legacy/*` during transition.
+- Keep rollback references (commit/branch/tag) for pre-removal restoration rather than preserving runtime legacy routes.
 - Use checkpoint refs before destructive route removals (commit + backup branch + tag).
 - If regressions occur after route removals, roll back to checkpoint refs and re-apply fixes in a new forward patch.
 
@@ -180,8 +180,10 @@ Exit criteria:
 
 - [x] `uv run pytest` passes.
 - [x] `npm run build` passes.
+- [x] `npm run check:spa-budgets` passes.
 - [x] Playwright smoke set captured for `/app` customer+staff routes.
 - [x] Playwright smoke set captured for `/app/account`.
+- [x] Playwright smoke set captured for `/app/cafe` and `/app/cowork` after chunk split.
 - [x] Feature-flagged route cutover tests pass.
 - [x] Legacy-template dependency map completed.
 - [x] Final cutover sign-off approved.
@@ -197,7 +199,20 @@ Exit criteria:
 
 ## 11. Increment Log
 
-### 2026-02-09 (Latest Increment - SPA Chunk Split + Performance Cut)
+### 2026-02-09 (Latest Increment - Phase 5 Closeout + Budget Enforcement)
+
+- Captured and versioned remaining chunked SPA smoke artifacts:
+  - `output/playwright/final-app-account-chunked.png`
+  - `output/playwright/final-app-cafe-chunked.png`
+  - `output/playwright/final-app-cowork-chunked.png`
+- Added enforceable SPA budget gate:
+  - `theme/static_src/scripts/check_spa_budgets.mjs`
+  - wired into build pipeline via `theme/static_src/package.json` (`npm run check:spa-budgets`)
+- Froze measurable customization baseline and hard caps in:
+  - `theme/static_src/src/spa/CUSTOMIZATION_GUARDRAILS.md`
+- Migration tracker and handoff sections updated to final migration-complete status.
+
+### 2026-02-09 (Previous Increment - SPA Chunk Split + Performance Cut)
 
 - Split monolithic SPA runtime into lazy-loaded route modules:
   - `theme/static_src/src/spa/pages/home-page.jsx`
@@ -486,10 +501,10 @@ Exit criteria:
 
 ### ETA to Full React
 
-- Estimated remaining effort: ~0.25 to 0.5 focused engineering day.
+- Migration complete for planned React cutover scope.
+- Estimated remaining migration effort: `0` focused engineering days.
 - Remaining scope:
-  - capture remaining Playwright smoke matrix screenshots for `/app/account`, `/app/cafe`, `/app/cowork`
-  - finalize migration closeout docs and cleanup stale historical references
+  - none for migration; next work is post-migration product customization.
 
 ### Last Verified Commands
 
@@ -513,6 +528,7 @@ Use this section first if chat history/context is truncated.
 - Backend + SPA migration changes are applied and test-verified.
 - Full suite currently passes (`115 passed, 84 warnings`).
 - SPA-first cutover is active and enforced in URL routing.
+- SPA bundle budgets are enforced in CI/local build via `npm run check:spa-budgets`.
 
 ### Source of Truth Files
 
@@ -534,9 +550,11 @@ Use this section first if chat history/context is truncated.
   - `uv run pytest accounts/test_spa_api.py cafe/tests/test_spa_api.py cowork/test_spa_api.py config/test_spa_cutover.py -q`
 - Frontend production bundle:
   - `cd theme/static_src && npm run build`
+- Budget enforcement only:
+  - `cd theme/static_src && npm run check:spa-budgets`
 
 ### Next Implementation Focus (Ordered)
 
-- Capture final Playwright smoke set for remaining SPA routes (`/app/account`, `/app/cafe`, `/app/cowork`).
-- Run full regression + build checks after final documentation cleanup.
-- Close Phase 5 by freezing bundle budgets from `theme/static_src/src/spa/CUSTOMIZATION_GUARDRAILS.md`.
+- Expand SPA `ui` adapter layer for third-party visual kits (ReactBits-first, vendor-agnostic imports).
+- Introduce theme packs by overriding `app.css` token variables without route-level class rewrites.
+- Add route-level performance telemetry dashboard (LCP/CLS) to track customization impact over time.

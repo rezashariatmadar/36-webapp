@@ -32,8 +32,16 @@ To keep customization fast and safe, follow these rules for all new SPA work.
 
 ## 4. Performance Budgets
 
-- Initial route JS payload target (gzip): `<= 180KB`.
-- Hard cap requiring explicit approval: `250KB`.
+- Frozen baseline (2026-02-09 production build):
+  - `theme/static/js/spa-app.js`: `138,334 B`
+  - `theme/static/js/spa-app.css`: `950 B`
+  - largest chunk: `theme/static/js/chunks/chunk-DZ4QUUKD.js` (`8,357 B`)
+  - total JS chunks: `32,152 B`
+- Enforced hard caps (`npm run check:spa-budgets`):
+  - `spa-app.js` <= `150,000 B`
+  - `spa-app.css` <= `2,000 B`
+  - largest JS chunk <= `10,000 B`
+  - total JS chunks <= `40,000 B`
 - LCP target: `<= 2.5s` (desktop baseline).
 - CLS target: `<= 0.1`.
 - Heavy animation components must be lazy-loaded per route.
@@ -54,4 +62,5 @@ To keep customization fast and safe, follow these rules for all new SPA work.
 1. `uv run pytest -q`
 2. `uv run python manage.py check`
 3. `cd theme/static_src && npm run build`
-4. Smoke check `/app`, `/app/account`, `/app/cafe`, `/app/cowork`, `/app/staff`
+4. `cd theme/static_src && npm run check:spa-budgets`
+5. Smoke check `/app`, `/app/account`, `/app/cafe`, `/app/cowork`, `/app/staff`
