@@ -17,7 +17,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Auth model: Django session + CSRF (same-origin APIs).
 - Cutover strategy: staged (`/app` first), then move route ownership.
 - API strategy: explicit `/api/auth/*`, `/api/cafe/*`, `/api/cowork/*` contracts.
-- Backward compatibility: legacy template routes remain during migration.
+- Backward compatibility: legacy template routes are decommissioned; compatibility is limited to non-legacy redirects (`/login|/register|/profile`, `/cafe/*`, `/cowork/*`).
 
 ## 3. Current State Snapshot
 
@@ -35,9 +35,8 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Session auth/account APIs expanded with login, logout, register, and profile contracts.
 - React account route is implemented at `/app/account` with SPA-native auth/profile UI.
 - Root cutover routing now serves SPA-first paths by default.
-- Legacy route fallback path added under `/legacy/*` for safe rollback operations.
-- Legacy account auth/profile paths under `/legacy/*` now redirect to `/app/account`.
-- Legacy account template auth/profile implementation has been removed (routes are redirect-only for compatibility).
+- Legacy route fallback under `/legacy/*` has been removed from runtime URL ownership.
+- Legacy account template auth/profile implementation has been removed.
 - Expanded regression coverage for migration APIs and cutover behavior; full suite currently green.
 - Alpine.js template directives and CDN dependency removed from runtime templates.
 - jQuery/Persian datepicker assets removed from global base template and scoped to legacy booking form only.
@@ -48,6 +47,9 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - `django-htmx` dependency has been removed from project manifests (`pyproject.toml`, `uv.lock`).
 - React Bits runtime assets and mount containers have been removed from template runtime (`base.html` and legacy UI fragments now use static markup).
 - jQuery/Persian datepicker runtime assets have been removed from legacy booking template flow (`theme/templates/cowork/book_space.html`).
+- Legacy staff user-management server template surface has been removed.
+- Admin user management is now API-native under `/api/auth/staff/users/*`.
+- React `/app/staff` now includes platform user role/status controls for Admin users.
 
 ### In Progress
 
@@ -55,8 +57,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 
 ### Not Started
 
-- Hard removal of remaining transitional legacy admin routes after staff/admin parity sign-off.
-- Cleanup of redirect-only legacy account aliases once external deep-link compatibility requirements are closed.
+- Decide whether to retire non-legacy compatibility redirects (`/login|/register|/profile`) after internal sign-off.
 
 ## 4. Migration Phases
 
@@ -332,6 +333,24 @@ Exit criteria:
   - added explicit compatibility redirects for `/legacy/logout`, `/legacy/admin/users/*`, and `/legacy/api/users`
   - moved account staff-management surface from `/admin/users/*` to `/staff/users/*` to avoid Django admin URL collisions
   - retained `cafe`/`cowork` namespace registration under `/legacy/cafe` and `/legacy/cowork` for stable reverse() behavior while hard-redirects remain in front
+- removed remaining `/legacy/*` compatibility route surface from runtime URL graph:
+  - removed explicit `/legacy/*` redirects and fallback root in `config/urls.py`
+  - kept strict SPA/system catch-all exclusions so `/legacy/*` now returns `404`
+  - moved `cafe`/`cowork` namespace registration from `/legacy/*` to `/cafe/*` and `/cowork/*` while preserving hard redirects to SPA
+- migrated platform user management to SPA + API:
+  - added admin-only APIs:
+    - `GET /api/auth/staff/users/`
+    - `PATCH /api/auth/staff/users/{id}/status/`
+    - `PATCH /api/auth/staff/users/{id}/role/`
+  - removed server route surface:
+    - `/staff/users/`
+    - `/staff/users/toggle/{id}/`
+    - `/staff/users/role/{id}/{role}/`
+    - `/api/users/`
+  - removed legacy staff template file:
+    - `theme/templates/accounts/admin_user_list.html`
+  - extended React staff page with admin controls for platform user role/status management
+  - rewired regression coverage to API-native staff management tests
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`
@@ -353,6 +372,7 @@ Exit criteria:
   - post redirect-alias route removal verification: `119 passed, 91 warnings`
   - post legacy home redirect + SPA shell assertion verification: `119 passed, 91 warnings`
   - post legacy include-removal + compatibility-redirect verification: `119 passed, 91 warnings`
+  - post legacy-route decommission + staff user API migration verification: `123 passed, 101 warnings`
 
 ## 12. Handoff Snapshot
 
@@ -368,10 +388,7 @@ Exit criteria:
 
 - Runtime mode:
   - root and non-system routes resolve to SPA shell.
-  - `/legacy/cafe/*` and `/legacy/cowork/*` redirect to SPA.
-  - `/legacy/login|register|profile` redirect to `/app/account`.
-  - `/legacy/logout` and `/legacy/admin/users/*` redirect to non-legacy compatibility endpoints.
-  - `config.legacy_urls` include has been removed; remaining `/legacy/*` behavior is explicit redirects.
+  - `/legacy/*` routes are disabled and return `404`.
   - compatibility redirects:
     - `/login|/register|/profile` -> `/app/account`
     - `/cafe/*` -> `/app/cafe`
@@ -399,7 +416,7 @@ Use this section first if chat history/context is truncated.
 ### Current Baseline (Trusted)
 
 - Backend + SPA migration changes are applied and test-verified.
-- Full suite currently passes (`119 passed`).
+- Full suite currently passes (`123 passed`).
 - SPA-first cutover is active and enforced in URL routing.
 
 ### Source of Truth Files
@@ -424,7 +441,7 @@ Use this section first if chat history/context is truncated.
 
 ### Next Implementation Focus (Ordered)
 
-- Decommission compatibility redirects under `/legacy/*` after deep-link support windows are closed.
-- Decide final ownership for staff management URL surface (`/staff/users/*` vs SPA-native staff management route) and remove server-template dependency if approved.
-- Decide whether to keep or retire non-legacy compatibility redirects (`/login|/register|/profile`) once product confirms no external reliance.
+- Migrate remaining server-template admin/ops actions (if any) to API endpoints consumed by `/app/staff`.
+- Remove dormant server-template route dependencies in `cafe` and `cowork` once API parity is confirmed.
+- Confirm final ownership for compatibility redirects (`/login|/register|/profile`, `/cafe/*`, `/cowork/*`) and retire them when safe.
 - Run full regression + smoke checks after each decommission batch.

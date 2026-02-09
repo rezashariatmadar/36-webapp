@@ -134,3 +134,46 @@ class SessionAccountAPITests(TestCase):
     def test_logout_requires_authentication(self):
         response = self.client.post("/api/auth/logout/", {}, format="json")
         self.assertIn(response.status_code, [401, 403])
+
+
+class StaffManagementAPITests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = UserFactory(phone_number="09127770001")
+        admin_group, _ = Group.objects.get_or_create(name="Admin")
+        self.admin.groups.add(admin_group)
+        self.target = UserFactory(phone_number="09127770002")
+
+    def test_staff_users_requires_admin(self):
+        response = self.client.get("/api/auth/staff/users/")
+        self.assertEqual(response.status_code, 403)
+
+        self.client.force_authenticate(user=self.target)
+        response = self.client.get("/api/auth/staff/users/")
+        self.assertEqual(response.status_code, 403)
+
+    def test_admin_can_list_toggle_and_change_role(self):
+        self.client.force_authenticate(user=self.admin)
+
+        listing = self.client.get("/api/auth/staff/users/?page=1&page_size=20")
+        self.assertEqual(listing.status_code, 200)
+        self.assertIn("results", listing.data)
+
+        status_update = self.client.patch(
+            f"/api/auth/staff/users/{self.target.id}/status/",
+            {},
+            format="json",
+        )
+        self.assertEqual(status_update.status_code, 200)
+
+        role_update = self.client.patch(
+            f"/api/auth/staff/users/{self.target.id}/role/",
+            {"role": "Barista"},
+            format="json",
+        )
+        self.assertEqual(role_update.status_code, 200)
+
+        self.target.refresh_from_db()
+        self.assertFalse(self.target.is_active)
+        self.assertTrue(self.target.groups.filter(name="Barista").exists())
+        self.assertTrue(self.target.is_staff)

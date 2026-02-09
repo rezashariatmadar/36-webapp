@@ -1,13 +1,18 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.middleware.csrf import get_token
+from rest_framework import serializers
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .models import CustomUser
 from .forms import ProfileForm, UserRegistrationForm
 from .utils import rate_limit
+
+VALID_ROLES = ("Admin", "Barista", "Customer")
 
 
 def _session_payload(request):
@@ -108,3 +113,79 @@ class SessionProfileAPIView(APIView):
 
         form.save()
         return Response(_session_payload(request))
+
+
+class StaffUserSerializer(serializers.ModelSerializer):
+    role = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CustomUser
+        fields = ["id", "phone_number", "full_name", "is_active", "is_staff", "role"]
+
+    def get_role(self, obj):
+        if obj.is_admin:
+            return "Admin"
+        if obj.is_barista:
+            return "Barista"
+        if obj.is_customer:
+            return "Customer"
+        return "Unassigned"
+
+
+class StaffUserListAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        if not (request.user.is_authenticated and request.user.is_admin):
+            return Response({"detail": "Permission denied"}, status=403)
+        qs = CustomUser.objects.prefetch_related("groups").order_by("id")
+        if "page" in request.GET or "page_size" in request.GET:
+            page = max(int(request.GET.get("page", 1)), 1)
+            page_size = min(max(int(request.GET.get("page_size", 25)), 1), 100)
+            offset = (page - 1) * page_size
+            total = qs.count()
+            users = qs[offset:offset + page_size]
+            serializer = StaffUserSerializer(users, many=True)
+            return Response(
+                {
+                    "count": total,
+                    "page": page,
+                    "page_size": page_size,
+                    "results": serializer.data,
+                }
+            )
+        serializer = StaffUserSerializer(qs, many=True)
+        return Response(serializer.data)
+
+
+class StaffUserStatusAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request, user_id):
+        if not (request.user.is_authenticated and request.user.is_admin):
+            return Response({"detail": "Permission denied"}, status=403)
+        target = get_object_or_404(CustomUser, id=user_id)
+        if target.id == request.user.id:
+            return Response({"detail": "Cannot change your own active status."}, status=400)
+        target.is_active = not target.is_active
+        target.save(update_fields=["is_active"])
+        return Response(StaffUserSerializer(target).data)
+
+
+class StaffUserRoleAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request, user_id):
+        if not (request.user.is_authenticated and request.user.is_admin):
+            return Response({"detail": "Permission denied"}, status=403)
+        new_role = (request.data.get("role") or "").strip()
+        if new_role not in VALID_ROLES:
+            return Response({"detail": "Invalid role selected."}, status=400)
+
+        target = get_object_or_404(CustomUser, id=user_id)
+        target.groups.clear()
+        group, _ = Group.objects.get_or_create(name=new_role)
+        target.groups.add(group)
+        target.is_staff = new_role in ("Admin", "Barista")
+        target.save(update_fields=["is_staff"])
+        return Response(StaffUserSerializer(target).data)

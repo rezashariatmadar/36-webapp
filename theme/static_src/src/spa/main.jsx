@@ -713,20 +713,38 @@ function StaffPage({ me }) {
   const [menuItems, setMenuItems] = useState([]);
   const [lookup, setLookup] = useState('');
   const [customers, setCustomers] = useState([]);
+  const [platformUsers, setPlatformUsers] = useState([]);
   const [busy, setBusy] = useState(false);
+  const [usersBusy, setUsersBusy] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const isStaffUser = Boolean(me?.user?.roles?.is_admin || me?.user?.roles?.is_barista);
+  const isAdminUser = Boolean(me?.user?.roles?.is_admin);
+
+  const loadCafeData = async () => {
+    const [ordersData, menuData] = await Promise.all([
+      apiFetch('/api/cafe/staff/orders/'),
+      apiFetch('/api/cafe/staff/menu-items/'),
+    ]);
+    setOrders(ordersData.orders || []);
+    setMenuItems(menuData.items || []);
+  };
+
+  const loadPlatformUsers = async () => {
+    if (!isAdminUser) {
+      setPlatformUsers([]);
+      return;
+    }
+    const data = await apiFetch('/api/auth/staff/users/?page=1&page_size=100');
+    setPlatformUsers(data.results || data || []);
+  };
 
   const loadAll = async () => {
     setBusy(true);
     setError('');
+    setMessage('');
     try {
-      const [ordersData, menuData] = await Promise.all([
-        apiFetch('/api/cafe/staff/orders/'),
-        apiFetch('/api/cafe/staff/menu-items/'),
-      ]);
-      setOrders(ordersData.orders || []);
-      setMenuItems(menuData.items || []);
+      await Promise.all([loadCafeData(), loadPlatformUsers()]);
     } catch (loadError) {
       setError(loadError.message);
     } finally {
@@ -742,12 +760,14 @@ function StaffPage({ me }) {
 
   const setOrderStatus = async (orderId, statusValue) => {
     setError('');
+    setMessage('');
     try {
       await apiFetch(`/api/cafe/staff/orders/${orderId}/status/`, {
         method: 'POST',
         body: JSON.stringify({ status: statusValue }),
       });
       await loadAll();
+      setMessage('Order status updated.');
     } catch (statusError) {
       setError(statusError.message);
     }
@@ -755,9 +775,11 @@ function StaffPage({ me }) {
 
   const togglePayment = async (orderId) => {
     setError('');
+    setMessage('');
     try {
       await apiFetch(`/api/cafe/staff/orders/${orderId}/toggle-payment/`, { method: 'POST' });
       await loadAll();
+      setMessage('Payment state updated.');
     } catch (paymentError) {
       setError(paymentError.message);
     }
@@ -765,9 +787,11 @@ function StaffPage({ me }) {
 
   const toggleItemAvailability = async (itemId) => {
     setError('');
+    setMessage('');
     try {
       await apiFetch(`/api/cafe/staff/menu-items/${itemId}/toggle-availability/`, { method: 'POST' });
       await loadAll();
+      setMessage('Menu availability updated.');
     } catch (toggleError) {
       setError(toggleError.message);
     }
@@ -784,6 +808,42 @@ function StaffPage({ me }) {
       setCustomers(data.customers || []);
     } catch (lookupError) {
       setError(lookupError.message);
+    }
+  };
+
+  const toggleUserStatus = async (userId) => {
+    setError('');
+    setMessage('');
+    setUsersBusy(true);
+    try {
+      await apiFetch(`/api/auth/staff/users/${userId}/status/`, {
+        method: 'PATCH',
+        body: JSON.stringify({}),
+      });
+      await loadPlatformUsers();
+      setMessage('User status updated.');
+    } catch (statusError) {
+      setError(statusError.message);
+    } finally {
+      setUsersBusy(false);
+    }
+  };
+
+  const setUserRole = async (userId, role) => {
+    setError('');
+    setMessage('');
+    setUsersBusy(true);
+    try {
+      await apiFetch(`/api/auth/staff/users/${userId}/role/`, {
+        method: 'PATCH',
+        body: JSON.stringify({ role }),
+      });
+      await loadPlatformUsers();
+      setMessage('User role updated.');
+    } catch (roleError) {
+      setError(roleError.message);
+    } finally {
+      setUsersBusy(false);
     }
   };
 
@@ -815,6 +875,7 @@ function StaffPage({ me }) {
           </button>
         </div>
         {error ? <div className="alert alert-error mt-4">{error}</div> : null}
+        {message ? <div className="alert alert-success mt-4">{message}</div> : null}
         <div className="mt-4 space-y-3">
           {!orders.length ? (
             <p className="text-sm text-white/60">No active orders.</p>
@@ -897,6 +958,40 @@ function StaffPage({ me }) {
             )}
           </div>
         </div>
+
+        {isAdminUser ? (
+          <div className="spa-card p-5">
+            <h2 className="text-lg font-bold">Platform Users</h2>
+            <div className="mt-3 space-y-2 max-h-96 overflow-auto pr-1">
+              {!platformUsers.length ? (
+                <p className="text-sm text-white/60">No users found.</p>
+              ) : (
+                platformUsers.map((userRecord) => (
+                  <div key={userRecord.id} className="spa-card p-3 text-sm">
+                    <div className="font-medium">{userRecord.full_name || '-'}</div>
+                    <div className="text-white/70">{userRecord.phone_number}</div>
+                    <div className="text-white/70">Role: {userRecord.role || 'Unassigned'}</div>
+                    <div className="text-white/70">Status: {userRecord.is_active ? 'Active' : 'Inactive'}</div>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <button type="button" className="btn btn-xs btn-outline border-white/30 text-white" onClick={() => setUserRole(userRecord.id, 'Admin')} disabled={usersBusy}>
+                        Admin
+                      </button>
+                      <button type="button" className="btn btn-xs btn-outline border-white/30 text-white" onClick={() => setUserRole(userRecord.id, 'Barista')} disabled={usersBusy}>
+                        Barista
+                      </button>
+                      <button type="button" className="btn btn-xs btn-outline border-white/30 text-white" onClick={() => setUserRole(userRecord.id, 'Customer')} disabled={usersBusy}>
+                        Customer
+                      </button>
+                      <button type="button" className="btn btn-xs btn-primary" onClick={() => toggleUserStatus(userRecord.id)} disabled={usersBusy}>
+                        {userRecord.is_active ? 'Deactivate' : 'Activate'}
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        ) : null}
       </aside>
     </section>
   );

@@ -5,15 +5,11 @@ class BaseUITests(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_legacy_home_redirects_to_spa(self):
+    def test_legacy_routes_are_disabled(self):
         response = self.client.get('/legacy/')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/app')
-
-    def test_legacy_cafe_routes_redirect_to_spa(self):
+        self.assertEqual(response.status_code, 404)
         response = self.client.get('/legacy/cafe/menu/')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/app/cafe')
+        self.assertEqual(response.status_code, 404)
 
     def test_auth_portals_redirect_to_spa_account(self):
         response = self.client.get('/login/')

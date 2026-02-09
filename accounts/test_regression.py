@@ -3,9 +3,9 @@ from django.urls import reverse
 
 class CorePagesRegressionTests(TestCase):
     def test_home_page_loads(self):
-        response = self.client.get('/legacy/')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/app')
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="app-root"')
 
     def test_login_page_loads(self):
         response = self.client.get('/login/')
@@ -32,11 +32,9 @@ class CorePagesRegressionTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/app/account')
 
-    def test_user_list_page_redirects_for_anonymous(self):
-        response = self.client.get(reverse('accounts:user_list'))
-        self.assertEqual(response.status_code, 302)
-        # Should redirect to login because of admin_required (which usually uses login_required)
-        self.assertIn('/app/account', response.url)
+    def test_staff_user_api_denies_anonymous(self):
+        response = self.client.get('/api/auth/staff/users/')
+        self.assertEqual(response.status_code, 403)
 
     def test_barista_dashboard_redirects_for_anonymous(self):
         response = self.client.get(reverse('cafe:barista_dashboard'))

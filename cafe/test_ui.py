@@ -19,10 +19,10 @@ class CafeUITests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/app/cafe")
 
-    def test_legacy_home_redirects_to_spa(self):
-        response = self.client.get("/legacy/")
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/app")
+    def test_root_serves_spa_shell(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="app-root"')
 
 
 class CafeEmptyStateTests(TestCase):

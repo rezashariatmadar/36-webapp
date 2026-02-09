@@ -1,67 +1,75 @@
-from django.test import TestCase, RequestFactory
-from django.urls import reverse
-from django.contrib.auth.models import Group, AnonymousUser
-from django.contrib.messages.storage.fallback import FallbackStorage
-from .models import CustomUser
+from django.test import TestCase
+from django.contrib.auth.models import Group
+from rest_framework.test import APIClient
 from .factories import UserFactory
-from .views import VALID_ROLES, change_user_role
+from .api_views import VALID_ROLES
 
 class RoleChangeTests(TestCase):
     def setUp(self):
-        self.factory = RequestFactory()
+        self.client = APIClient()
         self.admin_user = UserFactory(phone_number='09120000000')
         admin_group, _ = Group.objects.get_or_create(name='Admin')
         self.admin_user.groups.add(admin_group)
         self.admin_user.refresh_from_db()
 
         self.target_user = UserFactory(phone_number='09120000001')
-
-    def _get_request(self, user, url):
-        request = self.factory.get(url)
-        request.user = user
-        # Add message support
-        setattr(request, 'session', 'session')
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        return request
+        self.client.force_authenticate(user=self.admin_user)
 
     def test_valid_roles_constant(self):
         self.assertEqual(VALID_ROLES, ('Admin', 'Barista', 'Customer'))
 
     def test_change_role_to_barista(self):
-        url = reverse('accounts:change_user_role', args=[self.target_user.id, 'Barista'])
-        request = self._get_request(self.admin_user, url)
+        response = self.client.patch(
+            f"/api/auth/staff/users/{self.target_user.id}/role/",
+            {"role": "Barista"},
+            format="json",
+        )
 
-        response = change_user_role(request, self.target_user.id, 'Barista')
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('accounts:user_list'))
+        self.assertEqual(response.status_code, 200)
 
         self.target_user.refresh_from_db()
         self.assertTrue(self.target_user.groups.filter(name='Barista').exists())
         self.assertTrue(self.target_user.is_staff)
 
     def test_change_role_to_customer(self):
-        url = reverse('accounts:change_user_role', args=[self.target_user.id, 'Customer'])
-        request = self._get_request(self.admin_user, url)
+        response = self.client.patch(
+            f"/api/auth/staff/users/{self.target_user.id}/role/",
+            {"role": "Customer"},
+            format="json",
+        )
 
-        response = change_user_role(request, self.target_user.id, 'Customer')
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('accounts:user_list'))
+        self.assertEqual(response.status_code, 200)
 
         self.target_user.refresh_from_db()
         self.assertTrue(self.target_user.groups.filter(name='Customer').exists())
         self.assertFalse(self.target_user.is_staff)
 
     def test_change_role_invalid(self):
-        url = reverse('accounts:change_user_role', args=[self.target_user.id, 'Hacker'])
-        request = self._get_request(self.admin_user, url)
+        response = self.client.patch(
+            f"/api/auth/staff/users/{self.target_user.id}/role/",
+            {"role": "Hacker"},
+            format="json",
+        )
 
-        response = change_user_role(request, self.target_user.id, 'Hacker')
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('accounts:user_list'))
+        self.assertEqual(response.status_code, 400)
 
         self.target_user.refresh_from_db()
         self.assertFalse(self.target_user.groups.filter(name='Hacker').exists())
+
+    def test_toggle_status(self):
+        response = self.client.patch(
+            f"/api/auth/staff/users/{self.target_user.id}/status/",
+            {},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.target_user.refresh_from_db()
+        self.assertFalse(self.target_user.is_active)
+
+    def test_toggle_status_rejects_self(self):
+        response = self.client.patch(
+            f"/api/auth/staff/users/{self.admin_user.id}/status/",
+            {},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
