@@ -40,7 +40,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Expanded regression coverage for migration APIs and cutover behavior; full suite currently green.
 - Alpine.js template directives and CDN dependency removed from runtime templates.
 - jQuery/Persian datepicker assets removed from global base template and scoped to legacy booking form only.
-- Default-mode `/cafe/*` and `/cowork/*` now redirect into `/legacy/*` ownership.
+- Compatibility redirects keep `/cafe/*` and `/cowork/*` mapped to SPA routes (`/app/cafe`, `/app/cowork`).
 - HTMX runtime script and body `hx-headers` wiring have been removed from template runtime.
 - Server-side HTMX partial response branches have been removed from `cafe` and `cowork` views.
 - `django-htmx` app/middleware wiring removed from runtime settings; legacy HTMX detection now uses request headers.
@@ -53,7 +53,8 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 
 ### In Progress
 
-- Expanded SPA navigation and role-aware surfaces.
+- Final compatibility redirect retirement decisions.
+- SPA route-level performance optimization and bundle trimming.
 
 ### Not Started
 
@@ -105,7 +106,7 @@ Deliverables:
 Exit criteria:
 - Account flows consistent with app shell UX.
 
-## Phase 4: Route Cutover and Decommission (Planned)
+## Phase 4: Route Cutover and Decommission (In Progress)
 
 Deliverables:
 - Route ownership switch from template pages to SPA entry.
@@ -172,6 +173,7 @@ Exit criteria:
 - [x] Add SPA account route and account UX (`/app/account`).
 - [x] Prepare and implement root-route cutover with redirect map.
 - [x] Decommission legacy frontend dependencies.
+- [x] Decommission unreachable server-template view/template surface in `cafe` and `cowork`.
 
 ### Verification Checklist
 
@@ -194,7 +196,29 @@ Exit criteria:
 
 ## 11. Increment Log
 
-### 2026-02-08 (Current Increment)
+### 2026-02-09 (Latest Increment)
+
+- Decommissioned unreachable server-template route implementation:
+  - removed `cafe/views.py`
+  - removed `cowork/views.py`
+  - removed dormant cafe/cowork server templates and partials under:
+    - `theme/templates/cafe/*`
+    - `theme/templates/cowork/*`
+    - `theme/templates/dashboard.html`
+- Decoupled API cart/session behavior from removed template views:
+  - added `cafe/cart_session.py` for cart schema/constants/session helpers
+  - rewired `cafe/api_views.py` to use `cafe.cart_session`
+- Rebased tests on API/domain behavior (no template-view imports):
+  - rewrote `cafe/test_cafe_logic.py` around cart-session + model behavior
+  - rewrote `cowork/test_cowork_logic.py` around booking/space domain behavior
+  - rewrote `cafe/tests/test_performance.py` for `/api/cafe/cart/` performance checks
+  - removed dormant `cafe/tests_performance.py`
+- Verification:
+  - targeted migration suite: `24 passed`
+  - full suite: `115 passed, 84 warnings`
+  - Django system checks: clean
+
+### 2026-02-08 (Historical Increment)
 
 - Added staff API endpoints under `/api/cafe/staff/*` for:
   - active orders listing
@@ -387,6 +411,7 @@ Exit criteria:
   - post SPA-native dormant-redirect normalization verification: `123 passed, 101 warnings`
   - post cafe/cowork namespace include-removal verification: `123 passed, 101 warnings`
   - post dormant route-module removal verification: `123 passed, 101 warnings`
+  - post server-template surface decommission verification: `115 passed, 84 warnings`
 
 ## 12. Handoff Snapshot
 
@@ -410,6 +435,14 @@ Exit criteria:
 - Rollback strategy:
   - use checkpoint refs (branch/tag/commit) to restore pre-removal state if needed.
 
+### ETA to Full React
+
+- Estimated remaining effort: ~1 to 2 focused engineering days.
+- Remaining scope:
+  - decide whether to keep or retire compatibility redirects (`/login|/register|/profile`, `/cafe/*`, `/cowork/*`)
+  - finalize SPA route coverage for any residual edge paths and run smoke checks
+  - optional performance polish (bundle split/caching) before declaring final cutover complete
+
 ### Last Verified Commands
 
 - `uv run pytest accounts/test_spa_api.py cafe/tests/test_spa_api.py cowork/test_spa_api.py config/test_spa_cutover.py -q`
@@ -430,7 +463,7 @@ Use this section first if chat history/context is truncated.
 ### Current Baseline (Trusted)
 
 - Backend + SPA migration changes are applied and test-verified.
-- Full suite currently passes (`123 passed`).
+- Full suite currently passes (`115 passed, 84 warnings`).
 - SPA-first cutover is active and enforced in URL routing.
 
 ### Source of Truth Files
@@ -455,6 +488,6 @@ Use this section first if chat history/context is truncated.
 
 ### Next Implementation Focus (Ordered)
 
-- Decommission unused server-template views/partials in `cafe` and `cowork` that are no longer reachable from routed UX.
 - Confirm final ownership for compatibility redirects (`/login|/register|/profile`, `/cafe/*`, `/cowork/*`) and retire them when safe.
-- Run full regression + smoke checks after each decommission batch.
+- Run targeted Playwright smoke on final route matrix (`/app`, `/app/account`, `/app/cafe`, `/app/cowork`, `/app/staff`).
+- Run full regression + build checks after each redirect/polish batch.

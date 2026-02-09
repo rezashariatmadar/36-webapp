@@ -5,7 +5,7 @@ from rest_framework.test import APIClient
 from accounts.factories import UserFactory
 from cafe.factories import MenuCategoryFactory, MenuItemFactory
 from cafe.models import CafeOrder, OrderItem
-from cafe.views import MAX_CART_ITEMS
+from cafe.cart_session import MAX_CART_ITEMS
 
 
 class CafeSPAApiTests(TestCase):

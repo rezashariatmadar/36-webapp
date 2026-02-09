@@ -1,44 +1,31 @@
-from django.test import TestCase, RequestFactory
-from django.contrib.sessions.middleware import SessionMiddleware
-from cafe.models import MenuItem
+from django.test import TestCase
+from rest_framework.test import APIClient
+
 from cafe.factories import MenuItemFactory
-from cafe.views import cart_detail
-from django.db import connection, reset_queries
-from django.contrib.auth.models import AnonymousUser
+
 
 class CartPerformanceTest(TestCase):
     def setUp(self):
-        self.factory = RequestFactory()
+        self.client = APIClient()
         self.items = MenuItemFactory.create_batch(10)
-        self.cart = {str(item.id): 1 for item in self.items}
+        session = self.client.session
+        session["cart"] = {str(item.id): 1 for item in self.items}
+        session["cart_v"] = 1
+        session.save()
 
-    def _get_request_with_cart(self):
-        url = "/cafe/cart/"
-        request = self.factory.get(url)
-        request.user = AnonymousUser()
-        middleware = SessionMiddleware(lambda r: None)
-        middleware.process_request(request)
-        request.session['cart'] = self.cart
-        request.session.save()
-        request.htmx = False
-        return request
+    def test_cart_endpoint_query_count(self):
+        with self.assertNumQueries(2):
+            response = self.client.get("/api/cafe/cart/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["cart_count"], 10)
 
-    def test_cart_detail_query_count(self):
-        request = self._get_request_with_cart()
+    def test_cart_endpoint_drops_missing_items(self):
+        session = self.client.session
+        session["cart"]["99999"] = 1
+        session.save()
 
-        # Reset queries to ensure clean state
-        reset_queries()
+        response = self.client.get("/api/cafe/cart/")
 
-        with self.assertNumQueries(1):
-            # Optimized: 1 query for all items
-            cart_detail(request)
-
-    def test_cart_missing_item_logging(self):
-        # Add a non-existent item to cart
-        self.cart['99999'] = 1
-        request = self._get_request_with_cart()
-
-        with self.assertLogs('cafe.views', level='WARNING') as cm:
-            cart_detail(request)
-
-        self.assertTrue(any("Item with ID 99999 found in cart" in output for output in cm.output))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["cart_count"], 10)
+        self.assertNotIn("99999", self.client.session.get("cart", {}))

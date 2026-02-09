@@ -6,8 +6,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .cart_session import MAX_CART_ITEMS, MAX_PER_ITEM, get_cart, save_cart
 from .models import CafeOrder, MenuCategory, MenuItem, OrderItem
-from .views import MAX_CART_ITEMS, MAX_PER_ITEM, _get_cart, _save_cart
 from accounts.models import CustomUser
 
 
@@ -137,7 +137,7 @@ class StaffOrAdminPermission(IsAuthenticated):
 
 
 def _build_cart_payload(request):
-    cart = _get_cart(request)
+    cart = get_cart(request)
     fetched_items = MenuItem.objects.filter(id__in=cart.keys(), is_available=True).select_related("category")
     items_by_id = {str(item.id): item for item in fetched_items}
 
@@ -185,7 +185,7 @@ def _build_cart_payload(request):
         )
 
     if changed:
-        _save_cart(request, cart)
+        save_cart(request, cart)
 
     cart_count = sum(int(v) for v in cart.values() if str(v).isdigit())
     return {
@@ -228,7 +228,7 @@ class CafeCartItemsAPIView(APIView):
         if delta not in (-1, 1):
             return Response({"detail": "delta must be 1 or -1."}, status=status.HTTP_400_BAD_REQUEST)
 
-        cart = _get_cart(request)
+        cart = get_cart(request)
         item_id_str = str(menu_item_id)
 
         if delta == 1:
@@ -250,7 +250,7 @@ class CafeCartItemsAPIView(APIView):
                 else:
                     cart[item_id_str] = quantity - 1
 
-        _save_cart(request, cart)
+        save_cart(request, cart)
         return Response(_build_cart_payload(request))
 
 
@@ -258,7 +258,7 @@ class CafeCheckoutAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        cart = _get_cart(request)
+        cart = get_cart(request)
         if not cart:
             return Response({"detail": "Cart is empty."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -307,7 +307,7 @@ class CafeCheckoutAPIView(APIView):
             order.total_price = total_price
             order.save(update_fields=["total_price", "updated_at"])
 
-        _save_cart(request, {})
+        save_cart(request, {})
         return Response(
             {
                 "order_id": order.id,
@@ -339,7 +339,7 @@ class CafeReorderAPIView(APIView):
         cart = {}
         for item in order.items.all():
             cart[str(item.menu_item_id)] = min(item.quantity, MAX_PER_ITEM)
-        _save_cart(request, cart)
+        save_cart(request, cart)
         return Response(_build_cart_payload(request))
 
 
