@@ -165,14 +165,11 @@ LOGGING = {
     },
 }
 
-_default_script_src = (
-    "'self' https://cdn.jsdelivr.net https://unpkg.com"
-)
+_default_script_src = "'self' https://cdn.jsdelivr.net"
 _default_connect_src = "'self'"
-# Current templates rely on inline scripts and Alpine expression evaluation.
 # Keep stricter defaults in non-debug environments.
 if DEBUG:
-    _default_script_src += " 'unsafe-inline' 'unsafe-eval'"
+    _default_script_src += " 'unsafe-inline'"
     _default_connect_src += " http://localhost:5173 ws://localhost:5173"
 
 CONTENT_SECURITY_POLICY = os.getenv(

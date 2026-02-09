@@ -1,6 +1,6 @@
 # 36-webapp
 
-Django 5.2 web app with HTMX, DRF, and a Tailwind/PostCSS theme build.
+Django 5.2 web app with a React SPA frontend, DRF APIs, and a Tailwind/PostCSS theme build.
 
 **Requirements**
 - Python 3.12+

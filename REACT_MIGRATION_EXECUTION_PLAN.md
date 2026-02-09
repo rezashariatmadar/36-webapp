@@ -29,7 +29,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
   - `/api/cafe/menu|cart|cart/items|checkout|orders|orders/{id}/reorder`
   - `/api/cowork/spaces|bookings/preview|bookings|my-bookings`
 - React SPA scaffold is implemented in `theme/static_src/src/spa/`.
-- Build chain emits `spa-app.js` and `spa-app.css`.
+- Build chain emits `spa-app.js` + `spa-app.css` with route-level JS chunks.
 - CSP debug connect-src allows local SPA dev tooling.
 - Regression tests added for new auth/cafe/cowork APIs and SPA shell mount.
 - Session auth/account APIs expanded with login, logout, register, and profile contracts.
@@ -53,7 +53,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 
 ### In Progress
 
-- SPA route-level performance optimization and bundle trimming.
+- CSP hardening and final migration documentation cleanup.
 
 ### Not Started
 
@@ -197,7 +197,32 @@ Exit criteria:
 
 ## 11. Increment Log
 
-### 2026-02-09 (Latest Increment - Route Retirement + Customization Guardrails)
+### 2026-02-09 (Latest Increment - SPA Chunk Split + Performance Cut)
+
+- Split monolithic SPA runtime into lazy-loaded route modules:
+  - `theme/static_src/src/spa/pages/home-page.jsx`
+  - `theme/static_src/src/spa/pages/account-page.jsx`
+  - `theme/static_src/src/spa/pages/cafe-page.jsx`
+  - `theme/static_src/src/spa/pages/cowork-page.jsx`
+  - `theme/static_src/src/spa/pages/staff-page.jsx`
+  - shared API client extracted to `theme/static_src/src/spa/api.js`
+- Refactored `theme/static_src/src/spa/main.jsx` to route-level `React.lazy` + `Suspense`.
+- Switched SPA build output to ESM chunking in `theme/static_src/package.json` while keeping stable entry names (`spa-app.js`, `spa-app.css`).
+- Updated SPA template script loading to module mode in `theme/templates/app.html`.
+- Tightened CSP defaults and removed stale dependency/docs references:
+  - `config/settings.py` script-src cleanup
+  - removed `django-htmx` from `requirements.txt`
+  - refreshed frontend stack summary in `README.md`
+- Captured browser smoke artifacts for chunked runtime:
+  - `output/playwright/final-app-home-chunked.png`
+  - `output/playwright/final-app-staff-chunked.png`
+- Verification:
+  - frontend build: pass (`spa-app.js` ~135.1KB, `spa-app.css` ~950B, route chunks emitted)
+  - targeted SPA regressions: `9 passed`
+  - full suite: `115 passed, 84 warnings`
+  - Django system checks: clean
+
+### 2026-02-09 (Previous Increment - Route Retirement + Customization Guardrails)
 
 - Retired compatibility redirect routes from runtime URL ownership:
   - removed `/login|/register|/profile` redirect surface
@@ -461,10 +486,10 @@ Exit criteria:
 
 ### ETA to Full React
 
-- Estimated remaining effort: ~0.5 to 1 focused engineering day.
+- Estimated remaining effort: ~0.25 to 0.5 focused engineering day.
 - Remaining scope:
-  - run final Playwright smoke matrix for `/app`, `/app/account`, `/app/cafe`, `/app/cowork`, `/app/staff`
-  - optional performance polish (bundle split/caching) before migration closure
+  - capture remaining Playwright smoke matrix screenshots for `/app/account`, `/app/cafe`, `/app/cowork`
+  - finalize migration closeout docs and cleanup stale historical references
 
 ### Last Verified Commands
 
@@ -512,6 +537,6 @@ Use this section first if chat history/context is truncated.
 
 ### Next Implementation Focus (Ordered)
 
-- Run targeted Playwright smoke on final route matrix (`/app`, `/app/account`, `/app/cafe`, `/app/cowork`, `/app/staff`).
-- Run full regression + build checks after each performance-polish batch.
-- Optional: split SPA route chunks and enforce budget thresholds from `theme/static_src/src/spa/CUSTOMIZATION_GUARDRAILS.md`.
+- Capture final Playwright smoke set for remaining SPA routes (`/app/account`, `/app/cafe`, `/app/cowork`).
+- Run full regression + build checks after final documentation cleanup.
+- Close Phase 5 by freezing bundle budgets from `theme/static_src/src/spa/CUSTOMIZATION_GUARDRAILS.md`.
