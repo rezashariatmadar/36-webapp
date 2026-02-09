@@ -53,11 +53,13 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 
 ### In Progress
 
-- None.
+- Option-A preparation track is active:
+  - new root `frontend/` Vite + React + strict TypeScript workspace
+  - parallel-run with existing Django-served SPA fallback until edge cutover is complete
 
 ### Not Started
 
-- None.
+- Option-A edge deployment and one-release rollback window completion.
 
 ## 4. Migration Phases
 
@@ -126,6 +128,20 @@ Deliverables:
 Exit criteria:
 - Lean frontend stack, stable tests, reduced bundle/dependency surface.
 
+## Phase 6: Frontend Workspace and Edge Cutover (In Progress)
+
+Deliverables:
+- Root `frontend/` workspace (Vite + strict TypeScript) with `/app/` mount semantics.
+- React Router runtime basename set to `/app`.
+- Dev proxy from frontend to Django API (`/api/*`).
+- CSRF bootstrap endpoint for post-template SPA startup (`GET /api/auth/csrf/`).
+- Edge deployment playbook for Option A (`/app` static + `/api` proxy).
+
+Exit criteria:
+- Frontend build from `frontend/` passes and route parity is validated.
+- First unsafe API call works from SPA-only startup path without Django template visit.
+- Option A edge config validated with rollback path preserved for one release.
+
 ## 5. API Contract Rules
 
 - Use JSON objects only (no HTML partial responses for SPA endpoints).
@@ -175,6 +191,12 @@ Exit criteria:
 - [x] Decommission unreachable server-template view/template surface in `cafe` and `cowork`.
 - [x] Retire compatibility redirects (`/login|/register|/profile`, `/cafe/*`, `/cowork/*`) from runtime route ownership.
 - [x] Add SPA customization guardrails and theme-token baseline.
+- [x] Create baseline checkpoint before frontend workspace migration (`checkpoint/pre-frontend-vite-ts`).
+- [x] Scaffold `frontend/` Vite + React + strict TypeScript workspace.
+- [x] Port current SPA pages/API client into `frontend/src` with React Router basename `/app`.
+- [x] Add CSRF bootstrap endpoint (`GET /api/auth/csrf/`) for SPA-only startup.
+- [ ] Add `shadcn/ui` primitives and adapter boundary for third-party animated components.
+- [ ] Validate Option A edge config in staging (`/app` static + `/api` proxy) and keep one-release rollback path.
 
 ### Verification Checklist
 
@@ -199,7 +221,33 @@ Exit criteria:
 
 ## 11. Increment Log
 
-### 2026-02-09 (Latest Increment - Phase 5 Closeout + Budget Enforcement)
+### 2026-02-09 (Latest Increment - Frontend Workspace Bootstrap + CSRF Bootstrap API)
+
+- Created rollback checkpoint tag before workspace migration:
+  - `checkpoint/pre-frontend-vite-ts`
+- Added new root frontend workspace:
+  - `frontend/` (Vite + React + strict TypeScript)
+  - Vite config locked to `/app` semantics:
+    - `base: "/app/"`
+    - dev proxy `/api/*` -> `http://127.0.0.1:8000`
+- Ported current SPA implementation to strict TypeScript:
+  - `frontend/src/app.tsx`
+  - `frontend/src/pages/*.tsx`
+  - `frontend/src/lib/api.ts`
+  - `frontend/src/types/{auth,cafe,cowork}.ts`
+  - `frontend/src/app.css` + `frontend/src/index.css`
+- Added CSRF bootstrap API endpoint for SPA-only startup:
+  - `GET /api/auth/csrf/`
+  - updated `accounts/api_views.py` and `accounts/api_urls.py`
+  - added regression test `test_csrf_bootstrap_sets_cookie` in `accounts/test_spa_api.py`
+- Validation:
+  - `cd frontend && npm run build`: pass
+  - `uv run pytest accounts/test_spa_api.py -q`: `15 passed`
+  - `uv run pytest -q`: `116 passed, 85 warnings`
+  - `uv run python manage.py check`: clean
+  - `cd theme/static_src && npm run build`: pass (legacy fallback pipeline remains green)
+
+### 2026-02-09 (Previous Increment - Phase 5 Closeout + Budget Enforcement)
 
 - Captured and versioned remaining chunked SPA smoke artifacts:
   - `output/playwright/final-app-account-chunked.png`
@@ -501,10 +549,11 @@ Exit criteria:
 
 ### ETA to Full React
 
-- Migration complete for planned React cutover scope.
-- Estimated remaining migration effort: `0` focused engineering days.
+- Existing Django-first SPA migration remains complete and stable.
+- New Option-A workspace/cutover track remaining effort: `~2 to 3` focused engineering days.
 - Remaining scope:
-  - none for migration; next work is post-migration product customization.
+  - add `shadcn/ui` primitives and animation adapter boundary in `frontend/`
+  - validate Option-A edge config in staging and perform one-release rollback hardening
 
 ### Last Verified Commands
 
@@ -526,13 +575,15 @@ Use this section first if chat history/context is truncated.
 ### Current Baseline (Trusted)
 
 - Backend + SPA migration changes are applied and test-verified.
-- Full suite currently passes (`115 passed, 84 warnings`).
+- Full suite currently passes (`116 passed, 85 warnings`).
 - SPA-first cutover is active and enforced in URL routing.
 - SPA bundle budgets are enforced in CI/local build via `npm run check:spa-budgets`.
+- Frontend workspace migration has started under `frontend/` with strict TS and `/app` base semantics.
 
 ### Source of Truth Files
 
 - Migration tracker: `REACT_MIGRATION_EXECUTION_PLAN.md`
+- Option-A deployment/runbook: `frontend/DEPLOYMENT.md`
 - Legacy dependency map: `LEGACY_FRONTEND_DEPENDENCY_MAP.md`
 - SPA customization guardrails: `theme/static_src/src/spa/CUSTOMIZATION_GUARDRAILS.md`
 - Cutover wiring: `config/urls.py`
@@ -546,6 +597,8 @@ Use this section first if chat history/context is truncated.
 
 - Backend tests:
   - `uv run pytest -q`
+- Frontend workspace build:
+  - `cd frontend && npm run build`
 - Focused migration suite:
   - `uv run pytest accounts/test_spa_api.py cafe/tests/test_spa_api.py cowork/test_spa_api.py config/test_spa_cutover.py -q`
 - Frontend production bundle:

@@ -26,6 +26,12 @@ class SessionMeAPITests(TestCase):
         self.assertEqual(response.data["user"]["id"], self.user.id)
         self.assertIn("roles", response.data["user"])
 
+    def test_csrf_bootstrap_sets_cookie(self):
+        response = self.client.get("/api/auth/csrf/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("csrf_token", response.data)
+        self.assertIn("csrftoken", response.cookies)
+
 
 class SessionAccountAPITests(TestCase):
     def setUp(self):

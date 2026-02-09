@@ -13,6 +13,10 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+
+# Frontend workspace exceptions
+!frontend/src/lib/
+!frontend/src/lib/**
 downloads/
 eggs/
 .eggs/

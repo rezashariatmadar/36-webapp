@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .api_views import (
+    SessionCsrfAPIView,
     SessionLoginAPIView,
     SessionLogoutAPIView,
     SessionMeAPIView,
@@ -14,6 +15,7 @@ from .api_views import (
 app_name = "accounts_api"
 
 urlpatterns = [
+    path("csrf/", SessionCsrfAPIView.as_view(), name="csrf"),
     path("login/", SessionLoginAPIView.as_view(), name="login"),
     path("logout/", SessionLogoutAPIView.as_view(), name="logout"),
     path("register/", SessionRegisterAPIView.as_view(), name="register"),

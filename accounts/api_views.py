@@ -3,6 +3,8 @@ from django.contrib.auth.models import Group
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.middleware.csrf import get_token
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -50,6 +52,14 @@ class SessionMeAPIView(APIView):
 
     def get(self, request):
         return Response(_session_payload(request))
+
+
+@method_decorator(ensure_csrf_cookie, name="dispatch")
+class SessionCsrfAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response({"detail": "CSRF cookie initialized.", "csrf_token": get_token(request)})
 
 
 class SessionLoginAPIView(APIView):
