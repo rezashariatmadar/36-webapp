@@ -1,6 +1,5 @@
 from django.test import TestCase, RequestFactory
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.urls import reverse
 from cafe.models import MenuItem
 from cafe.factories import MenuItemFactory
 from cafe.views import cart_detail
@@ -14,7 +13,7 @@ class CartPerformanceTest(TestCase):
         self.cart = {str(item.id): 1 for item in self.items}
 
     def _get_request_with_cart(self):
-        url = reverse('cafe:cart_detail')
+        url = "/cafe/cart/"
         request = self.factory.get(url)
         request.user = AnonymousUser()
         middleware = SessionMiddleware(lambda r: None)

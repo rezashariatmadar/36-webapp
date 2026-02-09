@@ -7,7 +7,7 @@
 <div class="max-w-4xl mx-auto text-white">
     <div class="flex justify-between items-center mb-10 p-6 glass-panel glass-sheen hover-lift rounded-3xl fade-in-once">
         <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-tr from-white to-accent">رزروهای من</h1>
-        <a href="{% url 'cowork:space_list' %}" class="btn btn-accent btn-sm font-black shadow-lg shadow-accent/20">رزرو جدید</a>
+        <a href="/app/cowork" class="btn btn-accent btn-sm font-black shadow-lg shadow-accent/20">رزرو جدید</a>
     </div>
 
     {% if bookings %}
@@ -55,7 +55,7 @@
     {% else %}
         <div class="text-center py-20 glass-panel rounded-3xl border border-dashed border-white/20">
             <h2 class="text-xl font-bold opacity-40 mb-6">شما هیچ رزرو فعالی ندارید</h2>
-            <a href="{% url 'cowork:space_list' %}" class="btn btn-accent btn-outline font-black">مشاهده فضاهای خالی</a>
+            <a href="/app/cowork" class="btn btn-accent btn-outline font-black">مشاهده فضاهای خالی</a>
         </div>
     {% endif %}
 </div>

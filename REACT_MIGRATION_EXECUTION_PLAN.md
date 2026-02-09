@@ -351,6 +351,17 @@ Exit criteria:
     - `theme/templates/accounts/admin_user_list.html`
   - extended React staff page with admin controls for platform user role/status management
   - rewired regression coverage to API-native staff management tests
+- normalized dormant server-template redirects to SPA-native destinations:
+  - `cafe/views.py` now redirects residual flows directly to `/app/cafe` and `/app/staff`
+  - `cowork/views.py` now redirects booking completion directly to `/app/cowork`
+  - removed route-name reverse coupling in regression/performance tests where not required for behavior assertions
+- removed cafe/cowork route-namespace coupling from runtime URLConf:
+  - removed `path("cafe/", include("cafe.urls"))` and `path("cowork/", include("cowork.urls"))` from `config/urls.py`
+  - migrated template navigation/actions off `{% url 'cafe:*' %}` and `{% url 'cowork:*' %}` to SPA-native links (`/app/cafe`, `/app/cowork`, `/app/staff`)
+  - rewired primary navigation context processor to static SPA URLs in `accounts/context_processors.py`
+  - removed dormant route modules:
+    - `cafe/urls.py`
+    - `cowork/urls.py`
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`
@@ -373,6 +384,9 @@ Exit criteria:
   - post legacy home redirect + SPA shell assertion verification: `119 passed, 91 warnings`
   - post legacy include-removal + compatibility-redirect verification: `119 passed, 91 warnings`
   - post legacy-route decommission + staff user API migration verification: `123 passed, 101 warnings`
+  - post SPA-native dormant-redirect normalization verification: `123 passed, 101 warnings`
+  - post cafe/cowork namespace include-removal verification: `123 passed, 101 warnings`
+  - post dormant route-module removal verification: `123 passed, 101 warnings`
 
 ## 12. Handoff Snapshot
 
@@ -441,7 +455,6 @@ Use this section first if chat history/context is truncated.
 
 ### Next Implementation Focus (Ordered)
 
-- Migrate remaining server-template admin/ops actions (if any) to API endpoints consumed by `/app/staff`.
-- Remove dormant server-template route dependencies in `cafe` and `cowork` once API parity is confirmed.
+- Decommission unused server-template views/partials in `cafe` and `cowork` that are no longer reachable from routed UX.
 - Confirm final ownership for compatibility redirects (`/login|/register|/profile`, `/cafe/*`, `/cowork/*`) and retire them when safe.
 - Run full regression + smoke checks after each decommission batch.

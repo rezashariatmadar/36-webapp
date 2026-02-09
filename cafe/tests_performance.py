@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.urls import reverse
 from django.contrib.auth.models import Group
 from cafe.factories import MenuItemFactory
 from accounts.factories import UserFactory
@@ -19,7 +18,7 @@ class PerformanceTests(TestCase):
         self.items = MenuItemFactory.create_batch(20, price=1000)
 
     def test_manual_order_entry_performance(self):
-        url = reverse('cafe:manual_order')
+        url = "/cafe/manual-order/"
 
         # Prepare POST data
         data = {

@@ -1,5 +1,4 @@
 from django.test import TestCase, RequestFactory
-from django.urls import reverse
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.messages.storage.fallback import FallbackStorage
 from .factories import MenuItemFactory, MenuCategoryFactory
@@ -34,7 +33,7 @@ class CafeLogicTests(TestCase):
 
     def test_add_to_cart(self):
         from .views import add_to_cart
-        url = reverse('cafe:add_to_cart', args=[self.item.id])
+        url = f"/cafe/cart/add/{self.item.id}/"
         request = self._get_request_with_session(url)
         
         add_to_cart(request, self.item.id)
@@ -43,7 +42,7 @@ class CafeLogicTests(TestCase):
 
     def test_remove_from_cart(self):
         from .views import remove_from_cart
-        url = reverse('cafe:remove_from_cart', args=[self.item.id])
+        url = f"/cafe/cart/remove/{self.item.id}/"
         request = self._get_request_with_session(url)
         request.session['cart'] = {str(self.item.id): 2}
         
@@ -95,7 +94,7 @@ class CafeLogicTests(TestCase):
         response = add_to_cart(request, self.item.id)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("cafe:menu"))
+        self.assertEqual(response.url, "/app/cafe")
 
     def test_add_to_cart_legacy_hx_header_redirects(self):
         from .views import add_to_cart
@@ -107,7 +106,7 @@ class CafeLogicTests(TestCase):
         response = add_to_cart(request, self.item.id)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("cafe:menu"))
+        self.assertEqual(response.url, "/app/cafe")
 
     def test_update_order_status_nonlegacy_htmx_redirects(self):
         from .views import update_order_status
@@ -125,7 +124,7 @@ class CafeLogicTests(TestCase):
 
         self.assertEqual(order.status, CafeOrder.Status.PREPARING)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("cafe:barista_dashboard"))
+        self.assertEqual(response.url, "/app/staff")
 
     def test_update_order_status_legacy_hx_header_redirects(self):
         from .views import update_order_status
@@ -143,4 +142,4 @@ class CafeLogicTests(TestCase):
         order.refresh_from_db()
         self.assertEqual(order.status, CafeOrder.Status.PREPARING)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("cafe:barista_dashboard"))
+        self.assertEqual(response.url, "/app/staff")

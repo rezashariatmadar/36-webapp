@@ -1,5 +1,4 @@
 from django.test import Client, TestCase
-from django.urls import reverse
 
 from cowork.models import PricingPlan, Space
 
@@ -16,12 +15,12 @@ class CoworkUXTests(TestCase):
         self.client = Client()
 
     def test_space_list_route_redirects_to_spa(self):
-        response = self.client.get(reverse("cowork:space_list"))
+        response = self.client.get("/cowork/")
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/app/cowork")
 
     def test_book_space_route_redirects_to_spa(self):
-        response = self.client.get(reverse("cowork:book_space", args=[self.space.id]))
+        response = self.client.get(f"/cowork/book/{self.space.id}/")
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/app/cowork")
 
@@ -31,6 +30,6 @@ class CoworkEmptyStateTests(TestCase):
         self.client = Client()
 
     def test_space_list_empty_state_route_redirects_to_spa(self):
-        response = self.client.get(reverse("cowork:space_list"))
+        response = self.client.get("/cowork/")
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/app/cowork")

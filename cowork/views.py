@@ -7,6 +7,8 @@ from django.utils import timezone
 from .forms import BookingForm
 from .models import Booking, Space
 
+SPA_COWORK_PATH = "/app/cowork"
+
 
 def space_list(request):
     # Refresh statuses based on current time
@@ -84,7 +86,7 @@ def book_space(request, space_id):
                 booking.save()
                 space.refresh_status() # Update seat status based on the new booking
                 messages.success(request, "درخواست رزرو شما ثبت شد و توسط مدیریت بررسی خواهد شد.")
-                return redirect('cowork:my_bookings')
+                return redirect(SPA_COWORK_PATH)
             except Exception as e:
                 messages.error(request, str(e))
     else:

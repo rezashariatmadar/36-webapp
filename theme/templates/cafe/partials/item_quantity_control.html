@@ -9,22 +9,22 @@
 
     {% if quantity > 0 %}
         <div class="flex items-center glass-panel rounded-xl p-1 border border-white/10 shadow-lg">
-            <form method="post" action="{% url 'cafe:remove_from_cart' item.id %}">
+            <form method="post" action="/app/cafe">
                 {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.path }}">
+                <input type="hidden" name="next" value="/app/cafe">
                 <button type="submit" class="btn btn-ghost btn-xs btn-square text-white hover:bg-white/10 font-black">-</button>
             </form>
             <span class="w-8 text-center font-black text-sm text-white">{{ quantity }}</span>
-            <form method="post" action="{% url 'cafe:add_to_cart' item.id %}">
+            <form method="post" action="/app/cafe">
                 {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.path }}">
+                <input type="hidden" name="next" value="/app/cafe">
                 <button type="submit" class="btn btn-ghost btn-xs btn-square text-white hover:bg-white/10 font-black">+</button>
             </form>
         </div>
     {% else %}
-        <form method="post" action="{% url 'cafe:add_to_cart' item.id %}">
+        <form method="post" action="/app/cafe">
             {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.path }}">
+            <input type="hidden" name="next" value="/app/cafe">
             <button type="submit" class="btn-primary btn-sm px-6 h-10 rounded-xl flex items-center gap-2 group">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />

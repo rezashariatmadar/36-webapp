@@ -97,7 +97,7 @@
             <div class="mt-8 text-label px-2 mb-2">دسترسی سریع</div>
             <ul class="flex flex-col gap-2">
                 <li>
-                    <a href="{% url 'cafe:cart_detail' %}" class="flex items-center justify-between px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/5 transition-all">
+                    <a href="/app/cafe" class="flex items-center justify-between px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/5 transition-all">
                         <span class="font-bold text-sm">سبد خرید</span>
                         <span id="cart-badge-desktop" class="bg-accent text-black text-[10px] font-black px-2 py-0.5 rounded-full {% if not cart_count %}hidden{% endif %}">
                             {{ cart_count|default:0 }}
@@ -107,8 +107,8 @@
             </ul>
             <div class="mt-4 px-4">
                 <div class="grid grid-cols-2 gap-2">
-                    <a href="{% url 'cafe:menu' %}" class="btn btn-ghost btn-sm rounded-lg text-white/70 hover:text-white">Menu</a>
-                    <a href="{% url 'cowork:space_list' %}" class="btn btn-ghost btn-sm rounded-lg text-white/70 hover:text-white">Book</a>
+                    <a href="/app/cafe" class="btn btn-ghost btn-sm rounded-lg text-white/70 hover:text-white">Menu</a>
+                    <a href="/app/cowork" class="btn btn-ghost btn-sm rounded-lg text-white/70 hover:text-white">Book</a>
                 </div>
             </div>
         </nav>
@@ -139,7 +139,7 @@
 
                         {% if user.is_admin or user.is_barista %}
                             <div class="divider my-1 opacity-10"></div>
-                            <a href="{% url 'cafe:barista_dashboard' %}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 text-sm font-bold text-accent">
+                            <a href="/app/staff" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 text-sm font-bold text-accent">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                                 پنل مدیریت
                             </a>
@@ -197,14 +197,14 @@
         <!-- Mobile Bottom Tab Bar -->
         <nav class="md:hidden fixed bottom-6 left-4 right-4 h-16 material-glass-heavy glass-rail rounded-[2rem] z-50 flex justify-between items-center px-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/15">
             <!-- Menu -->
-            <a href="{% url 'cafe:menu' %}" class="flex flex-col items-center gap-1 transition-colors {% if request.resolver_match.url_name == 'menu' %}text-accent{% else %}text-white/50{% endif %}">
+            <a href="/app/cafe" class="flex flex-col items-center gap-1 transition-colors {% if '/app/cafe' in request.path %}text-accent{% else %}text-white/50{% endif %}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
             </a>
 
             <!-- Cart (Floating Action) -->
-            <a href="{% url 'cafe:cart_detail' %}" class="flex flex-col items-center justify-center">
+            <a href="/app/cafe" class="flex flex-col items-center justify-center">
                 <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-[0_0_15px_rgba(16,3,112,0.5)] relative">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -216,7 +216,7 @@
             </a>
 
             <!-- Profile/More -->
-            <a href="{% url 'cowork:space_list' %}" class="flex flex-col items-center gap-1 transition-colors {% if 'cowork' in request.path %}text-accent{% else %}text-white/50{% endif %}">
+            <a href="/app/cowork" class="flex flex-col items-center gap-1 transition-colors {% if '/app/cowork' in request.path %}text-accent{% else %}text-white/50{% endif %}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>

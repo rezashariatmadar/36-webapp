@@ -30,7 +30,7 @@
                                                 <div class="card glass-panel shadow-sm p-4 flex flex-col items-center gap-3 hover:bg-white/10 transition-colors">
                                                     <span class="font-bold text-sm">{{ seat.name }}</span>
                                                     {% if seat.status == 'AVAILABLE' %}
-                                                        <a href="{% url 'cowork:book_space' seat.id %}" class="btn btn-accent btn-sm w-full font-black">رزرو صندلی</a>
+                                                        <a href="/app/cowork" class="btn btn-accent btn-sm w-full font-black">رزرو صندلی</a>
                                                     {% elif seat.status == 'OCCUPIED' %}
                                                         <button class="btn btn-disabled btn-sm w-full opacity-30 text-white">رزرو شده</button>
                                                     {% else %}
@@ -81,7 +81,7 @@
 
                                         <div class="card-actions">
                                             {% if room.status == 'AVAILABLE' %}
-                                                <a href="{% url 'cowork:book_space' room.id %}" class="btn btn-accent btn-sm w-full font-black shadow-lg shadow-accent/20">رزرو اتاق</a>
+                                                <a href="/app/cowork" class="btn btn-accent btn-sm w-full font-black shadow-lg shadow-accent/20">رزرو اتاق</a>
                                             {% else %}
                                                 <button class="btn btn-disabled btn-sm w-full font-black opacity-30 text-white">غیرقابل رزرو</button>
                                             {% endif %}
@@ -146,7 +146,7 @@
 
                                         <div class="card-actions">
                                             {% if space.status == 'AVAILABLE' %}
-                                                <a href="{% url 'cowork:book_space' space.id %}" class="btn btn-accent w-full font-black shadow-lg shadow-accent/20">
+                                                <a href="/app/cowork" class="btn btn-accent w-full font-black shadow-lg shadow-accent/20">
                                                     رزرو آنلاین
                                                 </a>
                                             {% else %}

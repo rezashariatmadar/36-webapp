@@ -21,6 +21,8 @@ logger = logging.getLogger(__name__)
 CART_SCHEMA_VERSION = 1
 MAX_CART_ITEMS = 50
 MAX_PER_ITEM = 20
+CAFE_SPA_PATH = "/app/cafe"
+STAFF_SPA_PATH = "/app/staff"
 
 def is_staff_member(user):
     return user.is_authenticated and (user.is_staff or user.groups.filter(name__in=['Barista', 'Admin']).exists())
@@ -126,12 +128,12 @@ def add_to_cart(request, item_id):
 
     if not item.is_available:
         messages.error(request, _("Item is currently unavailable."))
-        return redirect(request.META.get('HTTP_REFERER', 'cafe:menu'))
+        return redirect(request.META.get('HTTP_REFERER', CAFE_SPA_PATH))
 
     current_total = sum(cart.values())
     if current_total >= MAX_CART_ITEMS:
         messages.error(request, _("Cart limit reached."))
-        return redirect(request.META.get('HTTP_REFERER', 'cafe:menu'))
+        return redirect(request.META.get('HTTP_REFERER', CAFE_SPA_PATH))
 
     cart[item_id_str] = cart.get(item_id_str, 0) + 1
     if cart[item_id_str] > MAX_PER_ITEM:
@@ -140,7 +142,7 @@ def add_to_cart(request, item_id):
 
     _save_cart(request, cart)
     
-    next_url = request.POST.get('next') or request.GET.get('next') or request.META.get('HTTP_REFERER') or 'cafe:menu'
+    next_url = request.POST.get('next') or request.GET.get('next') or request.META.get('HTTP_REFERER') or CAFE_SPA_PATH
     return redirect(next_url)
 
 def remove_from_cart(request, item_id):
@@ -153,7 +155,7 @@ def remove_from_cart(request, item_id):
             del cart[item_id_str]
         _save_cart(request, cart)
     
-    next_url = request.POST.get('next') or request.GET.get('next') or request.META.get('HTTP_REFERER') or 'cafe:cart_detail'
+    next_url = request.POST.get('next') or request.GET.get('next') or request.META.get('HTTP_REFERER') or CAFE_SPA_PATH
     return redirect(next_url)
 
 def cart_detail(request):
@@ -184,7 +186,8 @@ def cart_detail(request):
 @login_required
 def checkout(request):
     cart = _get_cart(request)
-    if not cart: return redirect('cafe:menu')
+    if not cart:
+        return redirect(CAFE_SPA_PATH)
     
     # Try to find an active booking for this user to pre-fill the delivery location
     now = timezone.now()
@@ -228,7 +231,7 @@ def checkout(request):
                     if not menu_item.is_available:
                         messages.error(request, _("One or more items are unavailable. Please update your cart."))
                         transaction.set_rollback(True)
-                        return redirect('cafe:cart_detail')
+                        return redirect(CAFE_SPA_PATH)
 
                     # Create OrderItem instance
                     order_items.append(OrderItem(
@@ -248,7 +251,7 @@ def checkout(request):
 
         _save_cart(request, {})
         messages.success(request, _("Order placed!"))
-        return redirect('cafe:order_list')
+        return redirect(CAFE_SPA_PATH)
     
     return render(request, 'cafe/checkout.html', {
         'suggested_location': suggested_location
@@ -273,7 +276,7 @@ def reorder_order(request, order_id):
         cart[str(item.menu_item_id)] = qty
     _save_cart(request, cart)
     messages.success(request, _("Order added to cart. You can review and checkout again."))
-    return redirect('cafe:cart_detail')
+    return redirect(CAFE_SPA_PATH)
 
 # --- Staff/Barista Views ---
 
@@ -381,7 +384,7 @@ def manual_order_entry(request):
                     order.update_total_price()
         
         messages.success(request, "سفارش با موفقیت ثبت شد.")
-        return redirect('cafe:barista_dashboard')
+        return redirect(STAFF_SPA_PATH)
         
     categories = MenuCategory.objects.prefetch_related('items').all()
     has_menu_items = MenuItem.objects.filter(is_available=True).exists()
@@ -409,17 +412,17 @@ def manage_menu_stock(request):
 
             if not name or not price_raw:
                 messages.error(request, "نام و قیمت را وارد کنید.")
-                return redirect('cafe:manage_menu')
+                return redirect(STAFF_SPA_PATH)
 
             try:
                 price = Decimal(price_raw)
             except InvalidOperation:
                 messages.error(request, "قیمت نامعتبر است.")
-                return redirect('cafe:manage_menu')
+                return redirect(STAFF_SPA_PATH)
 
             if price < 0:
                 messages.error(request, "قیمت نمی‌تواند منفی باشد.")
-                return redirect('cafe:manage_menu')
+                return redirect(STAFF_SPA_PATH)
 
             category = None
             if new_category:
@@ -434,7 +437,7 @@ def manage_menu_stock(request):
                 category = get_object_or_404(MenuCategory, id=category_id)
             else:
                 messages.error(request, "دسته‌بندی را انتخاب کنید.")
-                return redirect('cafe:manage_menu')
+                return redirect(STAFF_SPA_PATH)
 
             MenuItem.objects.create(
                 name=name,
@@ -444,17 +447,17 @@ def manage_menu_stock(request):
                 is_available=is_available
             )
             messages.success(request, "آیتم جدید اضافه شد.")
-            return redirect('cafe:manage_menu')
+            return redirect(STAFF_SPA_PATH)
 
         item_id = request.POST.get('item_id')
         try:
             item = get_object_or_404(MenuItem, id=int(item_id))
         except (TypeError, ValueError):
             messages.error(request, "شناسه آیتم نامعتبر است.")
-            return redirect('cafe:manage_menu')
+            return redirect(STAFF_SPA_PATH)
         item.is_available = not item.is_available
         item.save()
-        return redirect('cafe:manage_menu')
+        return redirect(STAFF_SPA_PATH)
 
     return render(request, 'cafe/manage_menu.html', {
         'items': items,
@@ -493,7 +496,7 @@ def update_order_status(request, order_id, new_status):
         extra={"order_id": order_id, "from": previous, "to": new_status, "actor": request.user.id, "ip": request.META.get("REMOTE_ADDR")}
     )
     
-    return redirect('cafe:barista_dashboard')
+    return redirect(STAFF_SPA_PATH)
 
 @user_passes_test(is_staff_member)
 @require_POST
@@ -512,4 +515,4 @@ def toggle_order_payment(request, order_id):
         extra={"order_id": order_id, "from": previous, "to": order.is_paid, "actor": request.user.id, "ip": request.META.get("REMOTE_ADDR")}
     )
     
-    return redirect('cafe:barista_dashboard')
+    return redirect(STAFF_SPA_PATH)

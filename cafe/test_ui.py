@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.urls import reverse
 
 from cafe.models import MenuCategory, MenuItem
 
@@ -15,7 +14,7 @@ class CafeUITests(TestCase):
         )
 
     def test_menu_route_redirects_to_spa(self):
-        response = self.client.get(reverse("cafe:menu"))
+        response = self.client.get("/cafe/menu/")
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/app/cafe")
 
@@ -27,6 +26,6 @@ class CafeUITests(TestCase):
 
 class CafeEmptyStateTests(TestCase):
     def test_menu_empty_state_route_redirects_to_spa(self):
-        response = self.client.get(reverse("cafe:menu"))
+        response = self.client.get("/cafe/menu/")
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/app/cafe")
