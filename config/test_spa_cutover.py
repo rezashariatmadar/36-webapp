@@ -59,6 +59,18 @@ class SPARouteCutoverTests(TestCase):
         self.assertEqual(legacy_home.status_code, 302)
         self.assertEqual(legacy_home.url, "/app")
 
+        legacy_logout = self.client.get("/legacy/logout/")
+        self.assertEqual(legacy_logout.status_code, 302)
+        self.assertEqual(legacy_logout.url, "/logout/")
+
+        legacy_admin_users = self.client.get("/legacy/admin/users/")
+        self.assertEqual(legacy_admin_users.status_code, 302)
+        self.assertEqual(legacy_admin_users.url, "/staff/users/")
+
+        legacy_api_users = self.client.get("/legacy/api/users/")
+        self.assertEqual(legacy_api_users.status_code, 302)
+        self.assertEqual(legacy_api_users.url, "/api/users/")
+
         user_model = get_user_model()
         staff_user = user_model.objects.create_user(phone_number="09120000003", password="Testpass123!", is_staff=True)
         self.client.force_login(staff_user)

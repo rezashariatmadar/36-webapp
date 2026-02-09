@@ -327,6 +327,11 @@ Exit criteria:
   - `LOGIN_REDIRECT_URL` and `LOGOUT_REDIRECT_URL` now point directly to `/app`
   - updated template nav logo/home links in `theme/templates/base.html` to `/app`
   - converted legacy home-template assertions to SPA shell assertions in route/UI regression tests
+- removed `config.legacy_urls` include dependency from runtime URL graph:
+  - deleted `config/legacy_urls.py`
+  - added explicit compatibility redirects for `/legacy/logout`, `/legacy/admin/users/*`, and `/legacy/api/users`
+  - moved account staff-management surface from `/admin/users/*` to `/staff/users/*` to avoid Django admin URL collisions
+  - retained `cafe`/`cowork` namespace registration under `/legacy/cafe` and `/legacy/cowork` for stable reverse() behavior while hard-redirects remain in front
 - Latest validation results:
   - targeted migration tests: `34 passed`
   - full test suite: `109 passed`
@@ -347,6 +352,7 @@ Exit criteria:
   - post template nav SPA-account link verification: `119 passed, 91 warnings`
   - post redirect-alias route removal verification: `119 passed, 91 warnings`
   - post legacy home redirect + SPA shell assertion verification: `119 passed, 91 warnings`
+  - post legacy include-removal + compatibility-redirect verification: `119 passed, 91 warnings`
 
 ## 12. Handoff Snapshot
 
@@ -364,7 +370,8 @@ Exit criteria:
   - root and non-system routes resolve to SPA shell.
   - `/legacy/cafe/*` and `/legacy/cowork/*` redirect to SPA.
   - `/legacy/login|register|profile` redirect to `/app/account`.
-  - remaining `/legacy/*` usage is limited to transitional admin/logout routes.
+  - `/legacy/logout` and `/legacy/admin/users/*` redirect to non-legacy compatibility endpoints.
+  - `config.legacy_urls` include has been removed; remaining `/legacy/*` behavior is explicit redirects.
   - compatibility redirects:
     - `/login|/register|/profile` -> `/app/account`
     - `/cafe/*` -> `/app/cafe`
@@ -399,7 +406,7 @@ Use this section first if chat history/context is truncated.
 
 - Migration tracker: `REACT_MIGRATION_EXECUTION_PLAN.md`
 - Legacy dependency map: `LEGACY_FRONTEND_DEPENDENCY_MAP.md`
-- Cutover wiring: `config/urls.py`, `config/legacy_urls.py`
+- Cutover wiring: `config/urls.py`
 - API regression tests:
   - `accounts/test_spa_api.py`
   - `cafe/tests/test_spa_api.py`
@@ -417,8 +424,7 @@ Use this section first if chat history/context is truncated.
 
 ### Next Implementation Focus (Ordered)
 
-- Decommission remaining legacy admin/logout route dependencies under `/legacy/*` after parity sign-off.
-- Remove redirect-only alias routes (`/login|/register|/profile`) when deep-link compatibility is no longer needed.
-- Remove `/legacy/login|register|profile` compatibility redirects when deep-link support is no longer required.
-- Remove redirect-only `accounts:home` alias after legacy namespace include retirement.
+- Decommission compatibility redirects under `/legacy/*` after deep-link support windows are closed.
+- Decide final ownership for staff management URL surface (`/staff/users/*` vs SPA-native staff management route) and remove server-template dependency if approved.
+- Decide whether to keep or retire non-legacy compatibility redirects (`/login|/register|/profile`) once product confirms no external reliance.
 - Run full regression + smoke checks after each decommission batch.

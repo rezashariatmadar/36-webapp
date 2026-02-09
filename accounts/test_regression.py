@@ -3,7 +3,7 @@ from django.urls import reverse
 
 class CorePagesRegressionTests(TestCase):
     def test_home_page_loads(self):
-        response = self.client.get(reverse('accounts:home'))
+        response = self.client.get('/legacy/')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/app')
 

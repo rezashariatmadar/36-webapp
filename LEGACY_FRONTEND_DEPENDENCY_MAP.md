@@ -35,6 +35,8 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 - Progress note: legacy cafe/cowork routes are now hard-redirected to SPA (`/legacy/cafe/*` -> `/app/cafe`, `/legacy/cowork/*` -> `/app/cowork`), and `config/legacy_urls_default.py` has been removed.
 - Progress note: legacy account auth/profile entry routes now redirect to SPA account (`/legacy/login|register|profile` -> `/app/account`).
 - Progress note: dead legacy account auth/profile templates and template-backed views have been removed; account entry routes are redirect-only.
+- Progress note: `config/legacy_urls.py` has been removed; legacy compatibility behavior is now explicit redirects in `config/urls.py`.
+- Progress note: legacy staff-management compatibility routes now redirect to `/staff/users/*` (moved off `/admin/*` to avoid Django admin collisions).
 - [x] Remove jQuery-dependent datepicker glue in `theme/templates/base.html`.
 - [x] Remove `django-htmx` runtime wiring from `config/settings.py`.
 - [x] Remove `django-htmx` from dependency manifests.
@@ -63,9 +65,10 @@ Scope: Track legacy frontend dependencies during Django-template to React migrat
 ## Notes
 
 - Decommission work must keep transitional auth redirects stable (`/legacy/login|register|profile` -> `/app/account`) until full legacy account cleanup is complete.
-- Remaining legacy account dependency surface is now primarily legacy admin/logout paths and redirect-only compatibility aliases.
+- Remaining legacy account dependency surface is now primarily redirect-only compatibility aliases (including `/legacy/logout` and `/legacy/admin/users/*`).
 - Base template auth/profile entry links now point directly to SPA account route (`/app/account`) instead of legacy named auth routes.
 - Legacy named route aliases for account auth/profile (`accounts:login|register|profile`) have been removed from `accounts.urls`; compatibility redirects remain at `/legacy/login|register|profile`.
 - Legacy `accounts:home` now acts as a redirect-only alias to `/app`, and auth post-login/logout redirects point directly to `/app`.
+- Cafe/cowork reverse namespaces remain registered under `/legacy/cafe` and `/legacy/cowork` for compatibility while those paths hard-redirect to SPA.
 - If a dependency is only used under `/legacy/*`, mark it as `active (legacy-only)` in future updates.
 - SPA-first routing is now always enabled; legacy cafe/cowork paths and legacy account auth/profile entry points now hard-redirect to SPA.
