@@ -55,14 +55,45 @@ server {
 }
 ```
 
+## Caddy Skeleton (Option A)
+
+```caddy
+your.domain.tld {
+  handle_path /api/* {
+    reverse_proxy 127.0.0.1:8000
+  }
+
+  handle_path /admin/* {
+    reverse_proxy 127.0.0.1:8000
+  }
+
+  handle /app/* {
+    root * /var/www/36-webapp/frontend/dist
+    try_files {path} /index.html
+    file_server
+  }
+}
+```
+
 ## CSRF Bootstrap Requirement
 
 - After removing Django template fallback, SPA startup must initialize CSRF cookie before unsafe methods.
 - Use `GET /api/auth/csrf/` at app boot.
 - Confirm first `POST|PATCH|DELETE` works from cold SPA load without visiting Django HTML endpoints.
 
+## Staging Validation Checklist
+
+1. Deep-link fallback:
+   - Open `/app/cafe`, `/app/cowork`, and `/app/staff` directly in a fresh browser tab.
+   - Confirm the edge server returns SPA index fallback (no 404).
+2. CSRF cold-start:
+   - Open `/app/account` in a private window.
+   - Confirm first unsafe call (login/register/profile mutation) returns app-level validation/auth responses, not CSRF 403.
+3. Route ownership:
+   - Confirm `/api/*` and `/admin/*` are served by Django upstream.
+   - Confirm static SPA assets resolve under `/app/assets/*`.
+
 ## Rollback Strategy
 
 - Keep Django Option-B SPA fallback for one release after Option-A deployment.
 - If regressions appear, route traffic back to Option-B and fix forward in a new patch.
-

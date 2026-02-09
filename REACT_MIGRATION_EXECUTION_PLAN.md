@@ -56,6 +56,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Option-A preparation track is active:
   - new root `frontend/` Vite + React + strict TypeScript workspace
   - parallel-run with existing Django-served SPA fallback until edge cutover is complete
+  - `shadcn/ui` primitive rollout and adapter-boundary enforcement in `frontend/`
 
 ### Not Started
 
@@ -195,7 +196,8 @@ Exit criteria:
 - [x] Scaffold `frontend/` Vite + React + strict TypeScript workspace.
 - [x] Port current SPA pages/API client into `frontend/src` with React Router basename `/app`.
 - [x] Add CSRF bootstrap endpoint (`GET /api/auth/csrf/`) for SPA-only startup.
-- [ ] Add `shadcn/ui` primitives and adapter boundary for third-party animated components.
+- [x] Add initial `shadcn/ui` primitive set (`button`, `input`, `label`, `card`, `dialog`, `dropdown-menu`, `table`, `sonner`).
+- [x] Add adapter-boundary enforcement for animation vendors in `frontend` linting/docs.
 - [ ] Validate Option A edge config in staging (`/app` static + `/api` proxy) and keep one-release rollback path.
 
 ### Verification Checklist
@@ -221,7 +223,33 @@ Exit criteria:
 
 ## 11. Increment Log
 
-### 2026-02-09 (Latest Increment - Frontend Workspace Bootstrap + CSRF Bootstrap API)
+### 2026-02-09 (Latest Increment - shadcn Bootstrap + Adapter Boundary Enforcement)
+
+- Initialized `shadcn/ui` for Vite + Tailwind v4 in `frontend/`:
+  - added `frontend/components.json` with aliases:
+    - `ui`: `src/components/ui`
+    - `utils`: `src/lib/utils`
+  - aligned Vite/TS aliases for `@/*` resolution
+- Added baseline UI primitives:
+  - `frontend/src/components/ui/button.tsx`
+  - `frontend/src/components/ui/input.tsx`
+  - `frontend/src/components/ui/label.tsx`
+  - `frontend/src/components/ui/card.tsx`
+  - `frontend/src/components/ui/dialog.tsx`
+  - `frontend/src/components/ui/dropdown-menu.tsx`
+  - `frontend/src/components/ui/table.tsx`
+  - `frontend/src/components/ui/sonner.tsx`
+- Enforced animation vendor boundary:
+  - lint restriction added in `frontend/eslint.config.js` to block direct `reactbits*` imports outside adapter folder
+  - created adapter boundary docs and entrypoint:
+    - `frontend/src/components/animated/README.md`
+    - `frontend/src/components/animated/index.ts`
+- Extended Option-A runbook with staging gates:
+  - deep-link fallback checks under `/app/*`
+  - CSRF cold-start checks
+  - added Caddy skeleton alongside Nginx in `frontend/DEPLOYMENT.md`
+
+### 2026-02-09 (Previous Increment - Frontend Workspace Bootstrap + CSRF Bootstrap API)
 
 - Created rollback checkpoint tag before workspace migration:
   - `checkpoint/pre-frontend-vite-ts`

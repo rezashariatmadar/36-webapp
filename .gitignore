@@ -14,9 +14,6 @@ build/
 develop-eggs/
 dist/
 
-# Frontend workspace exceptions
-!frontend/src/lib/
-!frontend/src/lib/**
 downloads/
 eggs/
 .eggs/
@@ -29,6 +26,10 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Frontend workspace exceptions
+!frontend/src/lib/
+!frontend/src/lib/**
 
 # Django
 db.sqlite3
