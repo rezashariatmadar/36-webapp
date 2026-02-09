@@ -15,7 +15,7 @@ class SPARouteCutoverTests(TestCase):
     def tearDown(self):
         self._reload_urlconf()
 
-    def test_spa_primary_routes_and_redirects(self):
+    def test_spa_primary_routes_and_retired_paths(self):
         self._reload_urlconf()
 
         root_response = self.client.get("/")
@@ -23,17 +23,20 @@ class SPARouteCutoverTests(TestCase):
         self.assertContains(root_response, 'id="app-root"')
         self.assertNotContains(root_response, "unpkg.com/htmx.org@2.0.4")
 
-        login_redirect = self.client.get("/login/")
-        self.assertEqual(login_redirect.status_code, 302)
-        self.assertEqual(login_redirect.url, "/app/account")
+        login_retired = self.client.get("/login/")
+        self.assertEqual(login_retired.status_code, 404)
 
-        cafe_redirect = self.client.get("/cafe/menu/")
-        self.assertEqual(cafe_redirect.status_code, 302)
-        self.assertEqual(cafe_redirect.url, "/app/cafe")
+        register_retired = self.client.get("/register/")
+        self.assertEqual(register_retired.status_code, 404)
 
-        cowork_redirect = self.client.get("/cowork/")
-        self.assertEqual(cowork_redirect.status_code, 302)
-        self.assertEqual(cowork_redirect.url, "/app/cowork")
+        profile_retired = self.client.get("/profile/")
+        self.assertEqual(profile_retired.status_code, 404)
+
+        cafe_retired = self.client.get("/cafe/menu/")
+        self.assertEqual(cafe_retired.status_code, 404)
+
+        cowork_retired = self.client.get("/cowork/")
+        self.assertEqual(cowork_retired.status_code, 404)
 
         legacy_home = self.client.get("/legacy/")
         self.assertEqual(legacy_home.status_code, 404)

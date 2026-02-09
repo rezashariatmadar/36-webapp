@@ -13,10 +13,9 @@ class CafeUITests(TestCase):
             is_available=True,
         )
 
-    def test_menu_route_redirects_to_spa(self):
+    def test_menu_route_is_retired(self):
         response = self.client.get("/cafe/menu/")
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/app/cafe")
+        self.assertEqual(response.status_code, 404)
 
     def test_root_serves_spa_shell(self):
         response = self.client.get("/")
@@ -25,7 +24,6 @@ class CafeUITests(TestCase):
 
 
 class CafeEmptyStateTests(TestCase):
-    def test_menu_empty_state_route_redirects_to_spa(self):
+    def test_menu_empty_state_route_is_retired(self):
         response = self.client.get("/cafe/menu/")
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/app/cafe")
+        self.assertEqual(response.status_code, 404)

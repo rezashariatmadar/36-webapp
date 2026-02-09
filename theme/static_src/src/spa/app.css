@@ -1,21 +1,33 @@
+:root {
+  --spa-bg-layer-1: rgba(35, 98, 255, 0.14);
+  --spa-bg-layer-2: rgba(157, 16, 66, 0.14);
+  --spa-bg-base-start: rgba(3, 7, 18, 0.98);
+  --spa-bg-base-end: rgba(3, 7, 18, 1);
+  --spa-surface-bg: rgba(255, 255, 255, 0.04);
+  --spa-surface-border: rgba(255, 255, 255, 0.14);
+  --spa-radius-lg: 1.25rem;
+  --spa-blur-lg: 14px;
+  --spa-container-max-width: 1120px;
+}
+
 .spa-shell {
   min-height: 100vh;
   background:
-    radial-gradient(1200px 600px at 90% -20%, rgba(35, 98, 255, 0.14), transparent 60%),
-    radial-gradient(1000px 700px at -10% 10%, rgba(157, 16, 66, 0.14), transparent 60%),
-    linear-gradient(180deg, rgba(3, 7, 18, 0.98), rgba(3, 7, 18, 1));
+    radial-gradient(1200px 600px at 90% -20%, var(--spa-bg-layer-1), transparent 60%),
+    radial-gradient(1000px 700px at -10% 10%, var(--spa-bg-layer-2), transparent 60%),
+    linear-gradient(180deg, var(--spa-bg-base-start), var(--spa-bg-base-end));
 }
 
 .spa-container {
-  width: min(1120px, 92vw);
+  width: min(var(--spa-container-max-width), 92vw);
   margin-inline: auto;
 }
 
 .spa-card {
-  border-radius: 1.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(14px);
+  border-radius: var(--spa-radius-lg);
+  border: 1px solid var(--spa-surface-border);
+  background: var(--spa-surface-bg);
+  backdrop-filter: blur(var(--spa-blur-lg));
 }
 
 .spa-grid {

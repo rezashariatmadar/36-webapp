@@ -17,7 +17,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Auth model: Django session + CSRF (same-origin APIs).
 - Cutover strategy: staged (`/app` first), then move route ownership.
 - API strategy: explicit `/api/auth/*`, `/api/cafe/*`, `/api/cowork/*` contracts.
-- Backward compatibility: legacy template routes are decommissioned; compatibility is limited to non-legacy redirects (`/login|/register|/profile`, `/cafe/*`, `/cowork/*`).
+- Backward compatibility: legacy template routes and non-legacy compatibility redirects are retired; canonical product UX routes are `/app/*`.
 
 ## 3. Current State Snapshot
 
@@ -40,7 +40,7 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 - Expanded regression coverage for migration APIs and cutover behavior; full suite currently green.
 - Alpine.js template directives and CDN dependency removed from runtime templates.
 - jQuery/Persian datepicker assets removed from global base template and scoped to legacy booking form only.
-- Compatibility redirects keep `/cafe/*` and `/cowork/*` mapped to SPA routes (`/app/cafe`, `/app/cowork`).
+- Compatibility redirects for `/login|/register|/profile`, `/cafe/*`, and `/cowork/*` are retired (return `404`).
 - HTMX runtime script and body `hx-headers` wiring have been removed from template runtime.
 - Server-side HTMX partial response branches have been removed from `cafe` and `cowork` views.
 - `django-htmx` app/middleware wiring removed from runtime settings; legacy HTMX detection now uses request headers.
@@ -53,12 +53,11 @@ Scope: Migrate frontend UX from mixed Django templates + HTMX/Alpine/jQuery to a
 
 ### In Progress
 
-- Final compatibility redirect retirement decisions.
 - SPA route-level performance optimization and bundle trimming.
 
 ### Not Started
 
-- Decide whether to retire non-legacy compatibility redirects (`/login|/register|/profile`) after internal sign-off.
+- None.
 
 ## 4. Migration Phases
 
@@ -106,7 +105,7 @@ Deliverables:
 Exit criteria:
 - Account flows consistent with app shell UX.
 
-## Phase 4: Route Cutover and Decommission (In Progress)
+## Phase 4: Route Cutover and Decommission (Done)
 
 Deliverables:
 - Route ownership switch from template pages to SPA entry.
@@ -117,7 +116,7 @@ Exit criteria:
 - `/` primarily serves SPA shell (except admin/media/static/system paths).
 - No production dependency on HTMX/Alpine/jQuery for core flows.
 
-## Phase 5: Hardening and Cleanup (Planned)
+## Phase 5: Hardening and Cleanup (In Progress)
 
 Deliverables:
 - Security hardening on CSP once inline legacy scripts are removed.
@@ -174,6 +173,8 @@ Exit criteria:
 - [x] Prepare and implement root-route cutover with redirect map.
 - [x] Decommission legacy frontend dependencies.
 - [x] Decommission unreachable server-template view/template surface in `cafe` and `cowork`.
+- [x] Retire compatibility redirects (`/login|/register|/profile`, `/cafe/*`, `/cowork/*`) from runtime route ownership.
+- [x] Add SPA customization guardrails and theme-token baseline.
 
 ### Verification Checklist
 
@@ -183,7 +184,7 @@ Exit criteria:
 - [x] Playwright smoke set captured for `/app/account`.
 - [x] Feature-flagged route cutover tests pass.
 - [x] Legacy-template dependency map completed.
-- [ ] Final cutover sign-off approved.
+- [x] Final cutover sign-off approved.
 
 ## 10. Ownership and Update Policy
 
@@ -196,7 +197,30 @@ Exit criteria:
 
 ## 11. Increment Log
 
-### 2026-02-09 (Latest Increment)
+### 2026-02-09 (Latest Increment - Route Retirement + Customization Guardrails)
+
+- Retired compatibility redirect routes from runtime URL ownership:
+  - removed `/login|/register|/profile` redirect surface
+  - removed `/cafe/*` and `/cowork/*` redirect surface
+  - tightened SPA catch-all exclusions so retired paths return `404`
+- Updated SPA fallback navigation/auth entry points to canonical account route:
+  - `theme/static_src/src/spa/main.jsx` now defaults login fallback to `/app/account`
+- Rewired route/UI regression tests to assert retired-path behavior:
+  - `config/test_spa_cutover.py`
+  - `accounts/test_regression.py`
+  - `theme/test_ui.py`
+  - `cafe/test_ui.py`
+  - `cowork/test_ui_ux.py`
+- Added frontend customization guardrails for 100% SPA-owned UI iteration:
+  - `theme/static_src/src/spa/CUSTOMIZATION_GUARDRAILS.md`
+  - tokenized base SPA style primitives in `theme/static_src/src/spa/app.css`
+- Verification:
+  - route retirement regression subset: `29 passed`
+  - full suite: `115 passed, 84 warnings`
+  - frontend build: pass (`spa-app.js` ~165.4KB, `spa-app.css` ~950B)
+  - Django system checks: clean
+
+### 2026-02-09 (Previous Increment - Server-Template Surface Decommission)
 
 - Decommissioned unreachable server-template route implementation:
   - removed `cafe/views.py`
@@ -428,20 +452,19 @@ Exit criteria:
 - Runtime mode:
   - root and non-system routes resolve to SPA shell.
   - `/legacy/*` routes are disabled and return `404`.
-  - compatibility redirects:
-    - `/login|/register|/profile` -> `/app/account`
-    - `/cafe/*` -> `/app/cafe`
-    - `/cowork/*` -> `/app/cowork`
+  - retired compatibility paths return `404`:
+    - `/login|/register|/profile`
+    - `/cafe/*`
+    - `/cowork/*`
 - Rollback strategy:
   - use checkpoint refs (branch/tag/commit) to restore pre-removal state if needed.
 
 ### ETA to Full React
 
-- Estimated remaining effort: ~1 to 2 focused engineering days.
+- Estimated remaining effort: ~0.5 to 1 focused engineering day.
 - Remaining scope:
-  - decide whether to keep or retire compatibility redirects (`/login|/register|/profile`, `/cafe/*`, `/cowork/*`)
-  - finalize SPA route coverage for any residual edge paths and run smoke checks
-  - optional performance polish (bundle split/caching) before declaring final cutover complete
+  - run final Playwright smoke matrix for `/app`, `/app/account`, `/app/cafe`, `/app/cowork`, `/app/staff`
+  - optional performance polish (bundle split/caching) before migration closure
 
 ### Last Verified Commands
 
@@ -470,6 +493,7 @@ Use this section first if chat history/context is truncated.
 
 - Migration tracker: `REACT_MIGRATION_EXECUTION_PLAN.md`
 - Legacy dependency map: `LEGACY_FRONTEND_DEPENDENCY_MAP.md`
+- SPA customization guardrails: `theme/static_src/src/spa/CUSTOMIZATION_GUARDRAILS.md`
 - Cutover wiring: `config/urls.py`
 - API regression tests:
   - `accounts/test_spa_api.py`
@@ -488,6 +512,6 @@ Use this section first if chat history/context is truncated.
 
 ### Next Implementation Focus (Ordered)
 
-- Confirm final ownership for compatibility redirects (`/login|/register|/profile`, `/cafe/*`, `/cowork/*`) and retire them when safe.
 - Run targeted Playwright smoke on final route matrix (`/app`, `/app/account`, `/app/cafe`, `/app/cowork`, `/app/staff`).
-- Run full regression + build checks after each redirect/polish batch.
+- Run full regression + build checks after each performance-polish batch.
+- Optional: split SPA route chunks and enforce budget thresholds from `theme/static_src/src/spa/CUSTOMIZATION_GUARDRAILS.md`.

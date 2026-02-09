@@ -63,7 +63,7 @@ const navItems = [
 ];
 
 function App() {
-  const [me, setMe] = useState({ authenticated: false, user: null, login_url: '/login/' });
+  const [me, setMe] = useState({ authenticated: false, user: null, login_url: '/app/account' });
   const [routePath, setRoutePath] = useState(stripAppPrefix(window.location.pathname));
   const [error, setError] = useState('');
   const refreshSession = async () => {
@@ -140,7 +140,7 @@ function App() {
                 Logout
               </a>
             ) : (
-              <a href={me.login_url || '/login/'} className="btn btn-sm btn-outline border-white/30 text-white">
+              <a href={me.login_url || '/app/account'} className="btn btn-sm btn-outline border-white/30 text-white">
                 Login
               </a>
             )}
@@ -406,7 +406,7 @@ function CafePage({ me }) {
 
   const checkout = async () => {
     if (!me.authenticated) {
-      window.location.assign(me.login_url || '/login/');
+      window.location.assign(me.login_url || '/app/account');
       return;
     }
     setError('');
@@ -594,7 +594,7 @@ function CoworkPage({ me }) {
 
   const book = async () => {
     if (!me.authenticated) {
-      window.location.assign(me.login_url || '/login/');
+      window.location.assign(me.login_url || '/app/account');
       return;
     }
     setBusy(true);

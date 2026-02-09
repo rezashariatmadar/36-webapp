@@ -11,14 +11,12 @@ class BaseUITests(TestCase):
         response = self.client.get('/legacy/cafe/menu/')
         self.assertEqual(response.status_code, 404)
 
-    def test_auth_portals_redirect_to_spa_account(self):
+    def test_auth_portals_are_retired(self):
         response = self.client.get('/login/')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/app/account')
+        self.assertEqual(response.status_code, 404)
 
         response = self.client.get('/register/')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/app/account')
+        self.assertEqual(response.status_code, 404)
 
     def test_root_serves_spa_shell(self):
         response = self.client.get('/')
