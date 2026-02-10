@@ -8,6 +8,8 @@ from .api_views import (
     CafeOrdersAPIView,
     CafeReorderAPIView,
     CafeStaffCustomerLookupAPIView,
+    CafeStaffManualOrdersAPIView,
+    CafeStaffMenuCategoriesAPIView,
     CafeStaffMenuItemAvailabilityAPIView,
     CafeStaffMenuItemsAPIView,
     CafeStaffOrderPaymentToggleAPIView,
@@ -28,6 +30,8 @@ urlpatterns = [
     path("staff/orders/<int:order_id>/status/", CafeStaffOrderStatusAPIView.as_view(), name="staff_order_status"),
     path("staff/orders/<int:order_id>/toggle-payment/", CafeStaffOrderPaymentToggleAPIView.as_view(), name="staff_order_toggle_payment"),
     path("staff/menu-items/", CafeStaffMenuItemsAPIView.as_view(), name="staff_menu_items"),
+    path("staff/menu-categories/", CafeStaffMenuCategoriesAPIView.as_view(), name="staff_menu_categories"),
     path("staff/menu-items/<int:item_id>/toggle-availability/", CafeStaffMenuItemAvailabilityAPIView.as_view(), name="staff_menu_toggle"),
+    path("staff/manual-orders/", CafeStaffManualOrdersAPIView.as_view(), name="staff_manual_orders"),
     path("staff/customer-lookup/", CafeStaffCustomerLookupAPIView.as_view(), name="staff_customer_lookup"),
 ]

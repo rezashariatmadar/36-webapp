@@ -3,8 +3,8 @@
 ## Project Structure & Module Organization
 - `config/` contains Django settings, URL routing, and ASGI/WSGI entrypoints.
 - Core apps are `accounts/`, `cafe/`, and `cowork/`; each owns its models, views, URLs, migrations, and tests.
-- Server-rendered UI lives in `theme/templates/` with reusable fragments under `partials/` and `components/`.
-- Frontend source code is in `theme/static_src/src/` (Tailwind/PostCSS and React islands); built files output to `theme/static/css/dist/` and `theme/static/js/`.
+- Frontend source code lives in `frontend/src/` (Vite React + TypeScript).
+- Django serves backend APIs and admin only.
 - `performance_tests/` stores benchmark-style tests; `output/playwright/` stores generated UI artifacts.
 
 ## Build, Test, and Development Commands
@@ -13,14 +13,13 @@
 - `uv run python manage.py runserver`: run the Django app locally.
 - `uv run pytest`: execute the full backend test suite.
 - `uv run pytest accounts -k rbac`: run a focused subset during iteration.
-- `cd theme/static_src && npm install`: install frontend dependencies.
-- `cd theme/static_src && npm run dev`: watch and rebuild CSS during development.
-- `cd theme/static_src && npm run build`: produce production CSS and React bundle.
+- `cd frontend && npm install`: install frontend dependencies.
+- `cd frontend && npm run dev`: run Vite dev server.
+- `cd frontend && npm run build`: produce production frontend bundle.
 
 ## Coding Style & Naming Conventions
 - Python: 4-space indentation; `snake_case` for functions/modules, `PascalCase` for classes, `ALL_CAPS` for constants.
 - JavaScript/CSS/HTML: 2-space indentation, lowercase file names, hyphenated CSS class names.
-- Keep templates modular by reusing includes in `partials/` and `components/`.
 - Follow existing app-local patterns (`factories.py`, `management/commands/`, `test_*.py`) instead of introducing new layouts.
 
 ## Testing Guidelines

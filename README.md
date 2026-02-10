@@ -1,11 +1,11 @@
 # 36-webapp
 
-Django 5.2 web app with HTMX, DRF, and a Tailwind/PostCSS theme build.
+Django 5.2 backend (API/admin) with a separate Vite React frontend in `frontend/`.
 
 **Requirements**
 - Python 3.12+
 - `uv` (Python package manager)
-- Node.js (for the theme build)
+- Node.js (for the React frontend)
 
 **Quick Start**
 1. Install Python deps:
@@ -26,13 +26,13 @@ uv run python manage.py migrate
 uv run python manage.py runserver
 ```
 
-**Theme (Tailwind/PostCSS)**
-The theme build lives in `theme/static_src` and outputs CSS to `theme/static/css/dist/styles.css`.
+**Frontend (Vite React)**
+The frontend app lives in `frontend/` and is served separately. In development, use Vite dev server with API proxy.
 
 1. Install Node deps:
 
 ```powershell
-cd theme/static_src
+cd frontend
 npm install
 ```
 

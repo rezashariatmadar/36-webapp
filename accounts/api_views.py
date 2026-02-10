@@ -1,6 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group
-from django.urls import reverse
 from django.middleware.csrf import get_token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -16,15 +15,15 @@ def _session_payload(request):
         return {
             "authenticated": False,
             "csrf_token": csrf_token,
-            "login_url": reverse("accounts:login"),
+            "login_url": "/login/",
         }
 
     user = request.user
     return {
         "authenticated": True,
         "csrf_token": csrf_token,
-        "login_url": reverse("accounts:login"),
-        "logout_url": reverse("accounts:logout"),
+        "login_url": "/login/",
+        "logout_url": "/api/auth/logout/",
         "user": {
             "id": user.id,
             "phone_number": user.phone_number,

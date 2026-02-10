@@ -5,7 +5,7 @@ from rest_framework.test import APIClient
 from accounts.factories import UserFactory
 from cafe.factories import MenuCategoryFactory, MenuItemFactory
 from cafe.models import CafeOrder, OrderItem
-from cafe.views import MAX_CART_ITEMS
+from cafe.cart import MAX_CART_ITEMS
 
 
 class CafeSPAApiTests(TestCase):
@@ -156,6 +156,37 @@ class CafeStaffSPAApiTests(TestCase):
         lookup_response = self.client.get("/api/cafe/staff/customer-lookup/", {"q": "0912555"})
         self.assertEqual(lookup_response.status_code, 200)
         self.assertEqual(len(lookup_response.data["customers"]), 1)
+
+    def test_staff_menu_categories_create_item_and_manual_order(self):
+        self.client.force_authenticate(user=self.staff)
+
+        categories_response = self.client.get("/api/cafe/staff/menu-categories/")
+        self.assertEqual(categories_response.status_code, 200)
+        self.assertEqual(len(categories_response.data["categories"]), 1)
+
+        create_response = self.client.post(
+            "/api/cafe/staff/menu-items/",
+            {
+                "name": "Latte",
+                "description": "Milk coffee",
+                "price": 110000,
+                "category_id": self.category.id,
+                "is_available": True,
+            },
+            format="json",
+        )
+        self.assertEqual(create_response.status_code, 201)
+
+        manual_response = self.client.post(
+            "/api/cafe/staff/manual-orders/",
+            {
+                "phone_number": self.customer.phone_number,
+                "notes": "walk-in",
+                "items": [{"menu_item_id": self.item.id, "quantity": 1}],
+            },
+            format="json",
+        )
+        self.assertEqual(manual_response.status_code, 201)
 
     def test_staff_customer_lookup_by_name_and_empty_query(self):
         self.customer.full_name = "Customer SearchName"

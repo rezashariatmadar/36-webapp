@@ -41,12 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Third party apps
-    'django_htmx',
     'django_jalali',
-    'tailwind',
     'rest_framework',
     # Local apps
-    'theme',
     'cafe',
     'cowork',
 ]
@@ -59,7 +56,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_htmx.middleware.HtmxMiddleware',
     'config.middleware.RequestIDMiddleware',
     'config.middleware.ContentSecurityPolicyMiddleware',
 ]
@@ -77,8 +73,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.csrf',
-                'cafe.context_processors.cart_context',
-                'accounts.context_processors.navigation',
             ],
         },
     },
@@ -167,30 +161,23 @@ LOGGING = {
     },
 }
 
-_default_script_src = (
-    "'self' https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com"
-)
+_default_script_src = "'self'"
 _default_connect_src = "'self'"
-# Current templates rely on inline scripts and Alpine expression evaluation.
-# Keep stricter defaults in non-debug environments.
 if DEBUG:
-    _default_script_src += " 'unsafe-inline' 'unsafe-eval'"
-    _default_connect_src += " http://localhost:5173 ws://localhost:5173"
+    _default_connect_src += " http://localhost:5173 ws://localhost:5173 http://127.0.0.1:5173 ws://127.0.0.1:5173"
 
 CONTENT_SECURITY_POLICY = os.getenv(
     'DJANGO_CSP',
     f"default-src 'self'; script-src {_default_script_src}; "
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css; "
-    f"img-src 'self' data: blob:; font-src 'self' https://cdn.jsdelivr.net; connect-src {_default_connect_src};"
+    "style-src 'self' 'unsafe-inline'; "
+    f"img-src 'self' data: blob:; font-src 'self'; connect-src {_default_connect_src};"
 )
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-TAILWIND_APP_NAME = 'theme'
 AUTH_USER_MODEL = 'accounts.CustomUser'
-LOGIN_URL = 'accounts:login'
-LOGIN_REDIRECT_URL = 'accounts:home'
-LOGOUT_REDIRECT_URL = 'accounts:home'
-SPA_PRIMARY_ROUTES = os.getenv('DJANGO_SPA_PRIMARY', 'False').lower() == 'true'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'

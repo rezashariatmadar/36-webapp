@@ -6,8 +6,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .cart import MAX_CART_ITEMS, MAX_PER_ITEM, get_cart as _get_cart, save_cart as _save_cart
 from .models import CafeOrder, MenuCategory, MenuItem, OrderItem
-from .views import MAX_CART_ITEMS, MAX_PER_ITEM, _get_cart, _save_cart
 from accounts.models import CustomUser
 
 
@@ -119,6 +119,12 @@ class StaffMenuItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
         fields = ["id", "name", "description", "price", "is_available", "category", "category_name"]
+
+
+class StaffMenuCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MenuCategory
+        fields = ["id", "name", "order"]
 
 
 class StaffCustomerLookupSerializer(serializers.ModelSerializer):
@@ -391,6 +397,39 @@ class CafeStaffMenuItemsAPIView(APIView):
         serializer = StaffMenuItemSerializer(items, many=True)
         return Response({"items": serializer.data})
 
+    def post(self, request):
+        name = (request.data.get("name") or "").strip()
+        description = (request.data.get("description") or "").strip()
+        price = request.data.get("price")
+        category_id = request.data.get("category_id")
+        is_available = bool(request.data.get("is_available", True))
+
+        if not name or price is None or category_id is None:
+            return Response({"detail": "name, price, and category_id are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        category = get_object_or_404(MenuCategory, id=category_id)
+        try:
+            item = MenuItem.objects.create(
+                name=name,
+                description=description,
+                price=price,
+                category=category,
+                is_available=is_available,
+            )
+        except Exception as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = StaffMenuItemSerializer(item)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CafeStaffMenuCategoriesAPIView(APIView):
+    permission_classes = [StaffOrAdminPermission]
+
+    def get(self, request):
+        categories = MenuCategory.objects.order_by("order", "name")
+        serializer = StaffMenuCategorySerializer(categories, many=True)
+        return Response({"categories": serializer.data})
+
 
 class CafeStaffMenuItemAvailabilityAPIView(APIView):
     permission_classes = [StaffOrAdminPermission]
@@ -416,3 +455,54 @@ class CafeStaffCustomerLookupAPIView(APIView):
         )
         serializer = StaffCustomerLookupSerializer(users, many=True)
         return Response({"customers": serializer.data})
+
+
+class CafeStaffManualOrdersAPIView(APIView):
+    permission_classes = [StaffOrAdminPermission]
+
+    def post(self, request):
+        items = request.data.get("items") or []
+        if not isinstance(items, list) or not items:
+            return Response({"detail": "items must be a non-empty list."}, status=status.HTTP_400_BAD_REQUEST)
+
+        phone_number = (request.data.get("phone_number") or "").strip()
+        notes = request.data.get("notes") or "Walk-in Guest"
+        customer = None
+        if phone_number:
+            customer = CustomUser.objects.filter(phone_number=phone_number).first()
+
+        with transaction.atomic():
+            order = CafeOrder.objects.create(user=customer, notes=notes, is_paid=True)
+            total_price = 0
+            order_items = []
+            for item in items:
+                menu_item_id = item.get("menu_item_id")
+                quantity = item.get("quantity", 1)
+                try:
+                    menu_item_id = int(menu_item_id)
+                    quantity = int(quantity)
+                except (TypeError, ValueError):
+                    continue
+                if quantity < 1 or quantity > MAX_PER_ITEM:
+                    continue
+
+                menu_item = MenuItem.objects.filter(id=menu_item_id).first()
+                if not menu_item:
+                    continue
+                order_items.append(
+                    OrderItem(
+                        order=order,
+                        menu_item=menu_item,
+                        quantity=quantity,
+                        unit_price=menu_item.price,
+                    )
+                )
+                total_price += menu_item.price * quantity
+
+            if not order_items:
+                return Response({"detail": "No valid items."}, status=status.HTTP_400_BAD_REQUEST)
+
+            OrderItem.objects.bulk_create(order_items)
+            order.total_price = total_price
+            order.save(update_fields=["total_price", "updated_at"])
+        return Response({"order_id": order.id, "total_price": _as_price(order.total_price)}, status=status.HTTP_201_CREATED)

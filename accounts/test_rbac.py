@@ -1,7 +1,6 @@
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import Group, AnonymousUser
 from django.http import HttpResponse
-from django.urls import reverse
 from .factories import UserFactory
 from .utils import admin_required, barista_required, customer_required
 
@@ -46,7 +45,7 @@ class RBACDecoratorTests(TestCase):
         request.user = AnonymousUser()
         response = dummy_admin_view(request)
         self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse('accounts:login'), response.url)
+        self.assertIn('/login/', response.url)
 
     def test_barista_required_as_barista(self):
         user = UserFactory()
