@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/liaraco/liara-cli/master/packages/schema/liara.schema.json",
-  "app": "webapp36-web",
+  "app": "36cowork",
   "platform": "node",
   "port": 80,
   "build": {
