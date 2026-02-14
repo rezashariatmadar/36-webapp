@@ -34,7 +34,7 @@ python manage.py seed_freelancer_taxonomy
 ## 2) Deploy React app (`frontend/`)
 1. In Liara dashboard, create a Node app for the frontend.
 2. In `frontend/liara.json`, set `app` to your frontend app name.
-3. Ensure `frontend/liara_nginx.conf` points to your deployed Django domain (`your-django-app.liara.run` placeholder must be replaced).
+3. `frontend/liara_nginx.conf` is configured for private network host `webapp36-api:8000`.
 4. Deploy from `frontend/` directory.
 
 Notes:
@@ -68,3 +68,9 @@ PowerShell:
 ```powershell
 powershell -ExecutionPolicy Bypass -File deploy/predeploy-check.ps1
 ```
+
+
+## 5) Private network requirement
+- Put webapp36-api, webapp36-web, and PostgreSQL in the same private network.
+- Private network cannot be changed after app creation; recreate app if needed.
+

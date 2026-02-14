@@ -63,8 +63,7 @@ These are optional; defaults are defined in `config/settings.py`.
 - `DJANGO_LOG_LEVEL` (default: `INFO`)
 - `DJANGO_CSP` (Content Security Policy string)
 
-Production env template:
-- `.env.example`
+Production env template:`n- `.env.example` (pre-filled for webapp36-web.liara.run and webapp36-api.liara.run)
 
 **Tests**
 
@@ -130,3 +129,5 @@ Example:
 ```powershell
 powershell -ExecutionPolicy Bypass -File deploy/predeploy-check.ps1
 ```
+
+

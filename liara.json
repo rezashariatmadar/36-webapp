@@ -1,5 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/liaraco/liara-cli/master/packages/schema/liara.schema.json",
-  "app": "your-django-app",
-  "platform": "django"
+  "app": "webapp36-api",
+  "platform": "django",
+  "port": 8000
 }
