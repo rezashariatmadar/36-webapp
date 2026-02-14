@@ -1,0 +1,11 @@
+# Backend deploy exclusions (root liara.json -> Django app)
+frontend/
+output/
+docs/
+conductor/
+performance_tests/
+node_modules/
+.venv/
+*.png
+*.jpg
+*.jpeg

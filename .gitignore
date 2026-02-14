@@ -55,8 +55,10 @@ yarn-debug.log*
 yarn-error.log*
 .parcel-cache
 dist/
+frontend/build/
 frontend/vite-dev.log
 *.tsbuildinfo
+output/playwright/
 
 # OS
 .DS_Store
