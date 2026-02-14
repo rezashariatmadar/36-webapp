@@ -1,4 +1,110 @@
-import { useMemo } from 'react'
+/* eslint-disable react/no-unknown-property */
+import { forwardRef, useLayoutEffect, useMemo, useRef, type MutableRefObject } from 'react'
+import { Canvas, useFrame, useThree, type RootState } from '@react-three/fiber'
+import { Color, Mesh, ShaderMaterial, type IUniform } from 'three'
+
+type NormalizedRgb = [number, number, number]
+
+const hexToNormalizedRgb = (hex: string): NormalizedRgb => {
+  const clean = hex.replace('#', '')
+  const r = parseInt(clean.slice(0, 2), 16) / 255
+  const g = parseInt(clean.slice(2, 4), 16) / 255
+  const b = parseInt(clean.slice(4, 6), 16) / 255
+  return [r, g, b]
+}
+
+interface UniformValue<T = number | Color> {
+  value: T
+}
+
+interface SilkUniforms {
+  uSpeed: UniformValue<number>
+  uScale: UniformValue<number>
+  uNoiseIntensity: UniformValue<number>
+  uColor: UniformValue<Color>
+  uRotation: UniformValue<number>
+  uTime: UniformValue<number>
+  [uniform: string]: IUniform
+}
+
+const vertexShader = `
+varying vec2 vUv;
+
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`
+
+const fragmentShader = `
+varying vec2 vUv;
+
+uniform float uTime;
+uniform vec3  uColor;
+uniform float uSpeed;
+uniform float uScale;
+uniform float uRotation;
+uniform float uNoiseIntensity;
+
+const float e = 2.71828182845904523536;
+
+float noise(vec2 texCoord) {
+  float G = e;
+  vec2  r = (G * sin(G * texCoord));
+  return fract(r.x * r.y * (1.0 + texCoord.x));
+}
+
+vec2 rotateUvs(vec2 uv, float angle) {
+  float c = cos(angle);
+  float s = sin(angle);
+  mat2  rot = mat2(c, -s, s, c);
+  return rot * uv;
+}
+
+void main() {
+  float rnd        = noise(gl_FragCoord.xy);
+  vec2  uv         = rotateUvs(vUv * uScale, uRotation);
+  vec2  tex        = uv * uScale;
+  float tOffset    = uSpeed * uTime;
+
+  tex.y += 0.03 * sin(8.0 * tex.x - tOffset);
+
+  float pattern = 0.6 +
+                  0.4 * sin(5.0 * (tex.x + tex.y +
+                                   cos(3.0 * tex.x + 5.0 * tex.y) +
+                                   0.02 * tOffset) +
+                           sin(20.0 * (tex.x + tex.y - 0.1 * tOffset)));
+
+  vec4 col = vec4(uColor, 1.0) * vec4(pattern) - rnd / 15.0 * uNoiseIntensity;
+  col.a = 1.0;
+  gl_FragColor = col;
+}
+`
+
+const SilkPlane = forwardRef<Mesh, { uniforms: SilkUniforms }>(function SilkPlane({ uniforms }, ref) {
+  const { viewport } = useThree()
+
+  useLayoutEffect(() => {
+    const mesh = ref as MutableRefObject<Mesh | null>
+    if (mesh.current) {
+      mesh.current.scale.set(viewport.width, viewport.height, 1)
+    }
+  }, [ref, viewport])
+
+  useFrame((_state: RootState, delta: number) => {
+    const mesh = ref as MutableRefObject<Mesh | null>
+    if (!mesh.current) return
+    const material = mesh.current.material as ShaderMaterial & { uniforms: SilkUniforms }
+    material.uniforms.uTime.value += 0.1 * delta
+  })
+
+  return (
+    <mesh ref={ref}>
+      <planeGeometry args={[1, 1, 1, 1]} />
+      <shaderMaterial uniforms={uniforms} vertexShader={vertexShader} fragmentShader={fragmentShader} />
+    </mesh>
+  )
+})
 
 type SilkProps = {
   speed?: number
@@ -8,48 +114,32 @@ type SilkProps = {
   rotation?: number
 }
 
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
-
-const hexToRgb = (hex: string) => {
-  const normalized = hex.replace('#', '').padEnd(6, '0').slice(0, 6)
-  const r = parseInt(normalized.slice(0, 2), 16)
-  const g = parseInt(normalized.slice(2, 4), 16)
-  const b = parseInt(normalized.slice(4, 6), 16)
-  return { r, g, b }
-}
-
 export default function Silk({
   speed = 4.6,
   scale = 0.95,
   color = '#39006c',
-  noiseIntensity = 0,
+  noiseIntensity = 1.2,
   rotation = 0.15,
 }: SilkProps) {
-  const style = useMemo(() => {
-    const { r, g, b } = hexToRgb(color)
-    const alphaA = clamp(0.4 + noiseIntensity * 0.03, 0.2, 0.65)
-    const alphaB = clamp(0.24 + noiseIntensity * 0.02, 0.12, 0.44)
-    const alphaC = clamp(0.2 + noiseIntensity * 0.015, 0.1, 0.34)
-    const duration = `${clamp(26 - speed * 2, 12, 34)}s`
-    const zoom = clamp(scale, 0.65, 1.5)
-    const rotateDeg = `${rotation * 30}deg`
+  const meshRef = useRef<Mesh>(null)
 
-    return {
-      ['--silk-rgb' as string]: `${r}, ${g}, ${b}`,
-      ['--silk-alpha-a' as string]: String(alphaA),
-      ['--silk-alpha-b' as string]: String(alphaB),
-      ['--silk-alpha-c' as string]: String(alphaC),
-      ['--silk-duration' as string]: duration,
-      ['--silk-zoom' as string]: String(zoom),
-      ['--silk-rotation' as string]: rotateDeg,
-    } as React.CSSProperties
-  }, [color, noiseIntensity, rotation, scale, speed])
+  const uniforms = useMemo<SilkUniforms>(
+    () => ({
+      uSpeed: { value: speed },
+      uScale: { value: scale },
+      uNoiseIntensity: { value: noiseIntensity },
+      uColor: { value: new Color(...hexToNormalizedRgb(color)) },
+      uRotation: { value: rotation },
+      uTime: { value: 0 },
+    }),
+    [speed, scale, noiseIntensity, color, rotation]
+  )
 
   return (
-    <div className="rb-silk" style={style} aria-hidden>
-      <div className="rb-silk-layer rb-silk-layer-a" />
-      <div className="rb-silk-layer rb-silk-layer-b" />
-      <div className="rb-silk-layer rb-silk-layer-c" />
+    <div style={{ position: 'absolute', inset: 0, background: '#000' }} aria-hidden>
+      <Canvas dpr={[1, 2]} frameloop="always" gl={{ antialias: true, alpha: false }}>
+        <SilkPlane ref={meshRef} uniforms={uniforms} />
+      </Canvas>
     </div>
   )
 }
