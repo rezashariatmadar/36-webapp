@@ -1,5 +1,6 @@
 ﻿import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import GlareHover from '../components/GlareHover'
 import { apiFetch } from '../lib/api/client'
 
 type Seat = { id: number; name: string; status: string; capacity: number }
@@ -9,6 +10,7 @@ type Zone = { code: string; label: string; spaces: Space[] }
 export function CoworkSpacesPage() {
   const [zones, setZones] = useState<Zone[]>([])
   const [expandedZones, setExpandedZones] = useState<Record<string, boolean>>({})
+  const [selectedSeatBySpace, setSelectedSeatBySpace] = useState<Record<number, Seat | null>>({})
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -27,6 +29,10 @@ export function CoworkSpacesPage() {
 
   const toggleZone = (zoneCode: string) => {
     setExpandedZones((prev) => ({ ...prev, [zoneCode]: !prev[zoneCode] }))
+  }
+
+  const selectSeat = (spaceId: number, seat: Seat) => {
+    setSelectedSeatBySpace((prev) => ({ ...prev, [spaceId]: seat }))
   }
 
   return (
@@ -60,28 +66,52 @@ export function CoworkSpacesPage() {
             </span>
           </button>
           {expandedZones[zone.code] ? (
-            <div className="cowork-grid">
+            <div className={`cowork-grid ${zone.code === 'SHARED_DESK' ? 'cowork-grid-shared' : ''}`}>
               {zone.spaces.map((space) => (
-                <article key={space.id} className="surface-glass cowork-card">
-                  <div className="cowork-card-summary">
-                    <strong>{space.name}</strong>
-                    <p className={`status-pill status-${space.status.toLowerCase()} cowork-status-pill`}>{space.status}</p>
-                  </div>
-                  <div className="cowork-card-body">
-                    {space.zone === 'SHARED_DESK' && space.seats?.length ? (
-                      <div className="cowork-seats-grid">
-                        {space.seats.map((seat) => (
-                          <div key={seat.id} className="cowork-seat-item">
-                            <span>{seat.name}</span>
-                            <span className={`status-pill status-${seat.status.toLowerCase()}`}>{seat.status}</span>
+                <article key={space.id}>
+                  <GlareHover className="surface-glass cowork-card" glareColor="#400080" glareOpacity={0.8} glareSize={500}>
+                    <div className="cowork-card-summary">
+                      <strong>{space.name}</strong>
+                      <p className={`status-pill status-${space.status.toLowerCase()} cowork-status-pill`}>{space.status}</p>
+                    </div>
+                    <div className="cowork-card-body">
+                      {space.zone === 'SHARED_DESK' && space.seats?.length ? (
+                        <>
+                          <div className="cowork-seats-grid">
+                            {space.seats.map((seat) => {
+                              const isSelected = selectedSeatBySpace[space.id]?.id === seat.id
+                              return (
+                                <button
+                                  key={seat.id}
+                                  type="button"
+                                  className={`cowork-seat-item ${isSelected ? 'is-selected' : ''}`}
+                                  onClick={() => selectSeat(space.id, seat)}
+                                  disabled={seat.status !== 'AVAILABLE'}
+                                >
+                                  <span>{seat.name}</span>
+                                  <span className={`status-pill status-${seat.status.toLowerCase()}`}>{seat.status}</span>
+                                </button>
+                              )
+                            })}
                           </div>
-                        ))}
-                      </div>
-                    ) : null}
-                    <Link className="btn-secondary" to={`/cowork/book/${space.id}`}>
-                      رزرو این فضا
-                    </Link>
-                  </div>
+                          {selectedSeatBySpace[space.id] ? (
+                            <p className="muted">صندلی انتخاب‌شده: {selectedSeatBySpace[space.id]!.name}</p>
+                          ) : null}
+                          {selectedSeatBySpace[space.id] ? (
+                            <Link className="btn-secondary" to={`/cowork/book/${selectedSeatBySpace[space.id]!.id}`}>
+                              رزرو این فضا
+                            </Link>
+                          ) : (
+                            <p className="muted">برای رزرو، یک صندلی را انتخاب کنید.</p>
+                          )}
+                        </>
+                      ) : (
+                        <Link className="btn-secondary" to={`/cowork/book/${space.id}`}>
+                          رزرو این فضا
+                        </Link>
+                      )}
+                    </div>
+                  </GlareHover>
                 </article>
               ))}
             </div>
@@ -91,3 +121,4 @@ export function CoworkSpacesPage() {
     </section>
   )
 }
+

@@ -1,0 +1,192 @@
+.rb-stepper {
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1rem;
+}
+
+.rb-stepper-indicators {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(var(--steps), minmax(0, 1fr));
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem;
+  direction: ltr;
+}
+
+.rb-stepper-indicator-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.rb-stepper-indicator {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  font-size: 0.92rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(16, 24, 44, 0.86);
+  color: rgba(244, 247, 255, 0.88);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+  cursor: pointer;
+  flex-shrink: 0;
+  justify-self: center;
+  position: relative;
+  z-index: 1;
+}
+
+.rb-stepper-indicator.is-active {
+  border-color: rgba(139, 194, 255, 0.72);
+  background: linear-gradient(120deg, rgba(139, 194, 255, 0.38), rgba(109, 121, 255, 0.3));
+  color: #fff;
+}
+
+.rb-stepper-indicator.is-complete {
+  border-color: rgba(139, 194, 255, 0.62);
+  background: rgba(86, 112, 241, 0.75);
+  color: #fff;
+}
+
+.rb-stepper-indicator:disabled {
+  cursor: default;
+}
+
+.rb-stepper-connector {
+  width: 100%;
+  min-width: 20px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  align-self: center;
+  margin-inline-start: 0.12rem;
+}
+
+.rb-stepper-indicator-item:last-child .rb-stepper-connector {
+  display: none;
+}
+
+.rb-stepper-connector.is-complete {
+  background: rgba(139, 194, 255, 0.72);
+}
+
+.rb-stepper-content {
+  position: relative;
+  overflow: hidden;
+  margin-top: 1rem;
+  border: 1px solid rgba(214, 229, 255, 0.9);
+  border-radius: 14px;
+  background: rgba(8, 16, 34, 0.98);
+  padding: 1rem;
+  backdrop-filter: blur(8px);
+}
+
+.rb-stepper-slide {
+  position: relative;
+  width: 100%;
+}
+
+.rb-stepper-step {
+  display: grid;
+  gap: 0.72rem;
+  min-height: 160px;
+}
+
+.rb-stepper-step input,
+.rb-stepper-step select,
+.rb-stepper-step textarea {
+  width: 100%;
+  color: #f8fafc;
+  border: 1px solid rgba(191, 219, 254, 0.72);
+  background: rgba(27, 42, 74, 0.92);
+  min-height: 48px;
+  padding: 0.72rem 0.85rem;
+  line-height: 1.3;
+  box-shadow:
+    inset 0 0 0 1px rgba(191, 219, 254, 0.36),
+    0 10px 20px rgba(2, 6, 23, 0.26);
+}
+
+.rb-stepper-step input::placeholder,
+.rb-stepper-step textarea::placeholder {
+  color: rgba(226, 232, 240, 0.86);
+}
+
+.rb-stepper-step input:focus-visible,
+.rb-stepper-step select:focus-visible,
+.rb-stepper-step textarea:focus-visible {
+  outline: 2px solid rgba(139, 194, 255, 0.55);
+  outline-offset: 1px;
+  border-color: rgba(139, 194, 255, 0.85);
+}
+
+.rb-stepper-footer {
+  display: flex;
+  margin-top: 1rem;
+}
+
+.rb-stepper-footer.spread {
+  justify-content: space-between;
+}
+
+.rb-stepper-footer.end {
+  justify-content: flex-end;
+}
+
+.rb-stepper-back,
+.rb-stepper-next {
+  border-radius: 999px;
+  padding: 0.48rem 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.rb-stepper-back {
+  color: rgba(244, 247, 255, 0.82);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.rb-stepper-next {
+  color: #fff;
+  border-color: rgba(139, 194, 255, 0.62);
+  background: linear-gradient(120deg, var(--accent-2), #4661ff);
+}
+
+@media (max-width: 720px) {
+  .rb-stepper {
+    padding: 0.75rem;
+  }
+
+  .rb-stepper-indicators {
+    gap: 0.4rem;
+  }
+
+  .rb-stepper-indicator-item {
+    gap: 0.3rem;
+  }
+
+  .rb-stepper-indicator {
+    width: 28px;
+    height: 28px;
+    font-size: 0.82rem;
+  }
+
+  .rb-stepper-connector {
+    min-width: 8px;
+  }
+
+  .rb-stepper-step {
+    min-height: 180px;
+  }
+}

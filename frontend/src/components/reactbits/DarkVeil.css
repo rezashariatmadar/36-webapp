@@ -1,0 +1,54 @@
+.rb-dark-veil {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at 48% 0%, #0d1429 0%, #080f1f 52%, #060b16 100%);
+}
+
+.rb-dark-veil-layer {
+  position: absolute;
+  inset: -24%;
+  filter: blur(58px) saturate(0.92);
+  opacity: 0.24;
+  transform-origin: center;
+  animation: rb-dark-veil-drift 24s ease-in-out infinite;
+}
+
+.rb-dark-veil-layer-a {
+  background:
+    radial-gradient(circle at 18% 26%, rgba(80, 123, 216, 0.45), transparent 46%),
+    radial-gradient(circle at 76% 34%, rgba(56, 96, 188, 0.3), transparent 44%);
+}
+
+.rb-dark-veil-layer-b {
+  background:
+    radial-gradient(circle at 66% 72%, rgba(77, 96, 168, 0.28), transparent 48%),
+    radial-gradient(circle at 22% 74%, rgba(52, 78, 132, 0.22), transparent 52%);
+  animation-delay: -7s;
+}
+
+.rb-dark-veil-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.06;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.18) 0.55px, transparent 0.55px);
+  background-size: 3px 3px;
+}
+
+@keyframes rb-dark-veil-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -2.5%, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-dark-veil-layer {
+    animation: none;
+  }
+}

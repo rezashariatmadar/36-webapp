@@ -92,16 +92,20 @@ export function StaffUsersPage() {
       <p className="panel">تعداد کل: {count}</p>
       <div className="grid">
         {users.map((user) => (
-          <article key={user.id} className="panel row">
-            <strong>{user.full_name || '-'}</strong>
-            <span>{user.phone_number}</span>
-            <span>{user.is_active ? 'فعال' : 'غیرفعال'}</span>
-            <button className="btn-secondary" onClick={() => toggleStatus(user.id, user.is_active)}>
-              {user.is_active ? 'تعلیق' : 'فعال‌سازی'}
-            </button>
-            <button className="btn-secondary" onClick={() => changeRole(user.id, 'Admin')}>Admin</button>
-            <button className="btn-secondary" onClick={() => changeRole(user.id, 'Barista')}>Barista</button>
-            <button className="btn-secondary" onClick={() => changeRole(user.id, 'Customer')}>Customer</button>
+          <article key={user.id} className="panel user-card">
+            <div className="user-meta">
+              <strong>{user.full_name || '-'}</strong>
+              <span>{user.phone_number}</span>
+              <span>{user.is_active ? 'فعال' : 'غیرفعال'}</span>
+            </div>
+            <div className="user-actions">
+              <button className="btn-secondary" onClick={() => toggleStatus(user.id, user.is_active)}>
+                {user.is_active ? 'تعلیق' : 'فعال‌سازی'}
+              </button>
+              <button className="btn-secondary" onClick={() => changeRole(user.id, 'Admin')}>Admin</button>
+              <button className="btn-secondary" onClick={() => changeRole(user.id, 'Barista')}>Barista</button>
+              <button className="btn-secondary" onClick={() => changeRole(user.id, 'Customer')}>Customer</button>
+            </div>
           </article>
         ))}
       </div>

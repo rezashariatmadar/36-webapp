@@ -27,13 +27,20 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-ce@kjvv%1)_-4z7y^@w
 DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = [h for h in os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',') if h] or ['*']
-CSRF_TRUSTED_ORIGINS = [o for o in os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if o]
+
+_env_csrf_trusted_origins = [o.strip() for o in os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
+_dev_csrf_trusted_origins = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+]
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(_env_csrf_trusted_origins + (_dev_csrf_trusted_origins if DEBUG else [])))
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'accounts',
+    'blog',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

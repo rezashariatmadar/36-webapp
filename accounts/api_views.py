@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import ProfileForm, UserRegistrationForm
+from .models import FreelancerProfile
 from .utils import rate_limit
 
 
@@ -19,6 +20,7 @@ def _session_payload(request):
         }
 
     user = request.user
+    freelancer_profile = FreelancerProfile.objects.filter(user=user).first()
     return {
         "authenticated": True,
         "csrf_token": csrf_token,
@@ -35,6 +37,8 @@ def _session_payload(request):
                 "is_barista": user.is_barista,
                 "is_customer": user.is_customer,
             },
+            "freelancer_profile_status": freelancer_profile.status if freelancer_profile else None,
+            "freelancer_public_slug": freelancer_profile.public_slug if freelancer_profile else None,
         },
     }
 

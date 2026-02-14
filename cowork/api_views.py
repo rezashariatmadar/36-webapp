@@ -1,3 +1,4 @@
+﻿import jdatetime
 from django.db.models import Exists, OuterRef
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -66,6 +67,12 @@ def _serialize_booking(booking):
         "start_time_jalali": booking.start_time_jalali,
         "end_time_jalali": booking.end_time_jalali,
     }
+
+
+def _to_jalali_string(value):
+    if not value:
+        return None
+    return jdatetime.date.fromgregorian(date=value).strftime("%Y/%m/%d")
 
 
 def _refresh_space_statuses():
@@ -148,7 +155,7 @@ class CoworkBookingPreviewAPIView(APIView):
                 "price": _as_price(price),
                 "start_time": preview_booking.start_time.strftime("%Y-%m-%d"),
                 "end_time": preview_booking.end_time.strftime("%Y-%m-%d"),
-                "end_time_jalali": preview_booking.end_time.strftime("%Y/%m/%d"),
+                "end_time_jalali": _to_jalali_string(preview_booking.end_time),
             }
         )
 
@@ -173,11 +180,18 @@ class CoworkBookingsAPIView(APIView):
         booking = form.save(commit=False)
         booking.user = request.user
         booking.space = space
-        booking.status = Booking.Status.CONFIRMED
+        booking.status = Booking.Status.PENDING_PAYMENT
         booking.price_charged = booking.calculate_price()
         booking.save()
         space.refresh_status()
-        return Response({"booking": _serialize_booking(booking)}, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                "booking": _serialize_booking(booking),
+                "detail": "رزرو ثبت شد اما نهایی نیست. برای تایید نهایی لطفا تماس بگیرید.",
+                "requires_admin_approval": True,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class CoworkMyBookingsAPIView(APIView):

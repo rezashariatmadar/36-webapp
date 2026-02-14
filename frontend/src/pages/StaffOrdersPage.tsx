@@ -1,7 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { apiFetch } from '../lib/api/client'
 
 type Order = { id: number; status: string; is_paid: boolean; total_price: number }
+
+const statusLabel: Record<string, string> = {
+  PENDING: 'در انتظار',
+  PREPARING: 'در حال آماده‌سازی',
+  READY: 'آماده تحویل',
+  DELIVERED: 'تحویل شده',
+  CANCELLED: 'لغو شده',
+}
 
 export function StaffOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -18,7 +26,7 @@ export function StaffOrdersPage() {
   }
 
   useEffect(() => {
-    load()
+    void load()
   }, [])
 
   const mutate = async (orderId: number, action: 'payment' | 'status', status?: string) => {
@@ -42,42 +50,100 @@ export function StaffOrdersPage() {
     }
   }
 
+  const metrics = useMemo(() => {
+    const pending = orders.filter((order) => order.status === 'PENDING').length
+    const preparing = orders.filter((order) => order.status === 'PREPARING').length
+    const ready = orders.filter((order) => order.status === 'READY').length
+    const paid = orders.filter((order) => order.is_paid).length
+    return { pending, preparing, ready, paid }
+  }, [orders])
+
   return (
-    <section className="page-stack">
-      <div className="panel row">
-        <h2>داشبورد سفارشات جاری</h2>
-        <button onClick={load}>بروزرسانی</button>
-      </div>
-      {error ? <p className="error">{error}</p> : null}
-      {!orders.length ? <div className="panel">سفارش فعالی وجود ندارد.</div> : null}
-      {orders.map((order) => (
-        <article key={order.id} className="panel">
-          <div className="row">
-            <strong>#{order.id}</strong>
-            <span>{order.status}</span>
-            <span>{order.total_price.toLocaleString()} تومان</span>
-            <span>{order.is_paid ? 'پرداخت‌شده' : 'پرداخت‌نشده'}</span>
-          </div>
-          <div className="row">
-            <button disabled={busy === order.id} onClick={() => mutate(order.id, 'status', 'PREPARING')}>
-              شروع تهیه
-            </button>
-            <button disabled={busy === order.id} onClick={() => mutate(order.id, 'status', 'READY')}>
-              آماده شد
-            </button>
-            <button disabled={busy === order.id} onClick={() => mutate(order.id, 'status', 'DELIVERED')}>
-              تحویل شد
-            </button>
-            <button disabled={busy === order.id} onClick={() => mutate(order.id, 'status', 'CANCELLED')}>
-              لغو
-            </button>
-            <button disabled={busy === order.id} onClick={() => mutate(order.id, 'payment')}>
-              {order.is_paid ? 'لغو پرداخت' : 'تایید پرداخت'}
-            </button>
-          </div>
+    <section className="page-stack layout-flow-compact">
+      <header className="surface-open section-head row">
+        <div>
+          <p className="eyebrow">Staff</p>
+          <h2>داشبورد سفارش‌های جاری</h2>
+          <p className="muted">عملیات سفارش‌های فعال را سریع و دقیق مدیریت کنید.</p>
+        </div>
+        <button className="btn-secondary" onClick={() => void load()} type="button">
+          بروزرسانی
+        </button>
+      </header>
+
+      <div className="grid dashboard-metrics">
+        <article className="surface-inline dashboard-metric-card">
+          <strong>{orders.length}</strong>
+          <span>کل سفارش‌های فعال</span>
         </article>
-      ))}
+        <article className="surface-inline dashboard-metric-card">
+          <strong>{metrics.pending}</strong>
+          <span>در انتظار</span>
+        </article>
+        <article className="surface-inline dashboard-metric-card">
+          <strong>{metrics.preparing}</strong>
+          <span>در حال آماده‌سازی</span>
+        </article>
+        <article className="surface-inline dashboard-metric-card">
+          <strong>{metrics.ready}</strong>
+          <span>آماده تحویل</span>
+        </article>
+        <article className="surface-inline dashboard-metric-card">
+          <strong>{metrics.paid}</strong>
+          <span>پرداخت شده</span>
+        </article>
+      </div>
+
+      {error ? <p className="error">{error}</p> : null}
+
+      {!orders.length ? (
+        <div className="surface-inline dashboard-empty">
+          <p>در حال حاضر سفارش فعالی وجود ندارد.</p>
+        </div>
+      ) : null}
+
+      <div className="grid dashboard-orders-grid">
+        {orders.map((order) => (
+          <article key={order.id} className="surface-glass dashboard-order-card">
+            <div className="dashboard-order-head">
+              <strong>سفارش #{order.id}</strong>
+              <span className={`status-pill status-${order.status.toLowerCase()}`}>{statusLabel[order.status] || order.status}</span>
+            </div>
+
+            <div className="dashboard-order-meta">
+              <p>
+                <span className="muted">مبلغ:</span> {order.total_price.toLocaleString()} تومان
+              </p>
+              <p>
+                <span className="muted">پرداخت:</span>{' '}
+                <span className={`status-pill ${order.is_paid ? 'status-available' : 'status-occupied'}`}>
+                  {order.is_paid ? 'پرداخت‌شده' : 'پرداخت‌نشده'}
+                </span>
+              </p>
+            </div>
+
+            <div className="dashboard-order-actions">
+              <div className="row dashboard-status-actions">
+                <button className="btn-secondary" disabled={busy === order.id} onClick={() => mutate(order.id, 'status', 'PREPARING')} type="button">
+                  شروع تهیه
+                </button>
+                <button className="btn-secondary" disabled={busy === order.id} onClick={() => mutate(order.id, 'status', 'READY')} type="button">
+                  آماده شد
+                </button>
+                <button className="btn-secondary" disabled={busy === order.id} onClick={() => mutate(order.id, 'status', 'DELIVERED')} type="button">
+                  تحویل شد
+                </button>
+                <button className="btn-secondary btn-danger-soft" disabled={busy === order.id} onClick={() => mutate(order.id, 'status', 'CANCELLED')} type="button">
+                  لغو
+                </button>
+              </div>
+              <button className="btn-primary dashboard-payment-btn" disabled={busy === order.id} onClick={() => mutate(order.id, 'payment')} type="button">
+                {order.is_paid ? 'لغو پرداخت' : 'تایید پرداخت'}
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
     </section>
   )
 }
-

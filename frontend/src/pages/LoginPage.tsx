@@ -31,13 +31,14 @@ export function LoginPage() {
   }
 
   return (
-    <section className="page-stack">
-      <div className="panel">
+    <section className="page-stack layout-flow-compact auth-layout">
+      <header className="surface-open auth-head">
         <p className="eyebrow">حساب کاربری</p>
         <h2>ورود</h2>
-        <p>برای ثبت سفارش و رزرو، با شماره موبایل وارد شوید.</p>
-      </div>
-      <form className="panel grid" onSubmit={onSubmit}>
+        <p>برای رزرو فضا و ثبت سفارش با شماره موبایل وارد شوید.</p>
+      </header>
+
+      <form className="surface-inline auth-form auth-surface" onSubmit={onSubmit}>
         <input
           autoComplete="tel"
           value={phoneNumber}
@@ -56,7 +57,8 @@ export function LoginPage() {
           {submitting ? 'در حال ورود...' : 'ورود'}
         </button>
       </form>
-      <div className="panel">
+
+      <div className="surface-strip auth-foot">
         <p>
           حساب ندارید؟ <a href="/register/">ثبت نام</a>
         </p>

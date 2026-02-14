@@ -54,10 +54,17 @@ class BookingForm(DigitNormalizationMixin, forms.ModelForm):
                 else:
                     # VIP has choices
                     self.fields['booking_type'].choices = [
+                        (Booking.BookingType.DAILY, _('Daily')),
                         (Booking.BookingType.MONTHLY, _('Monthly')),
                         (Booking.BookingType.SIX_MONTH, _('6-Month')),
                         (Booking.BookingType.YEARLY, _('Yearly')),
                     ]
+            elif self.space.zone == Space.ZoneType.MEETING_ROOM:
+                self.fields['booking_type'].choices = [
+                    (Booking.BookingType.HOURLY, _('Hourly')),
+                    (Booking.BookingType.DAILY, _('Daily')),
+                    (Booking.BookingType.MONTHLY, _('Monthly')),
+                ]
 
     def clean(self):
         cleaned_data = super().clean()
@@ -66,11 +73,10 @@ class BookingForm(DigitNormalizationMixin, forms.ModelForm):
         
         # Auto-calculate end date if needed
         if start_date:
-            if booking_type == Booking.BookingType.DAILY:
-                # Same day or next day? User said "just the date they are reserving" 
-                # implying start=end for single day.
-                # However, calculate_price expects diff.days >= 1 for Daily? 
-                # Let's use start_date + 1 day for Daily to be safe and logical.
+            if booking_type == Booking.BookingType.HOURLY:
+                # Date-only booking model: treat hourly as same-day slot boundary.
+                cleaned_data['end_time'] = start_date + timedelta(days=1)
+            elif booking_type == Booking.BookingType.DAILY:
                 cleaned_data['end_time'] = start_date + timedelta(days=1)
             elif booking_type == Booking.BookingType.MONTHLY:
                 cleaned_data['end_time'] = start_date + timedelta(days=30)
@@ -78,8 +84,12 @@ class BookingForm(DigitNormalizationMixin, forms.ModelForm):
                 cleaned_data['end_time'] = start_date + timedelta(days=180)
             elif booking_type == Booking.BookingType.YEARLY:
                 cleaned_data['end_time'] = start_date + timedelta(days=365)
+            else:
+                raise forms.ValidationError(_("Invalid booking type for selected space."))
             
             end_date = cleaned_data['end_time']
+            if not end_date:
+                raise forms.ValidationError(_("Invalid end date for selected booking type."))
             
             # Update the form instance end_time so it's available for preview
             self.instance.end_time = end_date

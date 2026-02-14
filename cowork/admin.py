@@ -17,3 +17,12 @@ class BookingAdmin(admin.ModelAdmin):
     list_filter = ('status', 'booking_type', 'space__zone')
     search_fields = ('user__phone_number', 'user__full_name')
     date_hierarchy = 'start_time'
+    actions = ("approve_bookings", "mark_cancelled")
+
+    @admin.action(description="Approve selected bookings")
+    def approve_bookings(self, request, queryset):
+        queryset.update(status=Booking.Status.CONFIRMED)
+
+    @admin.action(description="Mark selected bookings as cancelled")
+    def mark_cancelled(self, request, queryset):
+        queryset.update(status=Booking.Status.CANCELLED)
