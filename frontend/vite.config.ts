@@ -15,8 +15,7 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes('node_modules')) return
           if (id.includes('@mui/') || id.includes('@emotion/')) return 'mui'
-          if (id.includes('@react-three/fiber') || id.includes('/three/')) return 'three-stack'
-          if (id.includes('/motion/') || id.includes('/gsap/')) return 'motion-gsap'
+          if (id.includes('/motion/')) return 'motion'
           if (id.includes('react-multi-date-picker') || id.includes('react-date-object')) return 'date-stack'
         },
       },
