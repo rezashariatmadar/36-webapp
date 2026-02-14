@@ -2,27 +2,27 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "https://<your-render-service>.onrender.com/api/$1"
+      "dest": "https://webapp-alpha-api-production.up.railway.app/api/$1"
     },
     {
       "src": "/admin/(.*)",
-      "dest": "https://<your-render-service>.onrender.com/admin/$1"
+      "dest": "https://webapp-alpha-api-production.up.railway.app/admin/$1"
     },
     {
       "src": "/media/(.*)",
-      "dest": "https://<your-render-service>.onrender.com/media/$1"
+      "dest": "https://webapp-alpha-api-production.up.railway.app/media/$1"
     },
     {
       "src": "/static/(.*)",
-      "dest": "https://<your-render-service>.onrender.com/static/$1"
+      "dest": "https://webapp-alpha-api-production.up.railway.app/static/$1"
     },
     {
       "src": "/robots.txt",
-      "dest": "https://<your-render-service>.onrender.com/robots.txt"
+      "dest": "https://webapp-alpha-api-production.up.railway.app/robots.txt"
     },
     {
       "src": "/sitemap.xml",
-      "dest": "https://<your-render-service>.onrender.com/sitemap.xml"
+      "dest": "https://webapp-alpha-api-production.up.railway.app/sitemap.xml"
     },
     {
       "handle": "filesystem"
