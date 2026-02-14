@@ -4,7 +4,7 @@
   "platform": "node",
   "port": 80,
   "build": {
-    "location": "/",
+    "location": "iran",
     "command": "npm run build",
     "output": "build"
   }
