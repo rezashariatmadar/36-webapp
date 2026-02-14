@@ -58,8 +58,69 @@ These are optional; defaults are defined in `config/settings.py`.
 - `DJANGO_LOG_LEVEL` (default: `INFO`)
 - `DJANGO_CSP` (Content Security Policy string)
 
+Production env template:
+- `.env.example`
+
 **Tests**
 
 ```powershell
 uv run pytest
+```
+
+```powershell
+cd frontend
+npm run test
+```
+
+## New APIs: Blog + Freelancers
+
+- `GET /api/blog/posts/`
+- `GET /api/blog/posts/{slug}/`
+- `GET /api/blog/tags/`
+- `GET /api/freelancers/`
+- `GET /api/freelancers/{slug}/`
+- `GET /api/freelancers/specialties/`
+- `GET /api/freelancers/flairs/`
+- `GET /api/auth/freelancer-profile/`
+- `PATCH /api/auth/freelancer-profile/`
+- `POST /api/auth/freelancer-profile/submit/`
+- `GET /api/auth/freelancer-specialties/`
+- `GET /api/auth/freelancer-flairs/`
+- `POST /api/auth/freelancer-services/`
+- `PATCH /api/auth/freelancer-services/{id}/`
+- `DELETE /api/auth/freelancer-services/{id}/`
+
+## SEO Endpoints
+
+- `GET /sitemap.xml`
+- `GET /robots.txt`
+
+## Seed Freelancer Taxonomy
+
+```powershell
+uv run python manage.py seed_freelancer_taxonomy
+```
+
+## Production Proxy (Same Origin)
+
+Use a same-origin reverse proxy so browser session/CSRF behavior stays consistent:
+- `/api/*`, `/admin/*`, `/media/*`, `/static/*` -> Django
+- all other paths -> React `index.html` (SPA fallback)
+
+Reference config:
+- `deploy/nginx/react-django-cutover.conf`
+
+Cutover runbook:
+- `docs/cutover-checklist.md`
+
+Deployment runbook:
+- `deploy/DEPLOYMENT.md`
+
+Pre-deploy validation scripts:
+- Linux/macOS: `deploy/predeploy-check.sh`
+- Windows PowerShell: `deploy/predeploy-check.ps1`
+
+Example:
+```powershell
+powershell -ExecutionPolicy Bypass -File deploy/predeploy-check.ps1
 ```

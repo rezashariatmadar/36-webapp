@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>????? ????? ???????</title>
+  <style>
+    body { font-family: Tahoma, "Segoe UI", sans-serif; margin: 24px; line-height: 1.85; color: #111; }
+    h1,h2,h3 { margin-top: 1.2em; }
+    img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; }
+    hr { border: none; border-top: 1px solid #ddd; margin: 24px 0; }
+    a { color: #0a58ca; }
+    ul { padding-right: 20px; }
+    @media print { body { margin: 10mm; } }
+  </style>
+</head>
+<body>
+<h1>گزارش جامع وضعیت محصول برای تایید کارفرما</h1>
+<h2>1) خلاصه اجرایی</h2>
+<p>این پروژه به معماری <code>Django API/Admin + React SPA (Vite)</code> مهاجرت داده شده و اکنون فرانت‌اند کاربر نهایی به‌طور کامل روی React اجرا می‌شود.<br />
+Django فقط مسئول API، پنل ادمین، احراز هویت سشن/CSRF، قوانین کسب‌وکار و سرویس‌های SEO زیرساختی است.</p>
+<p>خروجی فعلی شامل:</p>
+<ul>
+<li>مسیرهای کامل کاربری (خانه، احراز هویت، پروفایل، کافه، کوورک)</li>
+<li>مسیرهای کامل پنل کارکنان (سفارش‌ها، سفارش دستی، مدیریت منو، مشتریان، تحلیل‌ها، کاربران)</li>
+<li>ماژول بلاگ و فریلنسرها (عمومی + بخش مالک)</li>
+<li>SEO پایه در SPA + <code>sitemap.xml</code> و <code>robots.txt</code></li>
+</ul>
+<hr />
+<h2>2) معماری نهایی سیستم</h2>
+<h3>بک‌اند</h3>
+<ul>
+<li>فریم‌ورک: <code>Django 5.2</code></li>
+<li>API: <code>Django REST Framework</code></li>
+<li>اپ‌ها: <code>accounts</code>, <code>blog</code>, <code>cafe</code>, <code>cowork</code></li>
+<li>پنل مدیریت: <code>Django Admin</code></li>
+<li>احراز هویت: Session-based + CSRF</li>
+<li>تاریخ جلالی: <code>django-jalali</code>, <code>jdatetime</code></li>
+<li>Middleware سفارشی:
+<ul>
+<li><code>RequestIDMiddleware</code> (افزودن <code>X-Request-ID</code>)</li>
+<li><code>ContentSecurityPolicyMiddleware</code> (اعمال CSP)</li>
+</ul>
+</li>
+</ul>
+<h3>فرانت‌اند</h3>
+<ul>
+<li>فریم‌ورک: <code>React 18 + TypeScript</code></li>
+<li>باندلر: <code>Vite 6</code></li>
+<li>مسیرها: <code>react-router-dom</code></li>
+<li>انیمیشن/تعاملات: <code>motion</code>, <code>gsap</code></li>
+<li>آیکن‌ها: <code>@mui/icons-material</code></li>
+<li>تاریخ جلالی: <code>react-multi-date-picker</code></li>
+<li>کامپوننت‌های بصری (ReactBits/سفارشی):
+<ul>
+<li><code>Silk</code> (پس‌زمینه سراسری)</li>
+<li><code>PillNav</code> (ناوبری موبایل)</li>
+<li><code>Stepper</code> (ثبت‌نام چندمرحله‌ای)</li>
+<li><code>GlareHover</code> (افکت hover روی کارت‌ها)</li>
+</ul>
+</li>
+</ul>
+<h3>مدل استقرار</h3>
+<ul>
+<li>Same-origin reverse proxy
+<ul>
+<li><code>/api/*</code>, <code>/admin/*</code>, <code>/media/*</code>, <code>/static/*</code>, <code>/sitemap.xml</code>, <code>/robots.txt</code> -&gt; Django</li>
+<li>سایر مسیرها -&gt; React <code>index.html</code> (SPA fallback)</li>
+</ul>
+</li>
+<li>مرجع کانفیگ: <code>deploy/nginx/react-django-cutover.conf</code></li>
+</ul>
+<hr />
+<h2>3) استک تکنولوژی</h2>
+<h3>Python</h3>
+<ul>
+<li><code>django==5.2.9</code></li>
+<li><code>djangorestframework==3.16.1</code></li>
+<li><code>django-jalali==7.4.0</code></li>
+<li><code>pytest</code>, <code>pytest-django</code>, <code>pytest-cov</code></li>
+<li><code>factory-boy</code>, <code>faker</code></li>
+<li><code>pillow</code></li>
+</ul>
+<h3>Frontend</h3>
+<ul>
+<li><code>react</code>, <code>react-dom</code>, <code>typescript</code>, <code>vite</code></li>
+<li><code>@mui/material</code>, <code>@mui/icons-material</code>, <code>@emotion/*</code></li>
+<li><code>motion</code>, <code>gsap</code></li>
+<li><code>three</code>, <code>@react-three/fiber</code></li>
+<li><code>vitest</code>, <code>@testing-library/*</code>, <code>jsdom</code></li>
+</ul>
+<hr />
+<h2>4) مسیرهای فرانت‌اند (Route Parity)</h2>
+<ul>
+<li><code>/</code></li>
+<li><code>/login/</code></li>
+<li><code>/register/</code></li>
+<li><code>/profile/</code></li>
+<li><code>/blog/</code></li>
+<li><code>/blog/:slug/</code></li>
+<li><code>/freelancers/</code></li>
+<li><code>/freelancers/:slug/</code></li>
+<li><code>/cafe/menu/</code></li>
+<li><code>/cafe/cart/</code></li>
+<li><code>/cafe/checkout/</code></li>
+<li><code>/cafe/orders/</code></li>
+<li><code>/cowork/</code></li>
+<li><code>/cowork/book/:spaceId</code></li>
+<li><code>/cowork/my-bookings/</code></li>
+<li><code>/cafe/dashboard/</code></li>
+<li><code>/cafe/manual-order/</code></li>
+<li><code>/cafe/manage-menu/</code></li>
+<li><code>/cafe/lookup/</code></li>
+<li><code>/cafe/analytics/</code></li>
+<li><code>/staff/users/</code></li>
+</ul>
+<hr />
+<h2>5) APIهای پیاده‌سازی‌شده</h2>
+<h3>Auth</h3>
+<ul>
+<li><code>POST /api/auth/login/</code></li>
+<li><code>POST /api/auth/logout/</code></li>
+<li><code>POST /api/auth/register/</code></li>
+<li><code>GET /api/auth/me/</code></li>
+<li><code>GET/PATCH /api/auth/profile/</code></li>
+</ul>
+<h3>Cafe (عمومی/کاربر)</h3>
+<ul>
+<li><code>GET /api/cafe/menu/</code></li>
+<li><code>GET /api/cafe/cart/</code></li>
+<li><code>POST /api/cafe/cart/items/</code></li>
+<li><code>POST /api/cafe/checkout/</code></li>
+<li><code>GET /api/cafe/orders/</code></li>
+<li><code>POST /api/cafe/orders/{id}/reorder/</code></li>
+</ul>
+<h3>Cafe (Staff)</h3>
+<ul>
+<li><code>GET /api/cafe/staff/orders/</code></li>
+<li><code>POST /api/cafe/staff/orders/{id}/status/</code></li>
+<li><code>POST /api/cafe/staff/orders/{id}/toggle-payment/</code></li>
+<li><code>GET/POST /api/cafe/staff/menu-items/</code></li>
+<li><code>GET /api/cafe/staff/menu-categories/</code></li>
+<li><code>POST /api/cafe/staff/menu-items/{id}/toggle-availability/</code></li>
+<li><code>POST /api/cafe/staff/manual-orders/</code></li>
+<li><code>GET /api/cafe/staff/customer-lookup/</code></li>
+</ul>
+<h3>Cowork</h3>
+<ul>
+<li><code>GET /api/cowork/spaces/</code></li>
+<li><code>GET /api/cowork/bookings/preview/</code></li>
+<li><code>POST /api/cowork/bookings/</code></li>
+<li><code>GET /api/cowork/my-bookings/</code></li>
+</ul>
+<h3>Staff مرکزی</h3>
+<ul>
+<li><code>GET /api/staff/analytics/overview/</code></li>
+<li><code>GET /api/staff/users/</code></li>
+<li><code>PATCH /api/staff/users/{id}/status/</code></li>
+<li><code>PATCH /api/staff/users/{id}/role/</code></li>
+</ul>
+<h3>Blog</h3>
+<ul>
+<li><code>GET /api/blog/posts/</code></li>
+<li><code>GET /api/blog/posts/{slug}/</code></li>
+<li><code>GET /api/blog/tags/</code></li>
+</ul>
+<h3>Freelancers</h3>
+<ul>
+<li>عمومی:
+<ul>
+<li><code>GET /api/freelancers/</code></li>
+<li><code>GET /api/freelancers/{slug}/</code></li>
+<li><code>GET /api/freelancers/specialties/</code></li>
+<li><code>GET /api/freelancers/flairs/</code></li>
+</ul>
+</li>
+<li>مالک پروفایل:
+<ul>
+<li><code>GET/PATCH /api/auth/freelancer-profile/</code></li>
+<li><code>POST /api/auth/freelancer-profile/submit/</code></li>
+<li><code>GET /api/auth/freelancer-specialties/</code></li>
+<li><code>GET /api/auth/freelancer-flairs/</code></li>
+<li><code>POST /api/auth/freelancer-services/</code></li>
+<li><code>PATCH/DELETE /api/auth/freelancer-services/{id}/</code></li>
+</ul>
+</li>
+</ul>
+<h3>SEO زیرساختی</h3>
+<ul>
+<li><code>GET /sitemap.xml</code></li>
+<li><code>GET /robots.txt</code></li>
+</ul>
+<hr />
+<h2>6) مدل داده و دامنه کسب‌وکار</h2>
+<h3>Accounts</h3>
+<ul>
+<li><code>CustomUser</code> با ورود بر پایه شماره موبایل</li>
+<li>نقش‌ها: <code>Admin</code>, <code>Barista</code>, <code>Customer</code></li>
+<li>اعتبارسنجی کد ملی ایران</li>
+</ul>
+<h3>دامنه فریلنسر</h3>
+<ul>
+<li><code>FreelancerProfile</code> (draft, pending_approval, published, rejected)</li>
+<li><code>FreelancerSpecialtyTag</code></li>
+<li><code>FreelancerFlair</code></li>
+<li><code>FreelancerServiceOffering</code></li>
+<li>قوانین:
+<ul>
+<li>slug عمومی با regex</li>
+<li>تخصص‌های سفارشی حداکثر 10 مورد</li>
+<li>dedupe و validation نوع کار</li>
+<li>سقف سرویس‌ها: 20 مورد</li>
+</ul>
+</li>
+</ul>
+<h3>Cafe</h3>
+<ul>
+<li><code>MenuCategory</code>, <code>MenuItem</code></li>
+<li><code>CafeOrder</code>, <code>OrderItem</code></li>
+<li>وضعیت سفارش: <code>PENDING</code>, <code>PREPARING</code>, <code>READY</code>, <code>DELIVERED</code>, <code>CANCELLED</code></li>
+</ul>
+<h3>Cowork</h3>
+<ul>
+<li><code>PricingPlan</code>, <code>Space</code>, <code>Booking</code></li>
+<li>zoneها:
+<ul>
+<li>سیت روزانه</li>
+<li>میز شخصی (تکی)</li>
+<li>میز اشتراکی (۴ نفره)</li>
+<li>اتاق VIP (۲ نفره)</li>
+<li>اتاق VIP (۳ نفره)</li>
+<li>اتاق جلسه</li>
+</ul>
+</li>
+<li>رزروها در ابتدا <code>PENDING</code> و نیازمند تایید ادمین</li>
+</ul>
+<h3>Blog</h3>
+<ul>
+<li><code>BlogPost</code>, <code>BlogTag</code></li>
+<li>محتوا با <code>content_blocks</code> نوع‌دار</li>
+<li>فیلدهای SEO/GEO</li>
+</ul>
+<hr />
+<h2>7) قابلیت‌های پیاده‌سازی‌شده (Product Features)</h2>
+<h3>احراز هویت و پروفایل</h3>
+<ul>
+<li>ثبت‌نام و ورود کاربر</li>
+<li>مدیریت session در React (<code>AuthContext</code>)</li>
+<li>محافظت مسیرهای کاربری و کارکنان (<code>AuthGuard</code>, <code>StaffGuard</code>)</li>
+<li>ویرایش پروفایل پایه</li>
+<li>مدیریت پروفایل فریلنسر (ویرایش، سرویس‌ها، ارسال برای تایید)</li>
+</ul>
+<h3>کافه (سمت کاربر)</h3>
+<ul>
+<li>منوی دسته‌بندی‌شده</li>
+<li>نوار چسبان دسته‌بندی‌ها با اسکرول افقی</li>
+<li>سبد خرید + افزودن/کاهش تعداد آیتم</li>
+<li>Checkout</li>
+<li>تاریخچه سفارش‌ها + سفارش مجدد</li>
+</ul>
+<h3>کافه (سمت کارکنان)</h3>
+<ul>
+<li>داشبورد سفارش‌های فعال</li>
+<li>تغییر وضعیت سفارش و تغییر وضعیت پرداخت</li>
+<li>مدیریت منو (افزودن آیتم، تغییر availability)</li>
+<li>جستجوی مشتری</li>
+<li>ثبت سفارش دستی:
+<ul>
+<li>جستجو مشتری با نام یا شماره (autocomplete)</li>
+<li>انتخاب آیتم از منو (به‌جای ID)</li>
+<li>کنترل تعداد آیتم‌ها</li>
+<li>انتخاب نوع مشتری از dropdown</li>
+<li>پیشنهاد آیتم‌ها بر اساس محبوبیت فروش (Sales rate ranking)</li>
+</ul>
+</li>
+</ul>
+<h3>کوورک</h3>
+<ul>
+<li>نمایش زون‌ها و فضاها با کارت‌های collapsible</li>
+<li>برای میز اشتراکی: انتخاب صندلی داخلی</li>
+<li>رزرو با پیش‌نمایش قیمت</li>
+<li>تاریخ جلالی و نمایش بازه رزرو</li>
+<li>پیام رزرو «نیازمند تایید نهایی/تماس»</li>
+<li>صفحه رزروهای من</li>
+</ul>
+<h3>بلاگ</h3>
+<ul>
+<li>لیست پست‌ها + فیلتر و جستجو</li>
+<li>نمایش جزئیات پست با بلاک‌های محتوا</li>
+<li>نمایش مطالب مرتبط</li>
+</ul>
+<h3>فریلنسرها</h3>
+<ul>
+<li>لیست عمومی فریلنسرها با فیلتر</li>
+<li>صفحه عمومی هر فریلنسر (خدمات، تگ‌ها، flair)</li>
+</ul>
+<h3>مدیریت کاربران Staff/Admin</h3>
+<ul>
+<li>لیست کاربران با paging/filter</li>
+<li>تغییر نقش کاربر</li>
+<li>تغییر وضعیت فعال/غیرفعال</li>
+</ul>
+<hr />
+<h2>8) UI/UX و دیزاین سیستم</h2>
+<ul>
+<li>RTL کامل و فارسی</li>
+<li>پس‌زمینه سراسری جدید با <code>Silk</code> (تم تیره و eye-friendly)</li>
+<li>سایدبار دسکتاپ + <code>PillNav</code> برای موبایل</li>
+<li>کارت‌های شیشه‌ای + Glare hover برای کارت‌های منو/کوورک</li>
+<li>بازطراحی منوی کافه:
+<ul>
+<li>دسته‌بندی‌های افقی</li>
+<li>حالت active دسته</li>
+<li>اسکرول چپ/راست</li>
+</ul>
+</li>
+<li>placeholder تصویر برای آیتم‌های منو</li>
+<li>فرم ثبت‌نام چندمرحله‌ای با <code>Stepper</code></li>
+<li>پولیش dropdown و scrollbar فرم سفارش دستی</li>
+</ul>
+<hr />
+<h2>9) SEO/GEO</h2>
+<ul>
+<li><code>SeoHead</code> برای مدیریت:
+<ul>
+<li>title</li>
+<li>description</li>
+<li>canonical</li>
+<li>Open Graph</li>
+<li>JSON-LD</li>
+</ul>
+</li>
+<li>JSON-LD مقاله در صفحه بلاگ (<code>Article</code>)</li>
+<li>JSON-LD فرد در صفحه فریلنسر (<code>Person</code>)</li>
+<li><code>sitemap.xml</code> پویا (خانه، بلاگ، فریلنسرهای منتشرشده)</li>
+<li><code>robots.txt</code></li>
+</ul>
+<hr />
+<h2>10) امنیت و تنظیمات کلیدی</h2>
+<ul>
+<li>Session + CSRF محفوظ</li>
+<li><code>credentials: include</code> در فراخوانی‌های API</li>
+<li><code>CSRF_TRUSTED_ORIGINS</code> برای dev:
+<ul>
+<li><code>http://localhost:5173</code></li>
+<li><code>http://127.0.0.1:5173</code></li>
+</ul>
+</li>
+<li>CSP قابل تنظیم با <code>DJANGO_CSP</code></li>
+<li>هدر ردیابی درخواست: <code>X-Request-ID</code></li>
+</ul>
+<hr />
+<h2>11) Seed و دستورات عملیاتی</h2>
+<h3>Python</h3>
+<ul>
+<li><code>uv sync</code></li>
+<li><code>uv run python manage.py migrate</code></li>
+<li><code>uv run python manage.py runserver</code></li>
+</ul>
+<h3>Frontend</h3>
+<ul>
+<li><code>cd frontend &amp;&amp; npm install</code></li>
+<li><code>cd frontend &amp;&amp; npm run dev</code></li>
+<li><code>cd frontend &amp;&amp; npm run build</code></li>
+</ul>
+<h3>Seed/Init</h3>
+<ul>
+<li><code>uv run python manage.py init_roles</code></li>
+<li><code>uv run python manage.py import_menu --file &quot;36 menu.csv&quot;</code></li>
+<li><code>uv run python manage.py seed_spaces</code></li>
+<li><code>uv run python manage.py seed_freelancer_taxonomy</code></li>
+</ul>
+<hr />
+<h2>12) تست و کنترل کیفیت</h2>
+<h3>Backend</h3>
+<ul>
+<li><code>uv run pytest</code></li>
+<li>پوشش تست در:
+<ul>
+<li>accounts (API/RBAC/Normalization/Freelancer/Staff)</li>
+<li>cafe (SPA API)</li>
+<li>cowork (Logic/Forms/SPA API)</li>
+<li>blog</li>
+</ul>
+</li>
+</ul>
+<h3>Frontend</h3>
+<ul>
+<li><code>cd frontend &amp;&amp; npm run test</code></li>
+<li>تست‌های مسیر و رفتار فرم/API</li>
+</ul>
+<h3>Build gate</h3>
+<ul>
+<li><code>cd frontend &amp;&amp; npm run build</code></li>
+</ul>
+<hr />
+<h2>13) خروجی‌ها و اسناد مرجع</h2>
+<ul>
+<li><code>README.md</code></li>
+<li><code>docs/cutover-checklist.md</code></li>
+<li><code>deploy/nginx/react-django-cutover.conf</code></li>
+<li><code>config/settings.py</code></li>
+<li><code>config/urls.py</code></li>
+<li><code>config/seo_views.py</code></li>
+<li><code>frontend/src/App.tsx</code></li>
+<li><code>frontend/src/layouts/AppShell.tsx</code></li>
+</ul>
+<hr />
+<h2>14) ضمیمه تصویری (Screenshots)</h2>
+<blockquote>
+<p>منبع تصاویر: محیط اجرای فعلی روی <code>http://localhost:5173/</code><br />
+مسیر ذخیره: <code>output/playwright/</code></p>
+</blockquote>
+<h3>نمای دسکتاپ</h3>
+<h4>خانه</h4>
+<p><img src="../output/playwright/home-desktop.png" alt="Home Desktop" />
+<a href="../output/playwright/home-desktop.png">نمایش با اندازه کامل</a></p>
+<h4>منوی کافه</h4>
+<p><img src="../output/playwright/cafe-menu-desktop.png" alt="Cafe Menu Desktop" />
+<a href="../output/playwright/cafe-menu-desktop.png">نمایش با اندازه کامل</a></p>
+<h4>فضای کاری</h4>
+<p><img src="../output/playwright/cowork-desktop.png" alt="Cowork Desktop" />
+<a href="../output/playwright/cowork-desktop.png">نمایش با اندازه کامل</a></p>
+<h4>سفارش دستی (پنل کافه)</h4>
+<p><img src="../output/playwright/manual-order-desktop.png" alt="Manual Order Desktop" />
+<a href="../output/playwright/manual-order-desktop.png">نمایش با اندازه کامل</a></p>
+<h4>داشبورد سفارش‌ها (Staff)</h4>
+<p><img src="../output/playwright/staff-dashboard-desktop.png" alt="Staff Dashboard Desktop" />
+<a href="../output/playwright/staff-dashboard-desktop.png">نمایش با اندازه کامل</a></p>
+<h4>ثبت‌نام</h4>
+<p><img src="../output/playwright/register-desktop.png" alt="Register Desktop" />
+<a href="../output/playwright/register-desktop.png">نمایش با اندازه کامل</a></p>
+<h3>نمای موبایل (Viewport شبیه‌سازی‌شده: <code>390x844</code>)</h3>
+<h4>خانه</h4>
+<p><img src="../output/playwright/home-mobile.png" alt="Home Mobile" />
+<a href="../output/playwright/home-mobile.png">نمایش با اندازه کامل</a></p>
+<h4>منوی کافه</h4>
+<p><img src="../output/playwright/cafe-menu-mobile.png" alt="Cafe Menu Mobile" />
+<a href="../output/playwright/cafe-menu-mobile.png">نمایش با اندازه کامل</a></p>
+<h4>فضای کاری</h4>
+<p><img src="../output/playwright/cowork-mobile.png" alt="Cowork Mobile" />
+<a href="../output/playwright/cowork-mobile.png">نمایش با اندازه کامل</a></p>
+<h4>سفارش دستی (پنل کافه)</h4>
+<p><img src="../output/playwright/manual-order-mobile.png" alt="Manual Order Mobile" />
+<a href="../output/playwright/manual-order-mobile.png">نمایش با اندازه کامل</a></p>
+<h4>ثبت‌نام</h4>
+<p><img src="../output/playwright/register-mobile.png" alt="Register Mobile" />
+<a href="../output/playwright/register-mobile.png">نمایش با اندازه کامل</a></p>
+<hr />
+<h2>15) فرض‌ها و پیش‌فرض‌های فعلی</h2>
+<ul>
+<li>نسخه فعلی محصول فارسی‌محور است.</li>
+<li>SEO فعلی از نوع SPA Meta/JSON-LD + Sitemap/Robots است (بدون SSR).</li>
+<li>فرآیند تایید نهایی رزرو کوورک توسط ادمین انجام می‌شود.</li>
+<li>انتشار بلاگ در نسخه فعلی از طریق Django Admin انجام می‌شود.</li>
+<li>پروکسی هم‌مبدأ برای Production الزامی در نظر گرفته شده است.</li>
+</ul>
+
+</body>
+</html>
