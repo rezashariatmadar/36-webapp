@@ -1,4 +1,4 @@
-import { Suspense, lazy, type ElementType } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useState, type ElementType } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
@@ -50,9 +50,22 @@ const normalizePath = (value: string) => (value.length > 1 && value.endsWith('/'
 export function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation()
   const { session, isStaff, logout } = useAuth()
-  const nav = isStaff ? [...baseNav, ...staffNav] : baseNav
+  const nav = useMemo(() => (isStaff ? [...baseNav, ...staffNav] : baseNav), [isStaff])
+  const navItems = useMemo(() => nav.map((item) => ({ label: item.label, href: item.to })), [nav])
   const authRoute = location.pathname === '/login/' || location.pathname === '/register/'
-  const showSilkBackground = !authRoute && location.pathname === '/'
+  const showSilkBackground = true
+  const [showMobileNav, setShowMobileNav] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth <= 1080 : false,
+  )
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mediaQuery = window.matchMedia('(max-width: 1080px)')
+    const applyState = () => setShowMobileNav(mediaQuery.matches)
+    applyState()
+    mediaQuery.addEventListener('change', applyState)
+    return () => mediaQuery.removeEventListener('change', applyState)
+  }, [])
 
   return (
     <div className={`app-root ${authRoute ? 'app-root-auth' : ''}`}>
@@ -64,20 +77,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       ) : null}
 
-      {!authRoute ? (
+      {!authRoute && showMobileNav ? (
         <div className="mobile-nav shell-enter">
           <Suspense fallback={null}>
             <PillNav
               logo="/img/36cowork/36-coworking-space.webp"
               logoAlt="36 cowork"
-              items={nav.map((item) => ({ label: item.label, href: item.to }))}
+              items={navItems}
               activeHref={location.pathname}
             />
           </Suspense>
         </div>
       ) : null}
 
-      {!authRoute ? (
+      {!authRoute && !showMobileNav ? (
         <aside className="sidebar shell-enter">
           <div className="brand">
             <img src="/img/36cowork/36-coworking-space.webp" alt="36 cowork" />
