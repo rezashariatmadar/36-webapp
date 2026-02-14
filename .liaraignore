@@ -1,5 +1,4 @@
 # Backend deploy exclusions (root liara.json -> Django app)
-frontend/
 output/
 docs/
 conductor/
