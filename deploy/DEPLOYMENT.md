@@ -1,87 +1,47 @@
-# Deployment Guide (Alpha)
+# Deployment Guide (Liara)
 
-For managed hosting split across Vercel (frontend) + Render (backend), use:
-- `deploy/VERCEL_RENDER_ALPHA.md`
+This repository is configured for a two-app Liara deployment:
+- Django app (root): serves backend routes (`/api/*`, `/admin/*`, `/media/*`, `/static/*`, `/sitemap.xml`, `/robots.txt`)
+- React app (`frontend/`): serves SPA routes and proxies backend paths to Django
 
-This repo is deployed as:
-- Django backend for `/api/*`, `/admin/*`, `/media/*`, `/static/*`, `/sitemap.xml`, `/robots.txt`
-- React SPA bundle for all other routes
+Official references:
+- https://docs.liara.ir/paas/django/quick-start/
+- https://docs.liara.ir/paas/django/how-tos/create-app/
 
-Nginx reference config:
-- `deploy/nginx/react-django-cutover.conf`
-
-## 1) Server prerequisites
-- Linux host with `nginx`
-- Python 3.12+
-- `uv`
-- Node.js 20+ and npm
-
-## 2) Pull code and configure env
-1. Clone/pull this repo on server.
-2. Create a production env file from `.env.example`.
-3. Export env vars before starting Django (or load via systemd environment file).
-
-Minimum required values:
-- `DJANGO_SECRET_KEY`
+## 1) Deploy Django app (root)
+1. In Liara dashboard, create a Django app.
+2. Use `liara.json` in repo root and set its `app` to your Liara Django app name.
+3. Configure env vars from `.env.example`:
+- `SECRET_KEY` (Liara default)
+- `DJANGO_SECRET_KEY` (fallback compatibility key)
 - `DJANGO_DEBUG=False`
-- `DJANGO_ALLOWED_HOSTS`
-- `DJANGO_CSRF_TRUSTED_ORIGINS`
+- `DJANGO_ALLOWED_HOSTS=<frontend-domain>,<backend-domain>`
+- `DJANGO_CSRF_TRUSTED_ORIGINS=https://<frontend-domain>,https://<backend-domain>`
+- `DATABASE_URL` (recommended) or `POSTGRESQL_DB_*`
+4. Deploy from the repository root.
+5. `liara_pre_start.sh` runs automatically and applies:
+- `python manage.py migrate --noinput`
+- `python manage.py collectstatic --noinput`
 
-Example:
+Optional first-time seed commands:
 ```bash
-export DJANGO_SECRET_KEY='replace-me-with-random-secret'
-export DJANGO_DEBUG=False
-export DJANGO_ALLOWED_HOSTS='example.com,www.example.com'
-export DJANGO_CSRF_TRUSTED_ORIGINS='https://example.com,https://www.example.com'
+python manage.py init_roles
+python manage.py import_menu --file "36 menu.csv"
+python manage.py seed_spaces
+python manage.py seed_freelancer_taxonomy
 ```
 
-## 3) Build backend
-```bash
-uv sync
-uv run python manage.py migrate
-uv run python manage.py collectstatic --noinput
-```
+## 2) Deploy React app (`frontend/`)
+1. In Liara dashboard, create a Node app for the frontend.
+2. In `frontend/liara.json`, set `app` to your frontend app name.
+3. Ensure `frontend/liara_nginx.conf` points to your deployed Django domain (`your-django-app.liara.run` placeholder must be replaced).
+4. Deploy from `frontend/` directory.
 
-Optional initial data seed (new environments):
-```bash
-uv run python manage.py init_roles
-uv run python manage.py import_menu --file "36 menu.csv"
-uv run python manage.py seed_spaces
-uv run python manage.py seed_freelancer_taxonomy
-```
+Notes:
+- Frontend build output is `frontend/build` (configured in `frontend/vite.config.ts`).
+- `frontend/liara_nginx.conf` keeps same-origin browser behavior by proxying backend paths through the frontend domain.
 
-## 4) Build frontend
-```bash
-cd frontend
-npm ci
-npm run build
-```
-
-Expected output:
-- `frontend/dist`
-
-## 5) Configure application process
-Run Django behind a process manager on `127.0.0.1:8000`.
-
-Example (replace with your preferred process manager):
-```bash
-uv run python manage.py runserver 127.0.0.1:8000
-```
-
-For production reliability, use a supervised process (systemd/supervisor/container entrypoint).
-
-## 6) Configure Nginx
-1. Copy `deploy/nginx/react-django-cutover.conf` to your nginx site config.
-2. Verify paths:
-   - `root /var/www/36-webapp/frontend/dist;`
-   - `upstream django_backend` points to your Django process (`127.0.0.1:8000`)
-3. Validate and reload:
-```bash
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-## 7) Post-deploy verification
+## 3) Post-deploy verification
 Run smoke checks:
 - `/`
 - `/login/`
@@ -99,12 +59,7 @@ API checks:
 - `/api/cafe/menu/`
 - `/api/cowork/spaces/`
 
-## 8) Rollback
-1. Switch nginx root/proxy back to previous release.
-2. Restart/reload services.
-3. Re-run smoke checks.
-
-## 9) Release gates (must pass before deploy)
+## 4) Release gates (must pass before deploy)
 ```bash
 ./deploy/predeploy-check.sh
 ```
@@ -113,7 +68,3 @@ PowerShell:
 ```powershell
 powershell -ExecutionPolicy Bypass -File deploy/predeploy-check.ps1
 ```
-
-Notes:
-- Scripts run backend tests in test-safe mode (`DJANGO_DEBUG=True`) to avoid HTTPS redirect side effects in Django test client.
-- Scripts run deploy security validation with `DJANGO_DEBUG=False` and fail on any deploy warning.

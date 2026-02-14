@@ -23,12 +23,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-ce@kjvv%1)_-4z7y^@wgsb*20$@vui1ubb(h)pq!yjq@5x&iai')
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    os.getenv('DJANGO_SECRET_KEY', 'django-insecure-ce@kjvv%1)_-4z7y^@wgsb*20$@vui1ubb(h)pq!yjq@5x&iai'),
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = [h for h in os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',') if h] or ['*']
+_env_allowed_hosts = [h.strip() for h in os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',') if h.strip()]
+_dev_allowed_hosts = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = _env_allowed_hosts or (_dev_allowed_hosts if DEBUG else [])
 
 _env_csrf_trusted_origins = [o.strip() for o in os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
 _dev_csrf_trusted_origins = [
@@ -94,11 +99,32 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 _database_url = os.getenv('DATABASE_URL')
+_postgres_host = os.getenv('POSTGRESQL_DB_HOST')
+_postgres_name = os.getenv('POSTGRESQL_DB_NAME')
+_postgres_user = os.getenv('POSTGRESQL_DB_USER') or os.getenv('POSTGRESQL_DB_USERNAME')
+_postgres_password = os.getenv('POSTGRESQL_DB_PASS') or os.getenv('POSTGRESQL_DB_PASSWORD')
+_postgres_port = os.getenv('POSTGRESQL_DB_PORT', '5432')
+
 if _database_url:
     DATABASES = {
         'default': dj_database_url.parse(_database_url, conn_max_age=600),
     }
     DATABASES['default']['CONN_HEALTH_CHECKS'] = True
+    if os.getenv('DJANGO_DB_SSL_REQUIRE', 'False').lower() == 'true':
+        DATABASES['default'].setdefault('OPTIONS', {})['sslmode'] = 'require'
+elif all([_postgres_host, _postgres_name, _postgres_user, _postgres_password]):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': _postgres_name,
+            'USER': _postgres_user,
+            'PASSWORD': _postgres_password,
+            'HOST': _postgres_host,
+            'PORT': _postgres_port,
+            'CONN_MAX_AGE': 600,
+            'CONN_HEALTH_CHECKS': True,
+        }
+    }
     if os.getenv('DJANGO_DB_SSL_REQUIRE', 'False').lower() == 'true':
         DATABASES['default'].setdefault('OPTIONS', {})['sslmode'] = 'require'
 else:

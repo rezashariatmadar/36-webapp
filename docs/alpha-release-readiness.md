@@ -23,7 +23,7 @@
 ## Frontend build
 - دستور: `cd frontend && npm run build`
 - نتیجه: **PASS**
-- جزئیات: build موفق، خروجی `frontend/dist`
+- جزئیات: build موفق، خروجی `frontend/build`
 - ریسک باز: main chunk بزرگ (`~1.36MB`) و هشدار chunk size
 
 ---

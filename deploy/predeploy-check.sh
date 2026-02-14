@@ -4,12 +4,13 @@ set -euo pipefail
 echo "[1/5] Backend tests"
 DJANGO_DEBUG=True uv run pytest
 
-if [[ -z "${DJANGO_SECRET_KEY:-}" ]]; then
-  echo "ERROR: DJANGO_SECRET_KEY is not set."
+SECRET_VALUE="${SECRET_KEY:-${DJANGO_SECRET_KEY:-}}"
+if [[ -z "${SECRET_VALUE}" ]]; then
+  echo "ERROR: SECRET_KEY (or DJANGO_SECRET_KEY) is not set."
   exit 1
 fi
-if [[ "${DJANGO_SECRET_KEY}" == django-insecure-* ]]; then
-  echo "ERROR: DJANGO_SECRET_KEY uses insecure default prefix."
+if [[ "${SECRET_VALUE}" == django-insecure-* ]]; then
+  echo "ERROR: SECRET_KEY uses insecure default prefix."
   exit 1
 fi
 if [[ -z "${DJANGO_ALLOWED_HOSTS:-}" ]]; then

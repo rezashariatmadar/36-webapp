@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/liaraco/liara-cli/master/packages/schema/liara.schema.json",
+  "app": "your-frontend-app",
+  "platform": "node",
+  "port": 80,
+  "build": {
+    "location": "/",
+    "command": "npm run build",
+    "output": "build"
+  }
+}

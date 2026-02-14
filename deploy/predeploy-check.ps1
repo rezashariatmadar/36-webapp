@@ -21,11 +21,12 @@ if ($null -eq $previousDebug) {
   $env:DJANGO_DEBUG = $previousDebug
 }
 
-if (-not $env:DJANGO_SECRET_KEY) {
-  throw "DJANGO_SECRET_KEY is not set."
+$secretValue = if ($env:SECRET_KEY) { $env:SECRET_KEY } else { $env:DJANGO_SECRET_KEY }
+if (-not $secretValue) {
+  throw "SECRET_KEY (or DJANGO_SECRET_KEY) is not set."
 }
-if ($env:DJANGO_SECRET_KEY.StartsWith("django-insecure-")) {
-  throw "DJANGO_SECRET_KEY uses insecure default prefix."
+if ($secretValue.StartsWith("django-insecure-")) {
+  throw "SECRET_KEY uses insecure default prefix."
 }
 if (-not $env:DJANGO_ALLOWED_HOSTS) {
   throw "DJANGO_ALLOWED_HOSTS is not set."
