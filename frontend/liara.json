@@ -3,8 +3,11 @@
   "app": "36cowork",
   "platform": "node",
   "port": 80,
+  "node": {
+    "version": "22"
+  },
   "build": {
-    "location": "iran",
+    "location": "germany",
     "command": "npm run build",
     "output": "build"
   }
