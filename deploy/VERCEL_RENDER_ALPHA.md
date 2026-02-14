@@ -13,8 +13,8 @@ This runbook deploys:
 4. Deploy.
 
 Notes:
-- `DJANGO_SQLITE_PATH=/var/data/db.sqlite3` is set for alpha persistence.
-- `startCommand` uses Django `runserver` for alpha speed, not long-term production.
+- Prefer setting `DATABASE_URL` to managed Postgres for production reliability.
+- `DJANGO_SQLITE_PATH=/var/data/db.sqlite3` remains as fallback for alpha-only setups.
 
 ## 2) Seed initial data on Render
 Run these from Render Shell (once on first environment):
@@ -41,6 +41,7 @@ uv run python manage.py seed_freelancer_taxonomy
 Backend env vars must include exact deployed domains:
 - `DJANGO_ALLOWED_HOSTS=<render-host>,<vercel-host>`
 - `DJANGO_CSRF_TRUSTED_ORIGINS=https://<render-host>,https://<vercel-host>`
+- `DATABASE_URL=<postgres-connection-url>` (recommended)
 
 If Vercel creates a new preview domain, add it before testing auth forms.
 
@@ -61,4 +62,3 @@ After both deploys:
 
 ## 6) Known alpha constraints
 - SQLite on a mounted disk is acceptable for alpha, but migrate to managed Postgres before beta.
-- `runserver` is acceptable for alpha, but migrate to `gunicorn` (or equivalent) before beta.

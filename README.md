@@ -55,6 +55,8 @@ These are optional; defaults are defined in `config/settings.py`.
 - `DJANGO_DEBUG` (default: `True`)
 - `DJANGO_ALLOWED_HOSTS` (comma-separated)
 - `DJANGO_CSRF_TRUSTED_ORIGINS` (comma-separated)
+- `DATABASE_URL` (recommended for production; Postgres connection URL)
+- `DJANGO_DB_SSL_REQUIRE` (set `True` if your database requires TLS)
 - `DJANGO_SQLITE_PATH` (defaults to `db.sqlite3`)
 - `DJANGO_LOG_LEVEL` (default: `INFO`)
 - `DJANGO_CSP` (Content Security Policy string)

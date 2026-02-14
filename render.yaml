@@ -9,7 +9,7 @@ services:
       uv sync --frozen
       uv run python manage.py migrate
       uv run python manage.py collectstatic --noinput
-    startCommand: uv run python manage.py runserver 0.0.0.0:$PORT
+    startCommand: uv run gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
     envVars:
       - key: DJANGO_DEBUG
         value: "False"
@@ -19,6 +19,8 @@ services:
         value: "<your-render-service>.onrender.com,<your-vercel-domain>.vercel.app"
       - key: DJANGO_CSRF_TRUSTED_ORIGINS
         value: "https://<your-render-service>.onrender.com,https://<your-vercel-domain>.vercel.app"
+      - key: DATABASE_URL
+        value: "<your-postgres-url>"
       - key: DJANGO_SQLITE_PATH
         value: "/var/data/db.sqlite3"
     disks:
