@@ -128,10 +128,11 @@ elif all([_postgres_host, _postgres_name, _postgres_user, _postgres_password]):
     if os.getenv('DJANGO_DB_SSL_REQUIRE', 'False').lower() == 'true':
         DATABASES['default'].setdefault('OPTIONS', {})['sslmode'] = 'require'
 else:
+    _default_sqlite_path = '/tmp/db.sqlite3' if not DEBUG else str(BASE_DIR / 'db.sqlite3')
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.getenv('DJANGO_SQLITE_PATH', str(BASE_DIR / 'db.sqlite3')),
+            'NAME': os.getenv('DJANGO_SQLITE_PATH', _default_sqlite_path),
         }
     }
 
