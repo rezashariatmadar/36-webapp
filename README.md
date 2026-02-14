@@ -55,6 +55,7 @@ These are optional; defaults are defined in `config/settings.py`.
 - `DJANGO_DEBUG` (default: `True`)
 - `DJANGO_ALLOWED_HOSTS` (comma-separated)
 - `DJANGO_CSRF_TRUSTED_ORIGINS` (comma-separated)
+- `DJANGO_SQLITE_PATH` (defaults to `db.sqlite3`)
 - `DJANGO_LOG_LEVEL` (default: `INFO`)
 - `DJANGO_CSP` (Content Security Policy string)
 
@@ -115,6 +116,7 @@ Cutover runbook:
 
 Deployment runbook:
 - `deploy/DEPLOYMENT.md`
+- `deploy/VERCEL_RENDER_ALPHA.md` (Vercel frontend + Render backend)
 
 Pre-deploy validation scripts:
 - Linux/macOS: `deploy/predeploy-check.sh`

@@ -1,5 +1,8 @@
 # Deployment Guide (Alpha)
 
+For managed hosting split across Vercel (frontend) + Render (backend), use:
+- `deploy/VERCEL_RENDER_ALPHA.md`
+
 This repo is deployed as:
 - Django backend for `/api/*`, `/admin/*`, `/media/*`, `/static/*`, `/sitemap.xml`, `/robots.txt`
 - React SPA bundle for all other routes

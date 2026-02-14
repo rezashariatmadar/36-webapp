@@ -1,0 +1,35 @@
+{
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://<your-render-service>.onrender.com/api/$1"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "https://<your-render-service>.onrender.com/admin/$1"
+    },
+    {
+      "src": "/media/(.*)",
+      "dest": "https://<your-render-service>.onrender.com/media/$1"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "https://<your-render-service>.onrender.com/static/$1"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "https://<your-render-service>.onrender.com/robots.txt"
+    },
+    {
+      "src": "/sitemap.xml",
+      "dest": "https://<your-render-service>.onrender.com/sitemap.xml"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}

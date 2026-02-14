@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: webapp-alpha-api
+    env: python
+    plan: starter
+    autoDeploy: true
+    buildCommand: |
+      pip install uv
+      uv sync --frozen
+      uv run python manage.py migrate
+      uv run python manage.py collectstatic --noinput
+    startCommand: uv run python manage.py runserver 0.0.0.0:$PORT
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "<your-render-service>.onrender.com,<your-vercel-domain>.vercel.app"
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: "https://<your-render-service>.onrender.com,https://<your-vercel-domain>.vercel.app"
+      - key: DJANGO_SQLITE_PATH
+        value: "/var/data/db.sqlite3"
+    disks:
+      - name: webapp-alpha-data
+        mountPath: /var/data
+        sizeGB: 1
