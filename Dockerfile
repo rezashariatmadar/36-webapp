@@ -1,4 +1,7 @@
-FROM python:3.12-slim AS builder
+#syntax=docker/dockerfile:1
+
+#=== Build stage: Install dependencies and create virtual environment ===#
+FROM python:3.13-alpine3.21 AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -13,7 +16,8 @@ COPY requirements-prod.txt .
 RUN pip install --upgrade pip \
     && pip install -r requirements-prod.txt
 
-FROM python:3.12-slim AS runtime
+#=== Final stage: Create minimal runtime image ===#
+FROM python:3.13-alpine3.21
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -25,16 +29,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-RUN apt-get update \
-    && apt-get upgrade -y --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY --from=builder /opt/venv /opt/venv
-# Keep runtime image lean by removing package installer binaries.
-RUN rm -f /opt/venv/bin/pip /opt/venv/bin/pip3 /opt/venv/bin/pip3.* \
-    /usr/local/bin/pip /usr/local/bin/pip3 /usr/local/bin/pip3.* \
-    && rm -rf /usr/local/lib/python3.12/site-packages/pip \
-    /usr/local/lib/python3.12/site-packages/pip-*.dist-info
+COPY --from=builder --chown=root:root /opt/venv /opt/venv
 
 COPY . .
 
