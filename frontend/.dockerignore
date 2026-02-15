@@ -1,0 +1,19 @@
+# Dependency and build artifacts
+node_modules/
+build/
+dist/
+coverage/
+
+# Local env files
+.env
+.env.*
+.env.local
+
+# VCS and editor metadata
+.git
+.gitignore
+.DS_Store
+*.log
+src/**/*.test.*
+src/**/*.spec.*
+tests/

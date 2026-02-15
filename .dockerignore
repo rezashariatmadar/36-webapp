@@ -1,0 +1,47 @@
+# VCS
+.git
+.gitignore
+
+# Python artifacts
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+
+# Node artifacts
+node_modules/
+frontend/
+
+# Local runtime state
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+.pytest_cache/
+htmlcov/
+output/
+
+# Local env files (do not bake secrets into images)
+.env
+.env.*
+
+# Docs/tests and heavy local assets not needed in backend image
+docs/
+performance_tests/
+conductor/
+tests/
+**/tests/
+**/tests.py
+test_*.py
+*_test.py
+pytest.ini
+*.md
+*.example
+AGENTS.md
+*.png
+*.jpg
+*.jpeg

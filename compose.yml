@@ -1,0 +1,123 @@
+services:
+  db:
+    image: 36-webapp-postgres:latest
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+      args:
+        BASE_POSTGRES_IMAGE: ${POSTGRES_IMAGE:-postgres:16.12-alpine3.23}
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: 0.75
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-webapp36}
+      POSTGRES_USER: ${POSTGRES_USER:-webapp36}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-webapp36}
+    ports:
+      - "${POSTGRES_FORWARD_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-webapp36} -d ${POSTGRES_DB:-webapp36}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  webapp36-api:
+    image: 36-webapp-webapp36-api-dev:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    mem_limit: 768m
+    cpus: 1.50
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+      python manage.py runserver 0.0.0.0:${PORT:-8000}"
+    environment:
+      PORT: ${BACKEND_PORT:-8000}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,webapp36-api,webapp36-web}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-http://localhost:5173}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-webapp36}:${POSTGRES_PASSWORD:-webapp36}@db:5432/${POSTGRES_DB:-webapp36}
+    ports:
+      - "${BACKEND_FORWARD_PORT:-8000}:${BACKEND_PORT:-8000}"
+    volumes:
+      - django_media:/app/media
+      - django_static:/app/staticfiles
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import os, urllib.request; p=os.getenv('PORT','8000'); u=f'http://127.0.0.1:{p}/robots.txt'; r=urllib.request.Request(u, headers={'X-Forwarded-Proto':'https'}); urllib.request.urlopen(r, timeout=2)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    develop:
+      watch:
+        - action: sync
+          path: ./accounts
+          target: /app/accounts
+        - action: sync
+          path: ./blog
+          target: /app/blog
+        - action: sync
+          path: ./cafe
+          target: /app/cafe
+        - action: sync
+          path: ./config
+          target: /app/config
+        - action: sync
+          path: ./cowork
+          target: /app/cowork
+        - action: sync
+          path: ./manage.py
+          target: /app/manage.py
+        - action: rebuild
+          path: ./requirements.txt
+
+  webapp36-web:
+    image: 36-webapp-webapp36-web-dev:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    mem_limit: 768m
+    cpus: 1.50
+    depends_on:
+      webapp36-api:
+        condition: service_healthy
+    environment:
+      VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET:-http://webapp36-api:8000}
+    ports:
+      - "${FRONTEND_FORWARD_PORT:-5173}:5173"
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/src
+        - action: sync
+          path: ./frontend/public
+          target: /app/public
+        - action: sync
+          path: ./frontend/index.html
+          target: /app/index.html
+        - action: sync+restart
+          path: ./frontend/vite.config.ts
+          target: /app/vite.config.ts
+        - action: rebuild
+          path: ./frontend/package.json
+        - action: rebuild
+          path: ./frontend/package-lock.json
+
+volumes:
+  postgres_data:
+  django_media:
+  django_static:

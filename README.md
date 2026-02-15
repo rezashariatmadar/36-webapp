@@ -48,6 +48,76 @@ npm run dev
 npm run build
 ```
 
+**Docker Compose Development (hot reload)**
+1. Create a dev env file:
+
+```powershell
+Copy-Item .env.docker.example .env.docker
+```
+
+2. Build and start services:
+
+```powershell
+docker compose --env-file .env.docker up --build
+```
+
+3. Enable file sync watch (hot reload without rebuilding):
+
+```powershell
+docker compose --env-file .env.docker watch
+```
+
+Note: this development stack builds `*-dev` images (`Dockerfile.dev` for frontend).  
+Use production compose images for Docker Scout/security sign-off.
+
+4. Endpoints:
+- Frontend (Vite): `http://localhost:5173`
+- Backend: `http://localhost:8000`
+- Postgres: `localhost:5432`
+
+5. Stop services:
+
+```powershell
+docker compose down
+```
+
+6. Reset volumes (DB/media/static):
+
+```powershell
+docker compose down -v
+```
+
+**Docker Compose Production-style run**
+1. Create a prod env file:
+
+```powershell
+Copy-Item .env.docker.prod.example .env.docker.prod
+```
+
+2. Start with production compose file:
+
+```powershell
+docker compose -f compose.prod.yml --env-file .env.docker.prod up --build -d
+```
+
+For security refreshes (base image and OS package CVEs), force a fresh pull/rebuild:
+
+```powershell
+docker compose -f compose.prod.yml --env-file .env.docker.prod build --pull --no-cache
+```
+
+Scout target images after prod build:
+- `36-webapp-webapp36-api:latest`
+- `36-webapp-webapp36-web:latest`
+- `36-webapp-postgres:latest` (custom wrapper over `POSTGRES_IMAGE` that removes `gosu`)
+
+DB base can be switched via env for CVE comparison, for example:
+
+```powershell
+$env:POSTGRES_IMAGE="postgres:16.12-bookworm"
+docker compose -f compose.prod.yml --env-file .env.docker.prod up -d db
+```
+
 **Environment Variables**
 These are optional; defaults are defined in `config/settings.py`.
 

@@ -1,0 +1,8 @@
+dj-database-url==3.1.0
+django==5.2.11
+django-jalali==7.4.0
+djangorestframework==3.16.1
+gunicorn==25.1.0
+jdatetime==5.2.0
+pillow==12.1.1
+psycopg[binary]==3.3.2

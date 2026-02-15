@@ -26,7 +26,10 @@ liara deploy
 5. Backend Docker startup runs:
 - `python manage.py migrate --noinput`
 - `python manage.py collectstatic --noinput`
-- `gunicorn config.wsgi:application --bind 0.0.0.0:8000 ...`
+- `gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} ...`
+6. Liara requires `liara.json` `port` to match the listening port in the container.
+   - Backend `liara.json` uses `8000` (matches Docker runtime default).
+   - Frontend `frontend/liara.json` uses `80` (nginx listen port).
 
 Optional first-time seed commands:
 ```bash
@@ -76,6 +79,22 @@ PowerShell:
 ```powershell
 powershell -ExecutionPolicy Bypass -File deploy/predeploy-check.ps1
 ```
+
+## Local Docker Compose
+- Development stack: `compose.yml` (debug on, hot reload via `develop.watch`)
+- Production-like stack: `compose.prod.yml` (gunicorn/nginx, debug off)
+- Copy dev env template: `.env.docker.example` -> `.env.docker`
+- Start dev: `docker compose --env-file .env.docker up --build`
+- Start dev watch sync: `docker compose --env-file .env.docker watch`
+- Copy prod env template: `.env.docker.prod.example` -> `.env.docker.prod`
+- Start prod: `docker compose -f compose.prod.yml --env-file .env.docker.prod up --build -d`
+- Scout/sign-off images: `36-webapp-webapp36-api:latest`, `36-webapp-webapp36-web:latest`
+- DB image is `36-webapp-postgres:latest`, built from `POSTGRES_IMAGE` and patched to use `su-exec` instead of `gosu`.
+- Override DB base via `POSTGRES_IMAGE` when you need to compare scanner results across variants (for example `postgres:16.12-bookworm`).
+- Stop: `docker compose down`
+- Remove data volumes: `docker compose down -v`
+
+Compose is for local orchestration only. Liara deploy still uses each app's Dockerfile and `liara.json`.
 
 
 ## 5) Private network requirement
