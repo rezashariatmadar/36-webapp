@@ -63,7 +63,8 @@ These are optional; defaults are defined in `config/settings.py`.
 - `DJANGO_LOG_LEVEL` (default: `INFO`)
 - `DJANGO_CSP` (Content Security Policy string)
 
-Production env template:`n- `.env.example` (pre-filled for webapp36-web.liara.run and webapp36-api.liara.run)
+Production env template:
+- `.env.example` (pre-filled for `36cowork.liara.run` and `webapp36-api.liara.run`)
 
 **Tests**
 
@@ -120,6 +121,10 @@ Cutover runbook:
 
 Deployment runbook:
 - `deploy/DEPLOYMENT.md`
+
+Liara Docker deploy:
+- Backend: `liara deploy` (run at repo root)
+- Frontend: `cd frontend && liara deploy`
 
 Pre-deploy validation scripts:
 - Linux/macOS: `deploy/predeploy-check.sh`

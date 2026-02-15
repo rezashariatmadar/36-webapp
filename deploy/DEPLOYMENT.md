@@ -3,14 +3,15 @@
 This repository is configured for a two-app Liara deployment:
 - Django app (root): serves backend routes (`/api/*`, `/admin/*`, `/media/*`, `/static/*`, `/sitemap.xml`, `/robots.txt`)
 - React app (`frontend/`): serves SPA routes and proxies backend paths to Django
+- Both apps deploy via Docker (`platform: docker`)
 
 Official references:
 - https://docs.liara.ir/paas/django/quick-start/
 - https://docs.liara.ir/paas/django/how-tos/create-app/
 
 ## 1) Deploy Django app (root)
-1. In Liara dashboard, create a Django app.
-2. Use `liara.json` in repo root and set its `app` to your Liara Django app name.
+1. In Liara dashboard, create a Docker app for backend.
+2. `liara.json` is already set for backend app id `webapp36-api`.
 3. Configure env vars from `.env.example`:
 - `SECRET_KEY` (Liara default)
 - `DJANGO_SECRET_KEY` (fallback compatibility key)
@@ -18,10 +19,14 @@ Official references:
 - `DJANGO_ALLOWED_HOSTS=<frontend-domain>,<backend-domain>`
 - `DJANGO_CSRF_TRUSTED_ORIGINS=https://<frontend-domain>,https://<backend-domain>`
 - `DATABASE_URL` (recommended) or `POSTGRESQL_DB_*`
-4. Deploy from the repository root.
-5. `liara_pre_start.sh` runs automatically and applies:
+4. Deploy from the repository root with:
+```bash
+liara deploy
+```
+5. Backend Docker startup runs:
 - `python manage.py migrate --noinput`
 - `python manage.py collectstatic --noinput`
+- `gunicorn config.wsgi:application --bind 0.0.0.0:8000 ...`
 
 Optional first-time seed commands:
 ```bash
@@ -32,10 +37,13 @@ python manage.py seed_freelancer_taxonomy
 ```
 
 ## 2) Deploy React app (`frontend/`)
-1. In Liara dashboard, create a Node app for the frontend.
-2. In `frontend/liara.json`, set `app` to your frontend app name.
+1. In Liara dashboard, create a Docker app for frontend.
+2. `frontend/liara.json` is already set for frontend app id `36cowork`.
 3. `frontend/liara_nginx.conf` is configured for private network host `webapp36-api:8000`.
-4. Deploy from `frontend/` directory.
+4. Deploy from `frontend/` directory with:
+```bash
+liara deploy
+```
 
 Notes:
 - Frontend build output is `frontend/build` (configured in `frontend/vite.config.ts`).
@@ -71,6 +79,6 @@ powershell -ExecutionPolicy Bypass -File deploy/predeploy-check.ps1
 
 
 ## 5) Private network requirement
-- Put webapp36-api, webapp36-web, and PostgreSQL in the same private network.
+- Put webapp36-api, 36cowork, and PostgreSQL in the same private network.
 - Private network cannot be changed after app creation; recreate app if needed.
 

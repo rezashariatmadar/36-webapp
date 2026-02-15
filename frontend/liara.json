@@ -1,14 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/liaraco/liara-cli/master/packages/schema/liara.schema.json",
   "app": "36cowork",
-  "platform": "node",
-  "port": 80,
-  "node": {
-    "version": "22"
-  },
-  "build": {
-    "location": "germany",
-    "command": "npm run build",
-    "output": "build"
-  }
+  "platform": "docker",
+  "port": 80
 }
